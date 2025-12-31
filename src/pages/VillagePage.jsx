@@ -203,16 +203,7 @@ const VillagePage = () => {
                                                     </div>
                                                 </div>
 
-                                                <button
-                                                    className={`harvest-btn ${isHarvestDisabled ? 'disabled' : ''} `}
-                                                    onClick={handleHarvest}
-                                                    disabled={isHarvestDisabled}
-                                                >
-                                                    <Sprout size={20} />
-                                                    <span>
-                                                        {hasWeed ? t('village.harvestLimit') : (cost === 0 ? t('village.harvest') : `${t('village.harvest')} (${cost}💧)`)}
-                                                    </span>
-                                                </button>
+
                                             </div>
 
                                             <div className="field-section">
@@ -230,6 +221,21 @@ const VillagePage = () => {
                                                         ))}
                                                     </div>
                                                 )}
+                                            </div>
+
+                                            {/* Moved Harvest Button Here */}
+                                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+                                                <button
+                                                    className={`harvest-btn ${isHarvestDisabled ? 'disabled' : ''} `}
+                                                    onClick={handleHarvest}
+                                                    disabled={isHarvestDisabled}
+                                                    style={{ width: '100%', justifyContent: 'center' }}
+                                                >
+                                                    <Sprout size={20} />
+                                                    <span>
+                                                        {hasWeed ? t('village.harvestLimit') : (cost === 0 ? t('village.harvest') : `${t('village.harvest')} (${cost}💧)`)}
+                                                    </span>
+                                                </button>
                                             </div>
 
                                             <div className="inventory-section">

@@ -3,13 +3,14 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
-import { Globe, LogIn, LogOut } from 'lucide-react';
+import { Globe, LogIn, LogOut, Menu, X } from 'lucide-react';
 import './MainLayout.css';
 
 const MainLayout = () => {
     const { language, toggleLanguage, t } = useLanguage();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
     const handleAuthClick = () => {
         if (user) {
@@ -18,29 +19,47 @@ const MainLayout = () => {
         } else {
             navigate('/auth');
         }
+        setIsMenuOpen(false); // Close menu on action
+    };
+
+    const handleLanguageClick = () => {
+        toggleLanguage();
+        // setIsMenuOpen(false); // Optional: Keep open to toggle back? Or close. Let's keep open for easier switching.
     };
 
     return (
         <div className="app-container">
             <div className="header-controls">
+                {/* Mobile Hamburger Toggle - Visible only on mobile via CSS */}
                 <button
-                    className="control-btn"
-                    onClick={toggleLanguage}
-                    title="Switch Language"
+                    className="hamburger-btn control-btn"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Toggle Menu"
                 >
-                    <span style={{ fontSize: '1.2rem', marginRight: '4px' }}>
-                        {language === 'ja' ? '🇯🇵' : '🇺🇸'}
-                    </span>
-                    <span>Language</span>
+                    {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
-                <button
-                    className={`control-btn ${user ? 'logout' : 'login'}`}
-                    onClick={handleAuthClick}
-                    title={user ? t('auth.logout') : t('auth.login')}
-                >
-                    {user ? <LogOut size={18} /> : <LogIn size={18} />}
-                    <span>{user ? t('auth.logout') : t('auth.login')}</span>
-                </button>
+
+                {/* Menu Items - Conditionally displayed on mobile */}
+                <div className={`menu-items ${isMenuOpen ? 'open' : ''}`}>
+                    <button
+                        className="control-btn"
+                        onClick={handleLanguageClick}
+                        title="Switch Language"
+                    >
+                        <span style={{ fontSize: '1.2rem', marginRight: '4px' }}>
+                            {language === 'ja' ? '🇯🇵' : '🇺🇸'}
+                        </span>
+                        <span>Language</span>
+                    </button>
+                    <button
+                        className={`control-btn ${user ? 'logout' : 'login'}`}
+                        onClick={handleAuthClick}
+                        title={user ? t('auth.logout') : t('auth.login')}
+                    >
+                        {user ? <LogOut size={18} /> : <LogIn size={18} />}
+                        <span>{user ? t('auth.logout') : t('auth.login')}</span>
+                    </button>
+                </div>
             </div>
             <main className="content-area">
                 <Outlet />

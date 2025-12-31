@@ -31,6 +31,16 @@
     right: 16px;
     z-index: 2000;
     display: flex;
+    flex-direction: column;
+    /* For mobile alignment context */
+    align-items: flex-end;
+    /* Right align */
+    gap: 8px;
+}
+
+/* Default Desktop: Row layout for items */
+.menu-items {
+    display: flex;
     gap: 8px;
 }
 
@@ -49,6 +59,7 @@
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .control-btn:hover {
@@ -70,4 +81,64 @@
 
 .control-btn.logout {
     color: #e74c3c;
+}
+
+/* HAMBURGER MENU STYLES */
+.hamburger-btn {
+    display: none;
+    /* Hidden on desktop */
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+}
+
+/* Mobile Media Query */
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .menu-items {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 50px;
+        /* Below hamburger */
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        padding: 16px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        min-width: 180px;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .menu-items.open {
+        display: flex;
+        animation: slideIn 0.2s ease-out;
+    }
+
+    .menu-items .control-btn {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        /* Larger touch target */
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
