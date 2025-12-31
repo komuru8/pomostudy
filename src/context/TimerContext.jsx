@@ -13,7 +13,7 @@ const MODES = {
 };
 
 export const TimerProvider = ({ children }) => {
-    const { completeFocusSession } = useGame();
+    const { completeFocusSession, completeBreakSession } = useGame();
     const { tasks, activeTaskId, incrementPomodoroCount } = useTasks();
 
     const [mode, setMode] = useState('FOCUS');
@@ -63,12 +63,16 @@ export const TimerProvider = ({ children }) => {
             }
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 5000); // Hide after 5 sec
+        } else {
+            // Record break session
+            const minutesCompleted = Math.floor(MODES[mode].time / 60);
+            completeBreakSession(minutesCompleted, mode);
         }
 
         // Auto switch? Or wait for user?
         // Requirement says "Operation: Start, Pause, Reset, Complete". 
         // Usually timer stops at 0.
-    }, [mode, completeFocusSession, activeTaskId, incrementPomodoroCount, tasks]);
+    }, [mode, completeFocusSession, completeBreakSession, activeTaskId, incrementPomodoroCount, tasks]);
 
     useEffect(() => {
         if (isActive && timeLeft > 0) {

@@ -63,12 +63,38 @@
 }
 
 .pomodoro-count {
-    font-size: 0.8rem;
-    color: #64748b;
-    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+}
+
+.tomatoes-container {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.tomato-icon {
+    font-size: 0.9rem;
+    transition: filter 0.3s ease;
+}
+
+.tomato-icon.done-colored {
+    filter: none;
+    /* Full color */
+    opacity: 1;
+}
+
+.tomato-icon.pending-gray {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-left: 2px;
 }
 
 .check-btn {

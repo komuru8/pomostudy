@@ -13,9 +13,15 @@ export const TaskProvider = ({ children }) => {
     // Load tasks when user changes
     useEffect(() => {
         if (user) {
-            const savedTasks = localStorage.getItem(`pomodoro_tasks_${user.id}`);
+            try {
+                const savedTasks = localStorage.getItem(`pomodoro_tasks_${user.id}`);
+                const parsed = savedTasks ? JSON.parse(savedTasks) : [];
+                setTasks(Array.isArray(parsed) ? parsed : []);
+            } catch (e) {
+                console.error("Failed to load tasks", e);
+                setTasks([]);
+            }
             const savedActive = localStorage.getItem(`pomodoro_active_task_${user.id}`);
-            setTasks(savedTasks ? JSON.parse(savedTasks) : []);
             setActiveTaskId(savedActive || null);
         } else {
             setTasks([]);

@@ -1,10 +1,85 @@
+/* ... (Same as Step 2109) ... */
 .village-page {
     padding: 24px;
     max-width: 600px;
     margin: 0 auto;
     text-align: center;
+    position: relative;
+    /* Ensure arrows are relative to this */
 }
 
+/* Navigation Arrows */
+.nav-arrow {
+    position: absolute;
+    top: 250px;
+    /* Vertically aligned with visual roughly */
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: var(--primary-dark);
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s;
+}
+
+.nav-arrow:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.nav-arrow.left {
+    left: 10px;
+}
+
+.nav-arrow.right {
+    right: 10px;
+}
+
+/* Carousel Structure */
+.carousel-window {
+    overflow: hidden;
+    width: 100%;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    /* "Nuru-nuru" easing */
+}
+
+.carousel-slide {
+    flex: 0 0 auto;
+    /* Allow width to be set by style attribute */
+    padding: 0 8px;
+    /* Spacing */
+    box-sizing: border-box;
+    opacity: 1;
+    transition: opacity 0.4s;
+}
+
+/* Locked State Styling */
+.locked .main-emoji {
+    filter: grayscale(100%) opacity(0.6);
+}
+
+.locked .level-title {
+    color: #95a5a6;
+}
+
+.lock-icon {
+    margin-left: 8px;
+    color: #95a5a6;
+}
+
+/* Reused Styles */
 .level-header {
     margin-bottom: 2rem;
 }
@@ -26,6 +101,9 @@
     font-weight: 800;
     color: var(--text-color);
     letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .village-visual {
@@ -35,10 +113,10 @@
     justify-content: center;
     margin-bottom: 2rem;
     position: relative;
+    user-select: none;
 }
 
 .village-visual::before {
-    /* Subtle "Soil" or "Ground" circle behind */
     content: '';
     position: absolute;
     width: 180px;
@@ -52,6 +130,7 @@
 .main-emoji {
     font-size: 8rem;
     filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.1));
+    transition: filter 0.3s;
 }
 
 .animate-bounce-slow {
@@ -78,35 +157,64 @@
     box-shadow: 0 8px 32px var(--glass-shadow);
     border: 1px solid var(--glass-border);
     margin-bottom: 24px;
+    min-height: 200px;
+    /* Prevent layout jump */
 }
 
-.xp-bar-container {
-    margin-bottom: 24px;
+.level-requirements-box {
+    text-align: left;
+    background: rgba(46, 204, 113, 0.1);
+    padding: 16px;
+    border-radius: 16px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: var(--text-color);
 }
 
-.xp-labels {
+.level-requirements-box h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.85rem;
+    color: #27ae60;
+    text-transform: uppercase;
+}
+
+.req-row {
+    margin-bottom: 12px;
+}
+
+.req-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
     font-size: 0.85rem;
-    color: var(--text-light);
-    margin-bottom: 8px;
     font-weight: 700;
 }
 
-.xp-track {
-    height: 14px;
-    background: #e2e8f0;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+.req-percent {
+    color: #27ae60;
+    font-family: monospace;
 }
 
-.xp-fill {
+.req-progress-track {
+    background: rgba(255, 255, 255, 0.4);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.req-progress-fill {
     height: 100%;
-    background: var(--primary-gradient);
-    border-radius: 10px;
+    background: #27ae60;
+    border-radius: 4px;
     transition: width 0.5s ease-out;
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+.req-row span.done {
+    text-decoration: line-through;
+    color: #94a3b8;
+    opacity: 0.7;
 }
 
 .resources-row {
@@ -136,11 +244,11 @@
     font-size: 0.8rem;
     font-weight: 700;
     color: #636e72;
+    margin-left: 4px;
 }
 
 .harvest-btn {
     background: var(--accent-color);
-    /* Carrot Orange for action */
     color: white;
     padding: 10px 20px;
     border-radius: 20px;
@@ -257,7 +365,85 @@
     }
 }
 
-/* Fix lint error */
-.res-name {
-    margin-left: 4px;
+/* Locked Info Centering */
+.locked-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+    text-align: center;
+    color: #7f8c8d;
+}
+
+.locked-message {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #95a5a6;
+    letter-spacing: 0.05em;
+}
+
+.locked-subtext {
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+    opacity: 0.8;
+    max-width: 80%;
+    line-height: 1.5;
+}
+
+/* Field Section */
+.field-section {
+    text-align: left;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.field-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--text-color);
+    font-weight: 800;
+    padding-left: 8px;
+    border-left: 4px solid var(--accent-color);
+}
+
+.field-locked-panel {
+    background: rgba(236, 240, 241, 0.5);
+    border: 2px dashed #bdc3c7;
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #95a5a6;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+.field-locked-panel:hover {
+    background: rgba(236, 240, 241, 0.8);
+    border-color: #95a5a6;
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.field-plot.empty {
+    aspect-ratio: 1;
+    background: #ecf0f1;
+    border: 2px dashed #bdc3c7;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.field-plot.empty:hover {
+    background: #e0e6ed;
+    border-color: #95a5a6;
 }

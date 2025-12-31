@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTasks } from '../context/TaskContext';
+import { useGame } from '../context/GameContext'; // New import
 import TaskItem from '../components/TaskItem';
 import { useLanguage } from '../context/LanguageContext';
 import { Plus, X } from 'lucide-react';
@@ -7,12 +8,14 @@ import './TasksPage.css';
 
 const TasksPage = () => {
     const { tasks, activeTaskId, addTask, updateTask, deleteTask, selectActiveTask, toggleToday } = useTasks();
+    const { incrementTaskStat } = useGame(); // Import game logic
     const { t } = useLanguage();
 
     const [title, setTitle] = useState('');
     const [priority, setPriority] = useState('TODAY');
-    const [category, setCategory] = useState('Study'); // Default changed to Study
+    const [category, setCategory] = useState('Study');
     const [subCategory, setSubCategory] = useState('');
+    const [targetPomodoros, setTargetPomodoros] = useState(1); // Default 1
     const [isFormOpen, setIsFormOpen] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -44,12 +47,14 @@ const TasksPage = () => {
             title,
             priority,
             category,
-            subCategory
+            subCategory,
+            targetPomodoros
         });
 
         setTitle('');
         setCategory('General');
         setSubCategory('');
+        setTargetPomodoros(1); // Reset
         setIsFormOpen(false);
     };
 
@@ -57,7 +62,19 @@ const TasksPage = () => {
         const task = tasks.find(t => t.id === id);
         if (task) {
             const newStatus = task.status === 'DONE' ? 'TODO' : 'DONE';
-            updateTask(id, { status: newStatus });
+            const updates = { status: newStatus };
+            if (newStatus === 'DONE') {
+                updates.completedAt = new Date().toISOString();
+                incrementTaskStat(); // Trigger game stat update
+            } else {
+                updates.completedAt = null;
+                // Optionally decrement? The doc doesn't specify losing progress.
+                // For "Total Tasks" cumulative count, we usually don't decrement even if un-done, 
+                // but "Level Up Condition: 3 Tasks Completed" implies "Currently Completed".
+                // However, roadmap usually implies "Cumulative Achievements". 
+                // Let's keep it simple: only increment on completion.
+            }
+            updateTask(id, updates);
         }
     };
 
@@ -129,6 +146,16 @@ const TasksPage = () => {
 
             {isFormOpen && (
                 <form className="task-form" onSubmit={handleSubmit}>
+                    {/* Close Button Top Right */}
+                    <button
+                        type="button"
+                        className="close-form-btn"
+                        onClick={() => setIsFormOpen(false)}
+                        title="Close"
+                    >
+                        <X size={20} />
+                    </button>
+
                     <div className="input-group">
                         <input
                             type="text"
@@ -146,45 +173,73 @@ const TasksPage = () => {
                     </div>
 
                     <div className="form-actions-grid">
-                        <div className="selectors-row">
-                            <select
-                                value={priority}
-                                onChange={(e) => setPriority(e.target.value)}
-                                className="priority-select"
-                            >
-                                <option value="TODAY">{t('tasks.priority.today')}</option>
-                                <option value="HIGH">{t('tasks.priority.high')}</option>
-                                <option value="MEDIUM">{t('tasks.priority.medium')}</option>
-                                <option value="LOW">{t('tasks.priority.low')}</option>
-                            </select>
+                        <div className="selectors-grid-2col">
+                            {/* 1. Category */}
+                            <div className="select-wrapper">
+                                <label className="select-label">{t('tasks.labels.category') || 'Category'}</label>
+                                <select
+                                    value={category}
+                                    onChange={handleCategoryChange}
+                                    className="priority-select"
+                                >
+                                    {CATEGORIES.map(cat => (
+                                        <option key={cat} value={cat}>
+                                            {t(`tasks.categories.${cat.toLowerCase()}`)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                            <select
-                                value={category}
-                                onChange={handleCategoryChange}
-                                className="priority-select"
-                            >
-                                {CATEGORIES.map(cat => (
-                                    <option key={cat} value={cat}>
-                                        {t(`tasks.categories.${cat.toLowerCase()}`)}
-                                    </option>
-                                ))}
-                            </select>
-
-                            {SUB_CATEGORIES[category] && (
+                            {/* 2. SubCategory */}
+                            <div className="select-wrapper">
+                                <label className="select-label">{t('tasks.labels.subCategory') || 'Sub'}</label>
                                 <select
                                     value={subCategory}
                                     onChange={(e) => setSubCategory(e.target.value)}
                                     className="priority-select"
+                                    disabled={!SUB_CATEGORIES[category]}
                                 >
                                     <option value="">{t('tasks.subCategories.misc') || 'Select...'}</option>
-                                    {SUB_CATEGORIES[category].map(sub => (
+                                    {SUB_CATEGORIES[category]?.map(sub => (
                                         <option key={sub} value={sub}>
                                             {t(`tasks.subCategories.${sub}`) || sub}
                                         </option>
                                     ))}
                                 </select>
-                            )}
+                            </div>
+
+                            {/* 3. Priority */}
+                            <div className="select-wrapper">
+                                <label className="select-label">{t('tasks.labels.priority') || 'Priority'}</label>
+                                <select
+                                    value={priority}
+                                    onChange={(e) => setPriority(e.target.value)}
+                                    className="priority-select"
+                                >
+                                    <option value="TODAY">{t('tasks.priority.today')}</option>
+                                    <option value="HIGH">{t('tasks.priority.high')}</option>
+                                    <option value="MEDIUM">{t('tasks.priority.medium')}</option>
+                                    <option value="LOW">{t('tasks.priority.low')}</option>
+                                </select>
+                            </div>
+
+                            {/* 4. Target Time (1-6 Pomodoros) */}
+                            <div className="select-wrapper">
+                                <label className="select-label">{t('tasks.labels.target') || 'Target'}</label>
+                                <select
+                                    value={targetPomodoros}
+                                    onChange={(e) => setTargetPomodoros(Number(e.target.value))}
+                                    className="priority-select"
+                                >
+                                    {[1, 2, 3, 4, 5, 6].map(num => (
+                                        <option key={num} value={num}>
+                                            {num} {'🍅'.repeat(num)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
+
                         <button type="submit" className="save-btn">{t('tasks.save')}</button>
                     </div>
                 </form>

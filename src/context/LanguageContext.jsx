@@ -9,32 +9,53 @@ const translations = {
         nav: {
             timer: 'タイマー',
             tasks: 'タスク',
-
             village: '村',
+            base: '拠点',
             history: '履歴',
             ai: 'AIコーチ'
         },
+        history: {
+            todayFocusTime: '今日の集中時間',
+            todayCompletedTasks: '今日の完了タスク',
+            totalFocusTime: '合計の集中時間',
+            totalCompletedTasks: '合計の完了タスク',
+            tasksSuffix: 'タスク',
+            totalFocus: '合計集中時間 (🍅)',
+            tasksCompleted: '完了タスク',
+            dailyFocus: '日別集中時間',
+            categoryDist: 'カテゴリ別内訳',
+            today: '今日',
+            total: '累計',
+            focusSessions: '集中回数',
+            shortBreaks: '休憩(5分)',
+            longBreaks: '長い休憩(15分)'
+        },
         timer: {
             focus: '集中',
-            shortBreak: '小休憩',
-            longBreak: '長休憩',
+            shortBreak: '休憩(5分)',
+            longBreak: '長い休憩(15分)',
             currentFocus: '現在のタスク',
             start: '開始',
             pause: '一時停止',
-
             reset: 'リセット',
             pomodoros: 'ポモドーロ'
         },
         tasks: {
             title: 'タスク',
             add: '追加',
-            placeholder: '何に取り組みますか？',
+            placeholder: 'ここにタスクを入力してね',
+            labels: {
+                priority: '優先度',
+                category: '大カテゴリー',
+                subCategory: '小カテゴリー',
+                target: '目標時間'
+            },
             empty: 'タスクがありません。追加して始めましょう！',
             priority: { today: '今日やる', high: '高', medium: '中', low: '低' },
             categories: { work: '仕事', study: '勉強', health: '健康', hobby: '趣味', general: '一般' },
+            targetPoms: 'ポモドーロ',
             save: '保存',
             confirmDelete: '削除してもよろしいですか？',
-
             confirmFocus: '現在のタスクとして設定しますか？',
             yes: 'はい',
             no: 'いいえ',
@@ -44,34 +65,45 @@ const translations = {
             sort: { priority: '優先度順', newest: '新しい順', oldest: '古い順' },
             newTask: '新規タスク',
             subCategories: {
-                // Work
                 meeting: '会議', development: '開発', planning: '計画', email: 'メール',
-                // Study
                 math: '数学', english: '英語', programming: 'プログラミング', reading: '読書',
-                // Health
                 exercise: '運動', meditation: '瞑想', meal: '食事',
-                // Hobby
                 game: 'ゲーム', art: '創作', music: '音楽',
-                // General
                 chores: '家事', shopping: '買い物', misc: 'その他'
             }
         },
         village: {
             level: 'Lv.',
-            water: '水',
+            water: '水ポイント',
+            waterNote: '(学習時間がポイントになります)',
             harvest: '収穫する',
             harvestCollection: '収穫コレクション',
             emptyCollection: '野菜を収穫してコレクションを埋めましょう！',
             logout: 'ログアウト',
             wasteland: '荒れ地',
-            field: '耕された畑',
+            field: 'キャンプ地',
             garden: '小さな芽',
             farmhouse: '実り',
             villageStart: '村の始まり',
             nextLevel: '次のレベル',
             toNextLevel: '次のレベルまで',
             tips: 'ヒント',
-            approxSessions: '集中セッションあと約{{count}}回 (25分)'
+            approxSessions: '集中セッションあと約{{count}}回 (25分)',
+            studyTime: '学習時間',
+            tasks: 'タスク完了',
+            lockedArea: 'ロックされたエリア',
+            unlockHint: '前のレベルの条件を達成して解放',
+            harvestLocked: '収穫する（ロック中）',
+            harvestLimit: '収穫済み'
+        },
+        crops: {
+            weed: '雑草',
+            radish: 'ラディッシュ',
+            potato: 'ジャガイモ'
+        },
+        field: {
+            yourField: 'あなたの畑',
+            locked: 'Lv.2で解放'
         },
         auth: {
             welcomeBack: 'おかえりなさい',
@@ -108,15 +140,31 @@ const translations = {
         nav: {
             timer: 'Timer',
             tasks: 'Tasks',
-
             village: 'Village',
+            base: 'Base',
             history: 'History',
             ai: 'AI Coach'
         },
+        history: {
+            todayFocusTime: 'Today Focus',
+            todayCompletedTasks: 'Today Tasks',
+            totalFocusTime: 'Total Focus',
+            totalCompletedTasks: 'Total Tasks',
+            tasksSuffix: ' tasks',
+            totalFocus: 'Total Focus (🍅)',
+            tasksCompleted: 'Tasks Completed',
+            dailyFocus: 'Daily Focus Time',
+            categoryDist: 'Category Distribution',
+            today: 'Today',
+            total: 'Total',
+            focusSessions: 'Focus Sessions',
+            shortBreaks: 'Short Breaks',
+            longBreaks: 'Long Breaks'
+        },
         timer: {
             focus: 'Focus',
-            shortBreak: 'Short Break',
-            longBreak: 'Long Break',
+            shortBreak: 'Short Break (5m)',
+            longBreak: 'Long Break (15m)',
             currentFocus: 'Current Focus',
             start: 'Start',
             pause: 'Pause',
@@ -126,13 +174,19 @@ const translations = {
         tasks: {
             title: 'Tasks',
             add: 'Add',
-            placeholder: 'What needs to be done?',
+            placeholder: 'Enter task here...',
+            labels: {
+                priority: 'Priority',
+                category: 'Category',
+                subCategory: 'Subcategory',
+                target: 'Target Time'
+            },
             empty: 'No tasks yet. Add one to get started!',
             priority: { today: 'Today', high: 'High', medium: 'Medium', low: 'Low' },
             categories: { work: 'Work', study: 'Study', health: 'Health', hobby: 'Hobby', general: 'General' },
+            targetPoms: 'Pomodoros',
             save: 'Add Task',
             confirmDelete: 'Are you sure you want to delete?',
-
             confirmFocus: 'Set as current task?',
             yes: 'Yes',
             no: 'No',
@@ -151,20 +205,36 @@ const translations = {
         },
         village: {
             level: 'Lv.',
-            water: 'Water',
+            water: 'Water Points',
+            waterNote: '(Learning time becomes points)',
             harvest: 'Harvest',
             harvestCollection: 'Harvest Collection',
             emptyCollection: 'Harvest crops to fill your collection!',
             logout: 'Logout',
             wasteland: 'Wasteland',
-            field: 'Field',
+            field: 'Camping Ground',
             garden: 'Garden',
             farmhouse: 'Farmhouse',
             villageStart: 'Village',
             nextLevel: 'Next Level',
             toNextLevel: 'To Next Level',
             tips: 'Tip',
-            approxSessions: 'Approx. {{count}} focus sessions (25m)'
+            approxSessions: 'Approx. {{count}} focus sessions (25m)',
+            studyTime: 'Study Time',
+            tasks: 'Tasks Completed',
+            lockedArea: 'Locked Area',
+            unlockHint: 'Complete requirements in previous level to unlock',
+            harvestLocked: 'Harvest (Locked)',
+            harvestLimit: 'Harvested'
+        },
+        crops: {
+            weed: 'Weed',
+            radish: 'Radish',
+            potato: 'Potato'
+        },
+        field: {
+            yourField: 'Your Field',
+            locked: 'Unlocks at Lv.2'
         },
         auth: {
             welcomeBack: 'Welcome Back',
@@ -173,7 +243,8 @@ const translations = {
             startJourney: 'Start building your habit today',
             email: 'Email Address',
             password: 'Password',
-            login: 'Sign In',
+            sign_in: 'Sign In',
+            login: 'Login',
             logout: 'Logout',
             signup: 'Create Account',
             or: 'OR',
@@ -212,7 +283,7 @@ export const LanguageProvider = ({ children }) => {
         const keys = path.split('.');
         let current = translations[language];
         for (const key of keys) {
-            if (current[key] === undefined) return path;
+            if (current === undefined || current[key] === undefined) return path;
             current = current[key];
         }
         return current;

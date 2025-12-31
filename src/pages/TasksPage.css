@@ -42,12 +42,55 @@
 
 .task-form {
     background: white;
-    padding: 24px;
+    padding: 32px 24px 24px;
+    /* Added top padding for close button */
     border-radius: 24px;
     margin-bottom: 24px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.02);
     animation: slideDown 0.3s ease-out;
+    position: relative;
+    /* For absolute close btn */
+}
+
+.close-form-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f1f5f9;
+    border: none;
+    color: #94a3b8;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.close-form-btn:hover {
+    background: #e2e8f0;
+    color: #ef4444;
+    /* Red on hover */
+    transform: rotate(90deg);
+}
+
+.select-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 100px;
+}
+
+.select-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-left: 4px;
 }
 
 /* Input Group for Clear Button */
@@ -99,16 +142,59 @@
     color: #64748b;
 }
 
+/* New 2-column grid layout */
+.selectors-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+    .selectors-grid-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Visual Tomato Selector */
+.tomato-selector {
+    display: flex;
+    gap: 4px;
+    padding: 10px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    justify-content: center;
+    align-items: center;
+    height: 42px;
+    /* Match select height roughly */
+}
+
+.tomato-select-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 2px;
+    filter: grayscale(100%) opacity(0.3);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.9);
+}
+
+.tomato-select-btn:hover {
+    transform: scale(1.2);
+    filter: grayscale(0%) opacity(0.7);
+}
+
+.tomato-select-btn.active {
+    filter: grayscale(0%) opacity(1);
+    transform: scale(1.1);
+}
+
 .form-actions-grid {
     display: flex;
     flex-direction: column;
     gap: 16px;
-}
-
-.selectors-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
 }
 
 .priority-select {
@@ -121,8 +207,9 @@
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    flex: 1;
-    min-width: 100px;
+    width: 100%;
+    /* Full width of wrapper */
+    min-width: unset;
 }
 
 .save-btn {

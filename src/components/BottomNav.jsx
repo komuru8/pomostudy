@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Timer, CheckSquare, Home, Bot, BarChart2 } from 'lucide-react';
+import { Timer, CheckSquare, Tent, Bot, BarChart2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import './BottomNav.css';
 
@@ -18,8 +18,8 @@ const BottomNav = () => {
                 <span>{t('nav.tasks')}</span>
             </NavLink>
             <NavLink to="/village" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                <Home size={24} />
-                <span>{t('nav.village')}</span>
+                <Tent size={24} />
+                <span>{t('nav.base') || 'Base'}</span>
             </NavLink>
             <NavLink to="/history" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                 <BarChart2 size={24} />

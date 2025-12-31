@@ -62,7 +62,24 @@ const TaskItem = ({ task, onSelect, onDelete, onComplete, isActive }) => {
                             {t(`tasks.priority.${task.priority.toLowerCase()}`)}
                         </span>
                         <span className="pomodoro-count">
-                            🍅 {task.pomodorosSpent || 0}
+                            <div className="tomatoes-container">
+                                {Array.from({ length: Math.max(task.targetPomodoros || 1, task.pomodorosSpent || 1) }).map((_, i) => {
+                                    // i is 0-indexed.
+                                    // If spent=1, i=0 is DONE (Colored). i=1 is PENDING (Gray).
+                                    // Logic: if (i < pomodorosSpent) -> DONE
+                                    const isDone = i < (task.pomodorosSpent || 0);
+                                    return (
+                                        <span key={i} className={`tomato-icon ${isDone ? 'done-colored' : 'pending-gray'}`}>
+                                            🍅
+                                        </span>
+                                    );
+                                })}
+                            </div>
+                            {(task.targetPomodoros > 0 || task.pomodorosSpent > 0) && (
+                                <span className="progress-text">
+                                    {task.pomodorosSpent || 0}/{task.targetPomodoros || 1}
+                                </span>
+                            )}
                         </span>
                     </div>
                 </div>
