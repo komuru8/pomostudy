@@ -1,0 +1,263 @@
+.village-page {
+    padding: 24px;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.level-header {
+    margin-bottom: 2rem;
+}
+
+.level-badge {
+    background: var(--primary-gradient);
+    color: #fff;
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+}
+
+.level-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-color);
+    letter-spacing: -0.02em;
+}
+
+.village-visual {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.village-visual::before {
+    /* Subtle "Soil" or "Ground" circle behind */
+    content: '';
+    position: absolute;
+    width: 180px;
+    height: 60px;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 50%;
+    bottom: 20px;
+    z-index: -1;
+}
+
+.main-emoji {
+    font-size: 8rem;
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.1));
+}
+
+.animate-bounce-slow {
+    animation: bounce 3s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+.stats-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px var(--glass-shadow);
+    border: 1px solid var(--glass-border);
+    margin-bottom: 24px;
+}
+
+.xp-bar-container {
+    margin-bottom: 24px;
+}
+
+.xp-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.xp-track {
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.xp-fill {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+.resources-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e0f2f1;
+    padding: 8px 16px;
+    border-radius: 16px;
+}
+
+.res-count {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #009688;
+}
+
+.res-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #636e72;
+}
+
+.harvest-btn {
+    background: var(--accent-color);
+    /* Carrot Orange for action */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    border: none;
+}
+
+.harvest-btn:hover:not(.disabled) {
+    transform: translateY(-2px);
+    background: #d35400;
+    box-shadow: 0 6px 16px rgba(230, 126, 34, 0.4);
+}
+
+.harvest-btn.disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.inventory-section {
+    text-align: left;
+}
+
+.inventory-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--text-color);
+    font-weight: 800;
+    padding-left: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.crop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    padding: 16px;
+    border-radius: 20px;
+    min-height: 80px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.crop-item {
+    font-size: 1.8rem;
+    background: white;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.crop-item:hover {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.empty-crops {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #95a5a6;
+    font-size: 0.95rem;
+    padding: 2rem;
+    font-style: italic;
+}
+
+.harvest-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s;
+}
+
+.popup-content {
+    background: white;
+    padding: 3rem;
+    border-radius: 32px;
+    text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.popup-icon {
+    font-size: 6rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Fix lint error */
+.res-name {
+    margin-left: 4px;
+}

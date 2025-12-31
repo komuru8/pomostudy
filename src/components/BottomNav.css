@@ -1,0 +1,55 @@
+.bottom-nav {
+    position: fixed;
+    bottom: 24px;
+    /* Floating look */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 35px;
+    /* Pill shape */
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    z-index: 1000;
+    padding-bottom: 0;
+    /* Remove safe-area padding for floating element */
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #b2bec3;
+    font-size: 0.7rem;
+    font-weight: 700;
+    gap: 4px;
+    width: 60px;
+    height: 60px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+
+
+.nav-item.active {
+    color: var(--primary-color, #2ecc71);
+    background: rgba(46, 204, 113, 0.1);
+    transform: translateY(-8px);
+}
+
+.nav-item svg {
+    transition: all 0.3s ease;
+}
+
+.nav-item.active svg {
+    transform: scale(1.1);
+}

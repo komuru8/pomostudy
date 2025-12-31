@@ -1,0 +1,342 @@
+.task-item {
+    background: white;
+    padding: 16px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.1);
+    /* Green tint shadow */
+}
+
+.task-item.active {
+    border-color: var(--primary-color);
+    background: #f0fdf4;
+    /* Very light green */
+}
+
+/* Green leaf/marker for active item */
+.task-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--primary-color);
+}
+
+.task-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.task-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-color);
+    transition: all 0.2s;
+}
+
+.task-title.completed {
+    text-decoration: line-through;
+    color: #cbd5e1;
+}
+
+.task-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pomodoro-count {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.check-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-right: 12px;
+    color: white;
+}
+
+.check-btn:hover {
+    border-color: var(--primary-color);
+    background: rgba(46, 204, 113, 0.1);
+}
+
+.check-btn.checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.task-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-details h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+.task-details h3.completed {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+.priority-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+}
+
+.priority-high {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.priority-medium {
+    color: #f39c12;
+    background: rgba(243, 156, 18, 0.1);
+    border: 1px solid rgba(243, 156, 18, 0.2);
+}
+
+.priority-low {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+}
+
+.priority-today {
+    color: #d35400;
+    background: rgba(230, 126, 34, 0.15);
+    border: 1px solid rgba(211, 84, 0, 0.2);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    color: #94a3b8;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background: #f1f5f9;
+    color: var(--text-dark);
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.focus-btn:hover {
+    background: #fff9c4;
+    color: var(--secondary-color);
+}
+
+.action-btn.today {
+    color: #cbd5e1;
+}
+
+.action-btn.today:hover {
+    color: #f39c12;
+    background: #fff3e0;
+}
+
+.action-btn.today.active {
+    color: #f39c12;
+    /* Orange Sun */
+}
+
+/* Category Badges - Pill Style */
+.category-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    color: white;
+}
+
+.category-badge.work {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.category-badge.study {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.category-badge.health {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.category-badge.hobby {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.category-badge.general {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+/* Task Item Container States */
+.task-item.done {
+    opacity: 0.6;
+    background: #f8fafc;
+    box-shadow: none;
+    border: 1px solid #f1f5f9;
+}
+
+.task-item.done:hover {
+    transform: none;
+    opacity: 0.8;
+}
+
+/* =========================================
+   New Styles for Phase 7 (Visual Refinement)
+   ========================================= */
+
+.task-item.is-today {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 225, 0.9));
+    border: 1px solid rgba(253, 203, 110, 0.4);
+}
+
+.task-item.active-focus {
+    border-color: var(--primary-color) !important;
+    background: white;
+    box-shadow: 0 8px 16px rgba(46, 204, 113, 0.15);
+    animation: pulse-border 2s infinite;
+    z-index: 2;
+}
+
+@keyframes pulse-border {
+    0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+    }
+}
+
+.active-indicator-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--primary-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-bottom-left-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 10;
+}
+
+/* Delete Confirmation Overlay */
+.confirm-delete-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    z-index: 20;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.confirm-content {
+    text-align: center;
+    padding: 16px;
+}
+
+.confirm-content p {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 12px;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: none;
+    font-weight: 700;
+    transition: transform 0.1s;
+}
+
+.confirm-btn:active {
+    transform: scale(0.95);
+}
+
+.confirm-btn.yes {
+    background: #FF6B6B;
+    color: white;
+}
+
+.confirm-btn.no {
+    background: #ecf0f1;
+    color: var(--text-color);
+}

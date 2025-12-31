@@ -14,28 +14,32 @@ const TimerDisplay = ({ timeLeft, totalTime }) => {
     return (
         <div className="timer-container" style={{ position: 'relative', width: '300px', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <svg width="300" height="300" style={{ transform: 'rotate(-90deg)' }}>
+                {/* Background Ring */}
                 <circle
                     cx="150"
                     cy="150"
                     r={radius}
-                    stroke="rgba(255, 255, 255, 0.2)"
+                    stroke="#e0f2f1" /* Light teal/green background */
                     strokeWidth="10"
-                    fill="transparent"
+                    fill="var(--bg-color)" /* Fill center with page bg or white */
                 />
+
+                {/* Visual "Farm" Indicator (Leaf/Sprout) could go here later */}
+
+                {/* Progress Ring */}
                 <circle
                     className="timer-circle"
                     cx="150"
                     cy="150"
                     r={radius}
-                    stroke="#ffffff"
-                    strokeWidth="10"
+                    strokeWidth="12"
                     fill="transparent"
                     strokeDasharray={circumference}
                     strokeDashoffset={dashoffset}
                     strokeLinecap="round"
                 />
             </svg>
-            <div className="time-text" style={{ position: 'absolute', fontSize: '4rem', fontWeight: 'bold', color: '#fff' }}>
+            <div className="time-text" style={{ position: 'absolute', fontSize: '4.5rem', fontWeight: '800', color: 'var(--text-color)', letterSpacing: '-2px' }}>
                 {formattedTime}
             </div>
         </div>

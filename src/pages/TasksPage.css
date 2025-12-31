@@ -1,0 +1,223 @@
+.tasks-page {
+    padding: 24px;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 80vh;
+    padding-bottom: 100px;
+    /* Space for fab */
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    color: var(--primary-dark);
+}
+
+/* New Pill Button */
+.add-task-btn-pill {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+.add-task-btn-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+}
+
+.task-form {
+    background: white;
+    padding: 24px;
+    border-radius: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Input Group for Clear Button */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.task-input {
+    width: 100%;
+    box-sizing: border-box;
+    /* Fix overflow */
+    border: none;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 40px 12px 0;
+    /* Space for clear btn */
+    font-size: 1.1rem;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-main);
+    transition: border-color 0.2s;
+    color: var(--text-color);
+}
+
+.task-input:focus {
+    border-bottom-color: var(--primary-color);
+}
+
+.clear-input-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f1f5f9;
+    border: none;
+    color: #94a3b8;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clear-input-btn:hover {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.form-actions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.selectors-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.priority-select {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-family: var(--font-main);
+    color: #64748b;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    flex: 1;
+    min-width: 100px;
+}
+
+.save-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    font-size: 1rem;
+}
+
+.save-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    border: 2px dashed #cbd5e1;
+}
+
+/* =========================================
+   Phase 12: Advanced Controls
+   ========================================= */
+
+.tasks-controls {
+    background: white;
+    padding: 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    outline: none;
+    transition: all 0.2s;
+    font-family: var(--font-main);
+}
+
+.search-input:focus {
+    background: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+}
+
+.filters-row {
+    display: flex;
+    gap: 10px;
+}
+
+.control-select {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    font-family: var(--font-main);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    outline: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.control-select:focus {
+    border-color: var(--primary-color);
+}

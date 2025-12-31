@@ -1,60 +1,49 @@
 import React from 'react';
+import { RefreshCw } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import './Controls.css';
 
 const Controls = ({ isActive, toggleTimer, resetTimer, mode, switchMode, MODES }) => {
-    return (
-        <div className="controls" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center', width: '100%' }}>
+    const { t } = useLanguage();
 
-            <div className="mode-switcher" style={{ display: 'flex', gap: '1rem', background: 'rgba(255,255,255,0.2)', padding: '0.5rem', borderRadius: '50px' }}>
+    const getModeLabel = (key) => {
+        switch (key) {
+            case 'FOCUS': return t('timer.focus');
+            case 'SHORT_BREAK': return t('timer.shortBreak');
+            case 'LONG_BREAK': return t('timer.longBreak');
+            default: return MODES[key].label;
+        }
+    };
+
+    return (
+        <div className="controls">
+
+            <div className="mode-switcher">
                 {Object.keys(MODES).map((key) => (
                     <button
                         key={key}
                         onClick={() => switchMode(key)}
-                        style={{
-                            padding: '0.5rem 1.5rem',
-                            borderRadius: '25px',
-                            background: mode === key ? '#fff' : 'transparent',
-                            color: mode === key ? 'var(--primary-color)' : '#fff',
-                            fontWeight: mode === key ? 'bold' : 'normal',
-                            fontSize: '0.9rem'
-                        }}
+                        className={`mode-btn ${mode === key ? 'active' : ''}`}
                     >
-                        {MODES[key].label}
+                        {getModeLabel(key)}
                     </button>
                 ))}
             </div>
 
-            <div className="main-controls" style={{ display: 'flex', gap: '1rem' }}>
+            <div className="main-controls">
                 <button
                     onClick={toggleTimer}
-                    style={{
-                        padding: '1rem 3rem',
-                        borderRadius: '50px',
-                        background: '#fff',
-                        color: 'var(--primary-color)',
-                        fontSize: '1.2rem',
-                        fontWeight: 'bold',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                    }}
+                    className={`toggle-timer-btn ${isActive ? 'active' : ''}`}
                 >
-                    {isActive ? 'PAUSE' : 'START'}
+                    {isActive ? t('timer.pause') : t('timer.start')}
                 </button>
 
                 <button
                     onClick={resetTimer}
-                    style={{
-                        width: '50px',
-                        height: '50px',
-                        borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.2)',
-                        color: '#fff',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        fontSize: '1.2rem'
-                    }}
-                    aria-label="Reset"
+                    className="reset-btn"
+                    aria-label={t('timer.reset')}
                 >
-                    ↻
+                    <RefreshCw size={20} />
                 </button>
             </div>
         </div>

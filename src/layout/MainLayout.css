@@ -1,0 +1,74 @@
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100vw;
+    max-width: 100%;
+}
+
+.content-area {
+    flex: 1;
+    padding-bottom: 80px;
+    /* Space for bottom nav */
+    width: 100%;
+    max-width: 600px;
+    /* Mobile width constraint for larger screens */
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Ensure glass container style fits inside the content area */
+.glass-container {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0 0 24px 24px;
+    /* Adjust radius if needed */
+    margin-top: 2rem;
+}
+
+.header-controls {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 2000;
+    display: flex;
+    gap: 8px;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.control-btn.login {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.control-btn.login:hover {
+    background: #27ae60;
+    /* darken primary */
+}
+
+.control-btn.logout {
+    color: #e74c3c;
+}
