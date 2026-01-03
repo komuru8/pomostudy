@@ -82,3 +82,36 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(44, 62, 80, 0.2);
 }
+
+/* Mobile Optimization */
+@media (max-width: 480px) {
+    .login-overlay-backdrop {
+        padding: 16px;
+    }
+
+    .login-overlay-card {
+        padding: 24px 20px;
+        border-radius: 20px;
+        max-width: 90%;
+        /* Allow slightly more width dynamically */
+    }
+
+    .lock-icon-circle {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+    }
+
+    .login-overlay-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .login-overlay-card p {
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+    }
+
+    .login-action-btn {
+        padding: 12px 24px;
+    }
+}

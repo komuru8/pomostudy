@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Timer, CheckSquare, Tent, Bot, BarChart2 } from 'lucide-react';
+import { Timer, CheckSquare, Tent, Bot, BookOpen } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import './BottomNav.css';
 
@@ -22,7 +22,7 @@ const BottomNav = () => {
                 <span>{t('nav.base') || 'Base'}</span>
             </NavLink>
             <NavLink to="/history" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                <BarChart2 size={24} />
+                <BookOpen size={24} />
                 <span>{t('nav.history')}</span>
             </NavLink>
             <NavLink to="/ai" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>

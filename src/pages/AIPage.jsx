@@ -1,24 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useGame } from '../context/GameContext';
+import { useTasks } from '../context/TaskContext';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import './AIPage.css';
 
 const AIPage = () => {
-    const [input, setInput] = useState('');
     const { t } = useLanguage();
-
-    // Need to get initial welcome message from translation
+    const { gameState } = useGame();
+    const { tasks } = useTasks();
+    const [input, setInput] = useState('');
     const [messages, setMessages] = useState([]);
-
-    // Initialize with welcome message when component mounts or language changes
-    useEffect(() => {
-        // Only reset if empty to avoid wiping history on lang switch, 
-        // OR just wipe it to update language. Let's append a new welcome for simplicity.
-        setMessages([{ id: Date.now(), text: t('ai.responses.default'), sender: 'ai' }]);
-    }, [t]);
-
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
+
+    // Initialize with welcome message
+    useEffect(() => {
+        if (messages.length === 0) {
+            setMessages([{ id: Date.now(), text: t('ai.responses.default'), sender: 'ai' }]);
+        }
+    }, [t]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -26,9 +28,55 @@ const AIPage = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, isTyping]);
 
-    const handleSend = (e) => {
+    const generateResponse = async (userText) => {
+        let keyToUse = import.meta.env.VITE_GEMINI_API_KEY;
+        if (keyToUse) keyToUse = keyToUse.trim();
+
+        if (!keyToUse || keyToUse === 'YOUR_API_KEY_HERE') {
+            return t('ai.system.apiKeyMissing');
+        }
+
+        try {
+            const genAI = new GoogleGenerativeAI(keyToUse);
+            // Updating model to available version based on diagnostic
+            // "gemini-flash-latest" points to a stable version with Free Tier access
+            const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+
+            // Construct Context
+            const pendingTasks = tasks.filter(t => !t.completed).map(t => `- ${t.title} (${t.priority})`).join('\n');
+            const context = `
+Current User Stats:
+- Level: ${gameState.level}
+- Total Focus Time: ${gameState.totalWP} minutes
+- Total XP: ${gameState.totalXP}
+- Harvested Crops: ${gameState.harvested?.length || 0}
+- Pending Tasks:\n${pendingTasks || "None"}
+            `;
+
+            const systemPrompt = `
+You are supportive productivity coach "Pomodoro Farm". 
+Goal: help user focus, plan day, balance work-life.
+Concise, friendly, use emojis (🍅, 🌱, 🚜).
+Context: ${context}
+            `;
+
+            const fullPrompt = `${systemPrompt}\n\nUser: ${userText}`;
+
+            const result = await model.generateContent(fullPrompt);
+            const response = await result.response;
+            return response.text();
+
+        } catch (error) {
+            console.error("Gemini API Error:", error);
+            if (error.message?.includes('429')) return t('ai.system.rateLimitError') || "System: Too many requests. Please wait a moment (Free Tier quota). ⏳";
+            if (error.message?.includes('404')) return t('ai.system.modelNotFoundError') || "System: Model not found. Please check API key permissions.";
+            return t('ai.system.connectionError');
+        }
+    };
+
+    const handleSend = async (e) => {
         e.preventDefault();
         if (!input.trim()) return;
 
@@ -38,19 +86,11 @@ const AIPage = () => {
         setInput('');
         setIsTyping(true);
 
-        // Simulate AI delay
-        setTimeout(() => {
-            let responseText = t('ai.responses.default');
-            const lower = userText.toLowerCase();
+        // API Call
+        const aiResponseText = await generateResponse(userText);
 
-            // Simple heuristic for mock responses
-            if (lower.includes('tired') || lower.includes('break') || lower.includes('sleepy') || lower.includes('疲れた') || lower.includes('休み')) responseText = t('ai.responses.tired');
-            else if (lower.includes('plan') || lower.includes('schedule') || lower.includes('計画') || lower.includes('プラン')) responseText = t('ai.responses.plan');
-            else if (lower.includes('hello') || lower.includes('hi') || lower.includes('こんにちは')) responseText = t('ai.responses.hello');
-
-            setMessages(prev => [...prev, { id: Date.now() + 1, text: responseText, sender: 'ai' }]);
-            setIsTyping(false);
-        }, 1500);
+        setMessages(prev => [...prev, { id: Date.now() + 1, text: aiResponseText, sender: 'ai' }]);
+        setIsTyping(false);
     };
 
     return (
@@ -59,7 +99,7 @@ const AIPage = () => {
                 <div className="ai-avatar">
                     <Bot size={24} color="#fff" />
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                     <h1>{t('ai.title')}</h1>
                     <span className="status-indicator">{t('ai.status')}</span>
                 </div>
@@ -95,8 +135,9 @@ const AIPage = () => {
                     placeholder={t('ai.placeholder')}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    disabled={isTyping}
                 />
-                <button type="submit" className="send-btn" disabled={!input.trim()}>
+                <button type="submit" className="send-btn" disabled={!input.trim() || isTyping}>
                     <Send size={20} />
                 </button>
             </form>

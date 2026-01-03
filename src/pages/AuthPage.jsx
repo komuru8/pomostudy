@@ -39,51 +39,13 @@ const AuthPage = () => {
         <div className="auth-page">
             <div className="auth-card">
                 <div className="auth-header">
-                    <h1>{isLogin ? t('auth.welcomeBack') : t('auth.joinVillage')}</h1>
-                    <p>{isLogin ? t('auth.continueJourney') : t('auth.startJourney')}</p>
+                    <h1>{t('auth.joinVillage')}</h1>
+                    <p>{t('auth.startJourney')}</p>
                 </div>
 
                 {error && <div className="error-msg">{error}</div>}
 
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <Mail size={18} className="input-icon" />
-                        <input
-                            type="email"
-                            placeholder={t('auth.email')}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <Lock size={18} className="input-icon" />
-                        <input
-                            type="password"
-                            placeholder={t('auth.password')}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            minLength={6}
-                        />
-                    </div>
-
-                    <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? '...' : (
-                            <>
-                                {isLogin ? t('auth.login') : t('auth.signup')}
-                                <ArrowRight size={18} />
-                            </>
-                        )}
-                    </button>
-                </form>
-
-                <div className="divider">
-                    <span>{t('auth.or')}</span>
-                </div>
-
-                <div className="social-login">
+                <div className="social-login" style={{ flexDirection: 'column', gap: '16px', marginTop: '24px' }}>
                     <button className="social-btn google" onClick={async () => {
                         setLoading(true);
                         try {
@@ -95,19 +57,15 @@ const AuthPage = () => {
                             setLoading(false);
                         }
                     }}>
-                        <span>G</span> {t('auth.google')}
-                    </button>
-                    <button className="social-btn apple">
-                        <span></span> {t('auth.apple')}
+                        <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>G</span>
+                        <span style={{ marginLeft: '8px' }}>{t('auth.google')}</span>
                     </button>
                 </div>
 
-                <div className="auth-footer">
-                    {isLogin ? t('auth.noAccount') + " " : t('auth.hasAccount') + " "}
-                    <button className="link-btn" onClick={() => setIsLogin(!isLogin)}>
-                        {isLogin ? t('auth.signup') : t('auth.login')}
-                    </button>
-                </div>
+                <p style={{ textAlign: 'center', marginTop: '24px', color: '#666', fontSize: '0.9rem' }}>
+                    * Email login is currently disabled while we migrate to the new cloudy farm database. ☁️
+                </p>
+
             </div>
         </div>
     );

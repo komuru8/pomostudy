@@ -5,47 +5,66 @@ const TaskContext = createContext();
 
 export const useTasks = () => useContext(TaskContext);
 
+import { db } from '../firebase';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+
 export const TaskProvider = ({ children }) => {
     const { user } = useAuth();
     const [tasks, setTasks] = useState([]);
     const [activeTaskId, setActiveTaskId] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    // Load tasks when user changes
+    // Load/Listen to Firestore
     useEffect(() => {
+        let unsubscribe = () => { };
+
         if (user) {
-            try {
-                const savedTasks = localStorage.getItem(`pomodoro_tasks_${user.id}`);
-                const parsed = savedTasks ? JSON.parse(savedTasks) : [];
-                setTasks(Array.isArray(parsed) ? parsed : []);
-            } catch (e) {
-                console.error("Failed to load tasks", e);
-                setTasks([]);
-            }
-            const savedActive = localStorage.getItem(`pomodoro_active_task_${user.id}`);
-            setActiveTaskId(savedActive || null);
+            setLoading(true);
+            const userRef = doc(db, 'users', user.id);
+
+            unsubscribe = onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.tasks && Array.isArray(data.tasks)) {
+                        setTasks(data.tasks);
+                    }
+                    if (data.activeTaskId !== undefined) {
+                        setActiveTaskId(data.activeTaskId);
+                    }
+                }
+                setLoading(false);
+            }, (error) => {
+                console.error("Firestore tasks listener error:", error);
+                setLoading(false);
+            });
         } else {
             setTasks([]);
             setActiveTaskId(null);
+            setLoading(false);
         }
+
+        return () => unsubscribe();
     }, [user]);
 
-    // Save tasks when changed
+    // Save to Firestore (Debounced)
     useEffect(() => {
-        if (user) {
-            localStorage.setItem(`pomodoro_tasks_${user.id}`, JSON.stringify(tasks));
-        }
-    }, [tasks, user]);
+        if (!user || loading) return;
 
-    // Save active task when changed
-    useEffect(() => {
-        if (user) {
-            if (activeTaskId) {
-                localStorage.setItem(`pomodoro_active_task_${user.id}`, activeTaskId);
-            } else {
-                localStorage.removeItem(`pomodoro_active_task_${user.id}`);
+        const saveToFirestore = async () => {
+            try {
+                const userRef = doc(db, 'users', user.id);
+                // Save tasks and activeTaskId together
+                await setDoc(userRef, { tasks: tasks, activeTaskId: activeTaskId || null }, { merge: true });
+            } catch (e) {
+                console.error("Error saving tasks:", e);
             }
-        }
-    }, [activeTaskId, user]);
+        };
+
+        const timeoutId = setTimeout(saveToFirestore, 1000); // 1s debounce
+        return () => clearTimeout(timeoutId);
+
+    }, [tasks, activeTaskId, user, loading]);
+
 
     const addTask = (taskData) => {
         const newTask = {
@@ -95,7 +114,8 @@ export const TaskProvider = ({ children }) => {
             updateTask,
             deleteTask,
             selectActiveTask,
-            incrementPomodoroCount
+            incrementPomodoroCount,
+            loading
         }}>
             {children}
         </TaskContext.Provider>

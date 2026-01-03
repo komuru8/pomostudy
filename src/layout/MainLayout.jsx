@@ -29,38 +29,50 @@ const MainLayout = () => {
 
     return (
         <div className="app-container">
-            <div className="header-controls">
-                {/* Mobile Hamburger Toggle - Visible only on mobile via CSS */}
-                <button
-                    className="hamburger-btn control-btn"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label="Toggle Menu"
-                >
-                    {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-
-                {/* Menu Items - Conditionally displayed on mobile */}
-                <div className={`menu-items ${isMenuOpen ? 'open' : ''}`}>
-                    <button
-                        className="control-btn"
-                        onClick={handleLanguageClick}
-                        title="Switch Language"
-                    >
-                        <span style={{ fontSize: '1.2rem', marginRight: '4px' }}>
-                            {language === 'ja' ? '🇯🇵' : '🇺🇸'}
-                        </span>
-                        <span>Language</span>
-                    </button>
-                    <button
-                        className={`control-btn ${user ? 'logout' : 'login'}`}
-                        onClick={handleAuthClick}
-                        title={user ? t('auth.logout') : t('auth.login')}
-                    >
-                        {user ? <LogOut size={18} /> : <LogIn size={18} />}
-                        <span>{user ? t('auth.logout') : t('auth.login')}</span>
-                    </button>
+            {/* Fixed Global Header */}
+            <header className="app-header">
+                {/* App Logo */}
+                <div className="app-logo">
+                    <span style={{ fontSize: '1.8rem' }}>🌱</span>
+                    <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary-dark)', letterSpacing: '-0.5px' }}>
+                        Pomodoro Farm
+                    </span>
                 </div>
-            </div>
+
+                <div className="header-controls">
+                    {/* Mobile Hamburger Toggle */}
+                    <button
+                        className="hamburger-btn control-btn"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle Menu"
+                    >
+                        {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                    </button>
+
+                    {/* Menu Items */}
+                    <div className={`menu-items ${isMenuOpen ? 'open' : ''}`}>
+                        <button
+                            className="control-btn"
+                            onClick={handleLanguageClick}
+                            title="Switch Language"
+                        >
+                            <span style={{ fontSize: '1.2rem', marginRight: '4px' }}>
+                                {language === 'ja' ? '🇯🇵' : '🇺🇸'}
+                            </span>
+                            <span>Language</span>
+                        </button>
+                        <button
+                            className={`control-btn ${user ? 'logout' : 'login'}`}
+                            onClick={handleAuthClick}
+                            title={user ? t('auth.logout') : t('auth.login')}
+                        >
+                            {user ? <LogOut size={18} /> : <LogIn size={18} />}
+                            <span>{user ? t('auth.logout') : t('auth.login')}</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
             <main className="content-area">
                 <Outlet />
             </main>

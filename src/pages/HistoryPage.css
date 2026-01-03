@@ -247,6 +247,32 @@
     width: 100%;
 }
 
+@media (max-width: 480px) {
+    .x-label {
+        font-size: 0.6rem;
+        transform: rotate(-30deg);
+        transform-origin: top center;
+        bottom: -5px;
+        /* Adjust for rotation layout shift */
+        white-space: nowrap;
+    }
+
+    .chart-column {
+        padding-bottom: 28px;
+        /* More space for rotated labels */
+    }
+
+    .chart-with-axis {
+        gap: 4px;
+        /* Tighter gap on mobile */
+    }
+
+    .y-axis {
+        min-width: 25px;
+        /* Smaller axis area */
+    }
+}
+
 /* Color mappings matching TaskItem.css */
 .bar-fill.work {
     background: #3498db;

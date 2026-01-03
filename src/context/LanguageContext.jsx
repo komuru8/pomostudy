@@ -11,7 +11,7 @@ const translations = {
             tasks: 'タスク',
             village: '村',
             base: '拠点',
-            history: '履歴',
+            history: '学習時間',
             ai: 'AIコーチ'
         },
         history: {
@@ -128,6 +128,12 @@ const translations = {
             title: 'AIコーチ',
             placeholder: '相談や計画作成を依頼...',
             status: 'オンライン',
+            system: {
+                apiKeyMissing: 'システム: APIキーが見つかりません。.envファイルの VITE_GEMINI_API_KEY を設定してください。',
+                connectionError: '接続エラーです。APIキーまたはインターネット接続を確認してください。🌱',
+                rateLimitError: 'システム: リクエストがいっぱいです。少し休憩してから話しかけてね⏳',
+                modelNotFoundError: 'システム: 指定されたモデルが見つかりません。設定を確認してください。'
+            },
             responses: {
                 default: '集中のお手伝いをします！目標を教えてください。',
                 tired: 'お疲れのようですね。5分間の小休憩はいかがですか？ストレッチもおすすめですよ！🧘',
@@ -142,7 +148,7 @@ const translations = {
             tasks: 'Tasks',
             village: 'Village',
             base: 'Base',
-            history: 'History',
+            history: 'Study Time',
             ai: 'AI Coach'
         },
         history: {
@@ -260,6 +266,10 @@ const translations = {
             title: 'AI Coach',
             placeholder: 'Ask for a plan, say you\'re tired...',
             status: 'Online',
+            system: {
+                apiKeyMissing: 'System: API Key not found. Please set VITE_GEMINI_API_KEY in your .env file.',
+                connectionError: 'Connection error. Please check your API Key or internet connection. 🌱'
+            },
             responses: {
                 default: "I'm here to help you focus! Tell me about your goals.",
                 tired: "It sounds like you need a break. Why not try a 5-minute Short Break? Stretching helps too! 🧘",

@@ -175,3 +175,47 @@
     text-decoration: underline;
     color: var(--primary-dark);
 }
+
+/* Mobile Optimizations */
+@media (max-width: 480px) {
+    .auth-page {
+        padding: 12px;
+        /* Smaller padding */
+        align-items: center;
+        /* Prefer top alignment or slight padding top */
+        padding-top: 20px;
+        /* Safe space */
+        height: auto;
+        /* Allow Scroll */
+        min-height: 100vh;
+    }
+
+    .auth-card {
+        padding: 24px 20px;
+        /* Tighter padding */
+        border-radius: 20px;
+        gap: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .form-group input {
+        padding: 12px 12px 12px 42px;
+        /* Adjusted padding */
+        font-size: 0.95rem;
+    }
+
+    .input-icon {
+        left: 12px;
+        /* Match padding */
+    }
+
+    .social-login {
+        flex-direction: column;
+        /* Stack buttons on very narrow screens if needed, or keep row */
+        /* Let's keep row for now unless < 320px */
+    }
+}

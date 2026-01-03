@@ -33,11 +33,7 @@ const TimerPage = () => {
         <div className="timer-page">
 
 
-            {/* App Logo Header */}
-            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '2rem' }}>🌱</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--primary-dark)' }}>Pomodoro Farm</span>
-            </div>
+
 
             {/* Timer Card */}
             <div className="glass-container" style={{ margin: 0, width: '100%' }}>
