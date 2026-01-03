@@ -21,7 +21,8 @@ const INITIAL_STATE = {
     lastLoginDate: new Date().toISOString(),
     completedTasksCount: 0, // Track total tasks
     chatHistory: [], // AI Chat History
-    theme: 'default' // 'default', 'wood', 'cafe'
+    theme: 'default', // 'default', 'wood', 'cafe'
+    username: '' // User's customized village name
 };
 
 // Simplified Requirement Schema for auto-check or manual check
@@ -63,6 +64,12 @@ export const GameProvider = ({ children }) => {
                 if (docSnap.exists() && docSnap.data().gameState) {
                     // Normal load from Firestore
                     const loadedState = { ...INITIAL_STATE, ...docSnap.data().gameState };
+
+                    // Auto-fill username from Google if missing
+                    if (!loadedState.username && user.displayName) {
+                        loadedState.username = user.displayName;
+                    }
+
                     setGameState(loadedState);
                     // Update Ref immediately to prevent race conditions
                     gameStateRef.current = loadedState;
@@ -71,18 +78,24 @@ export const GameProvider = ({ children }) => {
                     const localKey = `pomodoro_game_state_${user.id}`;
                     const localSaved = localStorage.getItem(localKey);
 
+                    let newState = INITIAL_STATE;
+
                     if (localSaved) {
                         try {
                             const parsed = JSON.parse(localSaved);
                             console.log("Migrating local data to Firestore...", parsed);
-                            setGameState({ ...INITIAL_STATE, ...parsed });
+                            newState = { ...INITIAL_STATE, ...parsed };
                         } catch (e) {
                             console.error("Migration failed, using initial state", e);
-                            setGameState(INITIAL_STATE);
                         }
-                    } else {
-                        setGameState(INITIAL_STATE);
                     }
+
+                    // Auto-fill username for new state too
+                    if (!newState.username && user.displayName) {
+                        newState.username = user.displayName;
+                    }
+
+                    setGameState(newState);
                 }
                 setLoading(false);
             }, (error) => {
@@ -263,6 +276,14 @@ export const GameProvider = ({ children }) => {
         // Theme change isn't critical, let debounce handle it
     };
 
+    const updateUsername = (name) => {
+        setGameState(prev => {
+            const newState = { ...prev, username: name };
+            saveGameToFirestore(newState);
+            return newState;
+        });
+    };
+
     const completeFocusSession = (minutes, category = 'General') => {
         setGameState((prev) => {
             const newState = {
@@ -322,6 +343,7 @@ export const GameProvider = ({ children }) => {
             harvestCrop,
             addChatMessage,
             changeTheme,
+            updateUsername,
             loading
         }}>
             {children}

@@ -101,7 +101,9 @@ const translations = {
                 default: 'スタンダード',
                 wood: '木の温もり',
                 cafe: 'リラックスカフェ'
-            }
+            },
+            defaultName: 'ゲスト',
+            titleFormat: '{{name}}の村'
         },
         crops: {
             weed: '雑草',
@@ -245,7 +247,9 @@ const translations = {
                 default: 'Standard',
                 wood: 'Wood Cabin',
                 cafe: 'Relax Cafe'
-            }
+            },
+            defaultName: 'Guest',
+            titleFormat: "{{name}}'s Village"
         },
         crops: {
             weed: 'Weed',

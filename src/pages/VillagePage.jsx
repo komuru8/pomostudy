@@ -2,15 +2,28 @@ import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTimerContext } from '../context/TimerContext';
-import { CloudRain, Sprout, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { CloudRain, Sprout, ChevronLeft, ChevronRight, Lock, Edit2, Check } from 'lucide-react';
 import './VillagePage.css';
 
 const VillagePage = () => {
-    const { gameState, LEVELS, harvestCrop, changeTheme } = useGame();
+    const { gameState, LEVELS, harvestCrop, changeTheme, updateUsername } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
     const [lastHarvest, setLastHarvest] = useState(null);
     const [viewLevel, setViewLevel] = useState(gameState.level);
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editName, setEditName] = useState('');
+
+    // Init edit name when editing starts
+    const startEditing = () => {
+        setEditName(gameState.username || '');
+        setIsEditingName(true);
+    };
+
+    const saveName = () => {
+        updateUsername(editName);
+        setIsEditingName(false);
+    };
 
     const LEVEL_VISUALS = {
         1: { icon: '🏜️', label: t('village.wasteland') || 'Wasteland' },
@@ -61,6 +74,63 @@ const VillagePage = () => {
 
     return (
         <div className="village-page">
+            {/* User Name Header */}
+            <div className="user-greeting-section" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                {isEditingName ? (
+                    <div className="name-edit-group" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="name-input"
+                            style={{
+                                fontSize: '1.2rem',
+                                padding: '4px 8px',
+                                borderRadius: '8px',
+                                border: '2px solid var(--primary-color)',
+                                width: '150px',
+                                textAlign: 'center'
+                            }}
+                            autoFocus
+                        />
+                        <button
+                            onClick={saveName}
+                            className="icon-btn-circle"
+                            style={{
+                                background: '#2ecc71',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '32px',
+                                height: '32px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <Check size={18} />
+                        </button>
+                    </div>
+                ) : (
+                    <div onClick={startEditing} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h2 style={{
+                            margin: 0,
+                            fontSize: '1.4rem',
+                            color: 'var(--primary-dark)',
+                            fontWeight: '800',
+                            borderBottom: '1px dashed transparent'
+                        }}
+                            onMouseEnter={(e) => e.currentTarget.style.borderBottom = '1px dashed #ccc'}
+                            onMouseLeave={(e) => e.currentTarget.style.borderBottom = '1px dashed transparent'}
+                        >
+                            {(t('village.titleFormat') || '{{name}}の村').replace('{{name}}', gameState.username || t('village.defaultName'))}
+                        </h2>
+                        <Edit2 size={16} color="#95a5a6" />
+                    </div>
+                )}
+            </div>
+
             {/* Carousel Navigation Layer */}
             {viewLevel > 1 && (
                 <button className="nav-arrow left" onClick={handlePrev}>

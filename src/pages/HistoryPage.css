@@ -249,16 +249,23 @@
 
 @media (max-width: 480px) {
     .x-label {
-        font-size: 0.6rem;
-        transform: rotate(-30deg);
+        font-size: 0.55rem;
+        /* Smaller font */
+        transform: rotate(-45deg);
+        /* Steeper rotation to fit more */
         transform-origin: top center;
-        bottom: -5px;
-        /* Adjust for rotation layout shift */
+        bottom: -8px;
+        /* Push down to avoid overlap */
         white-space: nowrap;
+        width: 150%;
+        /* Allow wider flow when rotated */
+        left: -25%;
+        /* Center the wider box */
+        text-align: center;
     }
 
     .chart-column {
-        padding-bottom: 28px;
+        padding-bottom: 32px;
         /* More space for rotated labels */
     }
 

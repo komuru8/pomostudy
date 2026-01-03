@@ -48,7 +48,7 @@
 
 @media (max-width: 480px) {
     .content-area {
-        padding-bottom: 80px;
+        padding-bottom: 70px;
         /* Even smaller for mobile */
     }
 }

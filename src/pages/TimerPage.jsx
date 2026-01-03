@@ -37,29 +37,9 @@ const TimerPage = () => {
 
             {/* Timer Card */}
             <div className="glass-container" style={{ margin: 0, width: '100%' }}>
-                <h1 style={{ marginBottom: '0.5rem' }}>{getModeLabel(mode)}</h1>
+                <h1 style={{ marginBottom: '0.2rem', fontSize: '1.5rem', marginTop: 0 }}>{getModeLabel(mode)}</h1>
 
-                {/* Active Task Display */}
-                {activeTask ? (
-                    <div style={{
-                        background: 'rgba(46, 204, 113, 0.1)',
-                        padding: '8px 16px',
-                        borderRadius: '12px',
-                        marginBottom: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        border: '1px solid rgba(46, 204, 113, 0.2)'
-                    }}>
-                        <span style={{ fontSize: '1.2rem' }}>📌</span>
-                        <div style={{ textAlign: 'left' }}>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--primary-dark)', fontWeight: 'bold' }}>{t('timer.currentFocus')}</div>
-                            <div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-color)' }}>{activeTask.title}</div>
-                        </div>
-                    </div>
-                ) : (
-                    <div style={{ marginBottom: '1rem', height: '20px' }}></div>
-                )}
+
 
                 <TimerDisplay timeLeft={timeLeft} totalTime={totalTime} />
 

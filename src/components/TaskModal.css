@@ -95,6 +95,20 @@
     margin-bottom: 24px;
 }
 
+.selectors-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Ensure mobile also keeps 2 columns */
+@media (max-width: 480px) {
+    .selectors-grid-2col {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px;
+    }
+}
+
 .modal-footer {
     margin-top: 20px;
     display: flex;
@@ -126,7 +140,7 @@
         width: 100%;
         height: auto;
         min-height: 40%;
-        max-height: 85%;
+        max-height: 92%;
         /* Don't cover entire screen */
         border-radius: 24px 24px 0 0;
         /* Bottom sheet style or just rounded top */
@@ -134,7 +148,7 @@
         position: absolute;
         bottom: 0;
         margin: 0;
-        padding-bottom: 30px;
-        /* Safe area */
+        padding-bottom: 90px;
+        /* Safe area + Bottom Nav buffer + Cancel Button overlap fix */
     }
 }

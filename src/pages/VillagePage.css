@@ -149,6 +149,51 @@
     }
 }
 
+/* Mobile Compression for Village */
+@media (max-width: 480px) {
+    .village-page {
+        padding: 12px 0;
+        /* Minimal Horizontal Padding */
+    }
+
+    .level-header {
+        margin-bottom: 0.5rem;
+        /* Drastic reduction */
+    }
+
+    .village-visual {
+        height: 140px;
+        /* Reduced from 220px */
+        margin-bottom: 0.5rem;
+    }
+
+    .village-visual::before {
+        width: 120px;
+        height: 40px;
+    }
+
+    .main-emoji {
+        font-size: 5rem;
+        /* Reduced from 8rem */
+    }
+
+    .level-title {
+        font-size: 1.5rem;
+    }
+
+    .stats-card {
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .nav-arrow {
+        top: 180px;
+        /* Adjust arrow position for new visual height */
+        width: 36px;
+        height: 36px;
+    }
+}
+
 .stats-card {
     background: var(--card-bg);
     backdrop-filter: blur(12px);
