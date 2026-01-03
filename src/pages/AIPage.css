@@ -218,17 +218,22 @@
     .input-area {
         padding: 8px;
         gap: 8px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .chat-input {
         padding: 10px 14px;
         font-size: 0.95rem;
+        min-width: 0;
+        /* Critical for flex container shrinking */
     }
 
     .send-btn {
         width: 40px;
         height: 40px;
         min-width: 40px;
-        /* Ensure button doesn't shrink */
+        flex-shrink: 0;
+        /* Prevent button from squashing */
     }
 }

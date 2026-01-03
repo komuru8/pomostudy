@@ -79,7 +79,6 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 placeholder={t('tasks.placeholder')}
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                autoFocus
                                 className="task-input"
                                 style={{ fontSize: '1.2rem', padding: '12px 0' }}
                             />
@@ -162,6 +161,9 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                     <button type="submit" form="task-modal-form" className="save-btn" disabled={!title.trim()}>
                         <Save size={20} style={{ marginRight: '8px' }} />
                         {t('tasks.save')}
+                    </button>
+                    <button type="button" className="cancel-btn" onClick={onClose}>
+                        {t('tasks.cancel')}
                     </button>
                 </footer>
             </div>

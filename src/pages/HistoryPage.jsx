@@ -335,49 +335,86 @@ const HistoryPage = () => {
 
             <div className="chart-card">
                 <h2>{t('history.categoryDist') || 'Category Distribution'}</h2>
-                <div className="chart-with-axis">
-                    {/* Y-Axis */}
-                    <div className="y-axis">
-                        <div className="y-tick"><span>{Math.ceil(maxVal)}</span></div>
-                        <div className="y-tick"><span>{Math.ceil(maxVal * 0.75)}</span></div>
-                        <div className="y-tick"><span>{Math.ceil(maxVal * 0.5)}</span></div>
-                        <div className="y-tick"><span>{Math.ceil(maxVal * 0.25)}</span></div>
-                        <div className="y-tick"><span>0</span></div>
-                    </div>
+                {(() => {
+                    // NEW: Calculate Category Minutes from Session History
+                    // This aligns with "Time Memory" request
+                    const catMins = {};
+                    CATEGORIES.forEach(c => catMins[c] = 0);
 
-                    <div className="bar-chart">
-                        {/* Horizontal Grid Lines */}
-                        <div className="grid-lines">
-                            <div className="grid-line"></div>
-                            <div className="grid-line"></div>
-                            <div className="grid-line"></div>
-                            <div className="grid-line"></div>
-                            <div className="grid-line"></div>
-                        </div>
+                    // 1. Accumulate History
+                    const sessionHistory = gameState.sessionHistory || [];
+                    sessionHistory.forEach(s => {
+                        let cat = s.category || 'General';
+                        // Normalize
+                        cat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+                        // Ignore Breaks for Category Distribution if we only want Focus Categories
+                        // Usually 'Break' is not in CATEGORIES list so it's filtered naturally unless mapped to General
+                        if (CATEGORIES.includes(cat)) {
+                            catMins[cat] += (s.duration || 0);
+                        } else if (s.type === 'FOCUS') {
+                            // Map potential outliers to General
+                            catMins['General'] += (s.duration || 0);
+                        }
+                    });
 
-                        {CATEGORIES.map(cat => {
-                            const val = stats[cat];
-                            const percentage = (val / maxVal) * 100;
-                            // Ensure at least a sliver if 0 but we usually don't show negative
-                            const displayHeight = percentage;
+                    // 2. Add Live Session
+                    if (mode === 'FOCUS' && (totalTime - timeLeft) >= 60) {
+                        const elapsedMins = Math.floor((totalTime - timeLeft) / 60);
+                        const activeCat = activeTask?.category || 'General';
+                        const normActiveIndex = CATEGORIES.findIndex(c => c.toLowerCase() === activeCat.toLowerCase());
+                        const normActiveVal = normActiveIndex !== -1 ? CATEGORIES[normActiveIndex] : 'General';
+                        catMins[normActiveVal] += elapsedMins;
+                    }
 
-                            return (
-                                <div key={cat} className="chart-column">
-                                    <div className="bar-container">
-                                        <div
-                                            className={`bar-fill ${cat.toLowerCase()}`}
-                                            style={{ height: `${displayHeight}%` }}
-                                            title={`${Math.floor(val)} Pomodoros`}
-                                        >
-                                            {/* Removed internal value */}
-                                        </div>
-                                    </div>
-                                    <span className="x-label">{t(`tasks.categories.${cat.toLowerCase()}`)}</span>
+                    const maxCatVal = Math.max(...Object.values(catMins), 60); // Min scale 60m
+
+                    // Helper for Axis Labels
+                    const formatAxis = (m) => {
+                        if (m === 0) return '0';
+                        if (m >= 60) return `${(m / 60).toFixed(1)}h`;
+                        return `${m}m`;
+                    };
+
+                    return (
+                        <div className="chart-with-axis">
+                            {/* Y-Axis */}
+                            <div className="y-axis">
+                                <div className="y-tick"><span>{formatAxis(maxCatVal)}</span></div>
+                                <div className="y-tick"><span>{formatAxis(Math.round(maxCatVal * 0.75))}</span></div>
+                                <div className="y-tick"><span>{formatAxis(Math.round(maxCatVal * 0.5))}</span></div>
+                                <div className="y-tick"><span>{formatAxis(Math.round(maxCatVal * 0.25))}</span></div>
+                                <div className="y-tick"><span>0</span></div>
+                            </div>
+
+                            <div className="bar-chart">
+                                <div className="grid-lines">
+                                    <div className="grid-line"></div>
+                                    <div className="grid-line"></div>
+                                    <div className="grid-line"></div>
+                                    <div className="grid-line"></div>
+                                    <div className="grid-line"></div>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </div>
+
+                                {CATEGORIES.map(cat => {
+                                    const val = catMins[cat];
+                                    const percentage = (val / maxCatVal) * 100;
+                                    return (
+                                        <div key={cat} className="chart-column">
+                                            <div className="bar-container">
+                                                <div
+                                                    className={`bar-fill ${cat.toLowerCase()}`}
+                                                    style={{ height: `${percentage}%` }}
+                                                    title={`${val} minutes`}
+                                                ></div>
+                                            </div>
+                                            <span className="x-label">{t(`tasks.categories.${cat.toLowerCase()}`)}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );
