@@ -19,7 +19,9 @@ const INITIAL_STATE = {
     streakDays: 0,
     loginDays: 1,
     lastLoginDate: new Date().toISOString(),
-    completedTasksCount: 0 // Track total tasks
+    completedTasksCount: 0, // Track total tasks
+    chatHistory: [], // AI Chat History
+    theme: 'default' // 'default', 'wood', 'cafe'
 };
 
 // Simplified Requirement Schema for auto-check or manual check
@@ -41,6 +43,14 @@ export const GameProvider = ({ children }) => {
     const [gameState, setGameState] = useState(INITIAL_STATE);
     const [loading, setLoading] = useState(true);
 
+    // Ref to track latest state for event listeners and async operations
+    const gameStateRef = React.useRef(gameState);
+
+    // Sync Ref with State
+    useEffect(() => {
+        gameStateRef.current = gameState;
+    }, [gameState]);
+
     // Load/Listen to Firestore
     useEffect(() => {
         let unsubscribe = () => { };
@@ -52,10 +62,12 @@ export const GameProvider = ({ children }) => {
             unsubscribe = onSnapshot(userRef, (docSnap) => {
                 if (docSnap.exists() && docSnap.data().gameState) {
                     // Normal load from Firestore
-                    setGameState(prev => ({ ...INITIAL_STATE, ...docSnap.data().gameState }));
+                    const loadedState = { ...INITIAL_STATE, ...docSnap.data().gameState };
+                    setGameState(loadedState);
+                    // Update Ref immediately to prevent race conditions
+                    gameStateRef.current = loadedState;
                 } else {
                     // Firestore is empty or missing gameState.
-                    // Try to migrate from localStorage (Legacy Support)
                     const localKey = `pomodoro_game_state_${user.id}`;
                     const localSaved = localStorage.getItem(localKey);
 
@@ -64,13 +76,11 @@ export const GameProvider = ({ children }) => {
                             const parsed = JSON.parse(localSaved);
                             console.log("Migrating local data to Firestore...", parsed);
                             setGameState({ ...INITIAL_STATE, ...parsed });
-                            // The useEffect saving hook will auto-upload this to Firestore shortly.
                         } catch (e) {
                             console.error("Migration failed, using initial state", e);
                             setGameState(INITIAL_STATE);
                         }
                     } else {
-                        // No local data, truly new user
                         setGameState(INITIAL_STATE);
                     }
                 }
@@ -87,42 +97,49 @@ export const GameProvider = ({ children }) => {
         return () => unsubscribe();
     }, [user]);
 
-    // Save to Firestore (Debounced or direct?)
-    // Using a ref to prevent infinite loops if we were using a 2-way binding effect efficiently, 
-    // but simplifying by creating a helper that saves AND sets state is better.
-    // However, existing code uses setsGameState extensively.
-    // Let's attach a saver effect but check for deep equality or rely on Firestore client side deduplication.
+    // Helper to save immediately
+    const saveGameToFirestore = async (state) => {
+        if (!user) return;
+        try {
+            const userRef = doc(db, 'users', user.id);
+            await setDoc(userRef, { gameState: state }, { merge: true });
+            console.log("Game State Saved to Firestore");
+        } catch (e) {
+            console.error("Error saving game state:", e);
+        }
+    };
 
-    // Actually, simplest migration: use saveGameData helper for critical actions, 
-    // OR persist-on-change effect with a debounce.
-    // Given the prompt "Database persistence", let's use the effect to ensure EVERYTHING is saved.
-
+    // 1. Debounced Auto-Save for general changes
     useEffect(() => {
         if (!user || loading) return;
 
-        const saveToFirestore = async () => {
-            try {
-                const userRef = doc(db, 'users', user.id);
-                // We utilize setDoc with merge.
-                // Note: This will write to DB on every local change.
-                // Be careful of write costs. Debouncing recommended.
-                await setDoc(userRef, { gameState }, { merge: true });
-            } catch (e) {
-                console.error("Error saving game state:", e);
-            }
-        };
+        const timeoutId = setTimeout(() => {
+            saveGameToFirestore(gameState);
+        }, 2000); // 2 sec debounce for general updates (chat, etc)
 
-        const timeoutId = setTimeout(saveToFirestore, 1000); // 1 sec debounce
         return () => clearTimeout(timeoutId);
-
     }, [gameState, user, loading]);
 
+    // 2. Safety Net: Save on Tab Close / Refresh
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (user && !loading) {
+                // Attempt to save. Note: Modern browsers limit async calls in unload.
+                // We use 'navigator.sendBeacon' or acceptable fetch patterns if needed, 
+                // but standard Firestore SDK usually tries best effort.
+                // For critical data, we relies on 'completeFocusSession' immediate save.
+                saveGameToFirestore(gameStateRef.current);
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [user, loading]);
 
-    // Login Streak Logic (Simple check on mount/user change)
+
+    // Login Streak Logic
     useEffect(() => {
         if (!user || loading) return;
         const today = new Date().toDateString();
-        // Guard against null lastLoginDate
         const lastLogin = gameState.lastLoginDate ? new Date(gameState.lastLoginDate).toDateString() : new Date().toDateString();
 
         if (today !== lastLogin) {
@@ -133,7 +150,7 @@ export const GameProvider = ({ children }) => {
             if (diffDays === 1) {
                 newStreak += 1;
             } else if (diffDays > 1) {
-                newStreak = 1; // Reset streak
+                newStreak = 1;
             }
 
             setGameState(prev => ({
@@ -143,19 +160,19 @@ export const GameProvider = ({ children }) => {
                 lastLoginDate: new Date().toISOString()
             }));
         }
-    }, [user, loading]); // Depend on loading to ensure we have fetched data first
+    }, [user, loading]);
 
     const checkLevelUp = (currentState) => {
         let newLevel = currentState.level;
         const totalMinutes = currentState.totalWP || 0;
         const tasks = currentState.completedTasksCount || 0;
 
-        // Requirement: To Reach Lv 2: 3 Tasks, 1 Pomodoro
+        // Lv 2: 3 Tasks, 1 Pomodoro
         if (newLevel < 2) {
             const pomoCount = currentState.sessionHistory?.filter(s => s.type === 'FOCUS' && s.duration >= 25).length || 0;
             if (tasks >= 3 && pomoCount >= 1) newLevel = 2;
         }
-        // To Reach Lv 3: 3 Hours (180m)
+        // Lv 3: 3 Hours (180m)
         else if (newLevel < 3) {
             if (totalMinutes >= 180) newLevel = 3;
         }
@@ -185,7 +202,9 @@ export const GameProvider = ({ children }) => {
                 completedTasksCount: (prev.completedTasksCount || 0) + 1
             };
             const nextLevel = checkLevelUp(newState);
-            return { ...newState, level: nextLevel };
+            const finalState = { ...newState, level: nextLevel };
+            saveGameToFirestore(finalState); // Immediate Save
+            return finalState;
         });
     };
 
@@ -222,9 +241,26 @@ export const GameProvider = ({ children }) => {
                 xp: (prev.xp || 0) + newCrop.xp,
                 totalXP: (prev.totalXP || 0) + newCrop.xp
             };
+            saveGameToFirestore(newState); // Immediate Save
             return newState;
         });
         return newCrop;
+    };
+
+    const addChatMessage = (message) => {
+        setGameState(prev => {
+            const currentHistory = prev.chatHistory || [];
+            const newHistory = [...currentHistory, message];
+            if (newHistory.length > 50) {
+                return { ...prev, chatHistory: newHistory.slice(newHistory.length - 50) };
+            }
+            return { ...prev, chatHistory: newHistory };
+        });
+    };
+
+    const changeTheme = (themeName) => {
+        setGameState(prev => ({ ...prev, theme: themeName }));
+        // Theme change isn't critical, let debounce handle it
     };
 
     const completeFocusSession = (minutes, category = 'General') => {
@@ -245,24 +281,33 @@ export const GameProvider = ({ children }) => {
                 ]
             };
             const nextLevel = checkLevelUp(newState);
-            return { ...newState, level: nextLevel };
+            const finalState = { ...newState, level: nextLevel };
+
+            // CRITICAL: Save immediately to prevent data loss on close
+            saveGameToFirestore(finalState);
+
+            return finalState;
         });
     };
 
     const completeBreakSession = (minutes, type = 'SHORT_BREAK') => {
-        setGameState((prev) => ({
-            ...prev,
-            sessionHistory: [
-                {
-                    id: Date.now(),
-                    date: new Date().toISOString(),
-                    duration: minutes,
-                    category: 'Break',
-                    type
-                },
-                ...(prev.sessionHistory || [])
-            ]
-        }));
+        setGameState((prev) => {
+            const newState = {
+                ...prev,
+                sessionHistory: [
+                    {
+                        id: Date.now(),
+                        date: new Date().toISOString(),
+                        duration: minutes,
+                        category: 'Break',
+                        type
+                    },
+                    ...(prev.sessionHistory || [])
+                ]
+            };
+            saveGameToFirestore(newState); // Immediate Save
+            return newState;
+        });
     };
 
     return (
@@ -275,6 +320,8 @@ export const GameProvider = ({ children }) => {
             completeFocusSession,
             completeBreakSession,
             harvestCrop,
+            addChatMessage,
+            changeTheme,
             loading
         }}>
             {children}

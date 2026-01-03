@@ -35,8 +35,8 @@
 
 .content-area {
     flex: 1;
-    padding-top: 80px;
-    /* Space for fixed header */
+    padding-top: 68px;
+    /* Reduced Space for fixed header (was 80px) */
     padding-bottom: 100px;
     /* Space for bottom nav */
     width: 100%;

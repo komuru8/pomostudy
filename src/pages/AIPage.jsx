@@ -8,19 +8,31 @@ import './AIPage.css';
 
 const AIPage = () => {
     const { t } = useLanguage();
-    const { gameState } = useGame();
+    const { gameState, addChatMessage } = useGame();
     const { tasks } = useTasks();
     const [input, setInput] = useState('');
-    const [messages, setMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
 
-    // Initialize with welcome message
+    // Use chatHistory from context. If undefined/empty, we might want to show default.
+    // However, to persist the default, we should add it once.
+    // Let's use a local variable to combine saved history + potential typing.
+    const messages = gameState.chatHistory || [];
+
+    // Initialize with welcome message if absolutely empty and not loading?
+    // Doing this in useEffect to avoid double-writes.
     useEffect(() => {
         if (messages.length === 0) {
-            setMessages([{ id: Date.now(), text: t('ai.responses.default'), sender: 'ai' }]);
+            // Only add if truly empty.
+            // Using a timeout to ensure we don't conflict with initial load
+            const timer = setTimeout(() => {
+                if ((gameState.chatHistory || []).length === 0) {
+                    addChatMessage({ id: Date.now(), text: t('ai.responses.default'), sender: 'ai' });
+                }
+            }, 500);
+            return () => clearTimeout(timer);
         }
-    }, [t]);
+    }, [t, gameState.chatHistory]); // Depend on history length
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -82,14 +94,17 @@ Context: ${context}
 
         const userText = input;
         const newMsg = { id: Date.now(), text: userText, sender: 'user' };
-        setMessages(prev => [...prev, newMsg]);
+
+        // Save User Message
+        addChatMessage(newMsg);
         setInput('');
         setIsTyping(true);
 
         // API Call
         const aiResponseText = await generateResponse(userText);
 
-        setMessages(prev => [...prev, { id: Date.now() + 1, text: aiResponseText, sender: 'ai' }]);
+        // Save AI Message
+        addChatMessage({ id: Date.now() + 1, text: aiResponseText, sender: 'ai' });
         setIsTyping(false);
     };
 

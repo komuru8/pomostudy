@@ -3,14 +3,25 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
+import { useGame } from '../context/GameContext';
 import { Globe, LogIn, LogOut, Menu, X } from 'lucide-react';
 import './MainLayout.css';
 
 const MainLayout = () => {
     const { language, toggleLanguage, t } = useLanguage();
     const { user, logout } = useAuth();
+    const { gameState } = useGame(); // Import GameContext
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+    // Sync Theme with Body Class
+    React.useEffect(() => {
+        if (gameState?.theme) {
+            document.body.className = `theme-${gameState.theme}`;
+        } else {
+            document.body.className = '';
+        }
+    }, [gameState?.theme]);
 
     const handleAuthClick = () => {
         if (user) {

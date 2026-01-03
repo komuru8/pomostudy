@@ -6,7 +6,7 @@ import { CloudRain, Sprout, ChevronLeft, ChevronRight, Lock } from 'lucide-react
 import './VillagePage.css';
 
 const VillagePage = () => {
-    const { gameState, LEVELS, harvestCrop } = useGame();
+    const { gameState, LEVELS, harvestCrop, changeTheme } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
     const [lastHarvest, setLastHarvest] = useState(null);
@@ -250,6 +250,49 @@ const VillagePage = () => {
                                                     ) : (
                                                         <div className="empty-crops">{t('village.emptyCollection')}</div>
                                                     )}
+                                                </div>
+                                            </div>
+
+                                            {/* Theme Selector Section */}
+                                            <div className="theme-section" style={{ marginTop: '24px', width: '100%', paddingBottom: '20px' }}>
+                                                <h3>{t('village.themes') || 'Themes'}</h3>
+                                                <div className="theme-grid" style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                                    {['default', 'wood', 'cafe'].map((themeName, idx) => {
+                                                        const unlockLevel = idx + 1; // 1, 2, 3
+                                                        const isLocked = gameState.level < unlockLevel;
+                                                        const isActive = (gameState.theme || 'default') === themeName;
+
+                                                        const themeLabels = {
+                                                            default: t('village.themeNames.default'),
+                                                            wood: t('village.themeNames.wood'),
+                                                            cafe: t('village.themeNames.cafe')
+                                                        };
+
+                                                        return (
+                                                            <button
+                                                                key={themeName}
+                                                                className={`theme-btn ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
+                                                                onClick={() => !isLocked && changeTheme(themeName)}
+                                                                disabled={isLocked}
+                                                                style={{
+                                                                    padding: '8px 12px',
+                                                                    borderRadius: '12px',
+                                                                    border: isActive ? '2px solid var(--primary-color)' : '1px solid #ddd',
+                                                                    background: isActive ? '#e8f8f5' : (isLocked ? '#f5f5f5' : '#fff'),
+                                                                    opacity: isLocked ? 0.6 : 1,
+                                                                    cursor: isLocked ? 'not-allowed' : 'pointer',
+                                                                    fontWeight: isActive ? 'bold' : 'normal',
+                                                                    fontSize: '0.9rem',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '4px'
+                                                                }}
+                                                            >
+                                                                {isLocked && <Lock size={12} />}
+                                                                {themeLabels[themeName]}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>

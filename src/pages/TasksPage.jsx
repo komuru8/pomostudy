@@ -1,78 +1,40 @@
 import React, { useState } from 'react';
 import { useTasks } from '../context/TaskContext';
-import { useGame } from '../context/GameContext'; // New import
+import { useGame } from '../context/GameContext';
 import TaskItem from '../components/TaskItem';
+import TaskModal from '../components/TaskModal'; // Import Modal
 import { useLanguage } from '../context/LanguageContext';
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import './TasksPage.css';
 
 const TasksPage = () => {
-    const { tasks, activeTaskId, addTask, updateTask, deleteTask, selectActiveTask, toggleToday } = useTasks();
-    const { incrementTaskStat } = useGame(); // Import game logic
+    const { tasks, activeTaskId, addTask, updateTask, deleteTask, selectActiveTask } = useTasks();
+    const { incrementTaskStat } = useGame();
     const { t } = useLanguage();
 
-    const [title, setTitle] = useState('');
-    const [priority, setPriority] = useState('TODAY');
-    const [category, setCategory] = useState('Study');
-    const [subCategory, setSubCategory] = useState('');
-    const [targetPomodoros, setTargetPomodoros] = useState(1); // Default 1
     const [isFormOpen, setIsFormOpen] = useState(false);
-
     const [searchQuery, setSearchQuery] = useState('');
     const [filterCategory, setFilterCategory] = useState('ALL');
     const [sortBy, setSortBy] = useState('PRIORITY');
 
-    // Requested Order: Study, Health, Hobby, Work, General
     const CATEGORIES = ['Study', 'Health', 'Hobby', 'Work', 'General'];
 
-    const SUB_CATEGORIES = {
-        Work: ['meeting', 'development', 'planning', 'email'],
-        Study: ['math', 'english', 'programming', 'reading'],
-        Health: ['exercise', 'meditation', 'meal'],
-        Hobby: ['game', 'art', 'music'],
-        General: ['chores', 'shopping', 'misc']
-    };
-
-    const handleCategoryChange = (e) => {
-        const newCat = e.target.value;
-        setCategory(newCat);
-        setSubCategory('');
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!title.trim()) return;
-
-        addTask({
-            title,
-            priority,
-            category,
-            subCategory,
-            targetPomodoros
-        });
-
-        setTitle('');
-        setCategory('General');
-        setSubCategory('');
-        setTargetPomodoros(1); // Reset
+    const handleAddTask = (taskData) => {
+        addTask(taskData);
         setIsFormOpen(false);
     };
 
     const handleComplete = (id) => {
+        // ... (Keep existing logic)
         const task = tasks.find(t => t.id === id);
         if (task) {
             const newStatus = task.status === 'DONE' ? 'TODO' : 'DONE';
             const updates = { status: newStatus };
             if (newStatus === 'DONE') {
                 updates.completedAt = new Date().toISOString();
-                incrementTaskStat(); // Trigger game stat update
+                incrementTaskStat();
             } else {
                 updates.completedAt = null;
-                // Optionally decrement? The doc doesn't specify losing progress.
-                // For "Total Tasks" cumulative count, we usually don't decrement even if un-done, 
-                // but "Level Up Condition: 3 Tasks Completed" implies "Currently Completed".
-                // However, roadmap usually implies "Cumulative Achievements". 
-                // Let's keep it simple: only increment on completion.
             }
             updateTask(id, updates);
         }
@@ -105,7 +67,7 @@ const TasksPage = () => {
         <div className="tasks-page">
             <header className="page-header">
                 <h1>{t('tasks.title')}</h1>
-                <button className="add-task-btn-pill" onClick={() => setIsFormOpen(!isFormOpen)}>
+                <button className="add-task-btn-pill" onClick={() => setIsFormOpen(true)}>
                     <Plus size={18} />
                     <span>{t('tasks.newTask')}</span>
                 </button>
@@ -144,106 +106,12 @@ const TasksPage = () => {
                 </div>
             </div>
 
-            {isFormOpen && (
-                <form className="task-form" onSubmit={handleSubmit}>
-                    {/* Close Button Top Right */}
-                    <button
-                        type="button"
-                        className="close-form-btn"
-                        onClick={() => setIsFormOpen(false)}
-                        title="Close"
-                    >
-                        <X size={20} />
-                    </button>
-
-                    <div className="input-group">
-                        <input
-                            type="text"
-                            placeholder={t('tasks.placeholder')}
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            autoFocus
-                            className="task-input"
-                        />
-                        {title && (
-                            <button type="button" className="clear-input-btn" onClick={() => setTitle('')}>
-                                <X size={16} />
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="form-actions-grid">
-                        <div className="selectors-grid-2col">
-                            {/* 1. Category */}
-                            <div className="select-wrapper">
-                                <label className="select-label">{t('tasks.labels.category') || 'Category'}</label>
-                                <select
-                                    value={category}
-                                    onChange={handleCategoryChange}
-                                    className="priority-select"
-                                >
-                                    {CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>
-                                            {t(`tasks.categories.${cat.toLowerCase()}`)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* 2. SubCategory */}
-                            <div className="select-wrapper">
-                                <label className="select-label">{t('tasks.labels.subCategory') || 'Sub'}</label>
-                                <select
-                                    value={subCategory}
-                                    onChange={(e) => setSubCategory(e.target.value)}
-                                    className="priority-select"
-                                    disabled={!SUB_CATEGORIES[category]}
-                                >
-                                    <option value="">{t('tasks.subCategories.misc') || 'Select...'}</option>
-                                    {SUB_CATEGORIES[category]?.map(sub => (
-                                        <option key={sub} value={sub}>
-                                            {t(`tasks.subCategories.${sub}`) || sub}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* 3. Priority */}
-                            <div className="select-wrapper">
-                                <label className="select-label">{t('tasks.labels.priority') || 'Priority'}</label>
-                                <select
-                                    value={priority}
-                                    onChange={(e) => setPriority(e.target.value)}
-                                    className="priority-select"
-                                >
-                                    <option value="TODAY">{t('tasks.priority.today')}</option>
-                                    <option value="HIGH">{t('tasks.priority.high')}</option>
-                                    <option value="MEDIUM">{t('tasks.priority.medium')}</option>
-                                    <option value="LOW">{t('tasks.priority.low')}</option>
-                                </select>
-                            </div>
-
-                            {/* 4. Target Time (1-6 Pomodoros) */}
-                            <div className="select-wrapper">
-                                <label className="select-label">{t('tasks.labels.target') || 'Target'}</label>
-                                <select
-                                    value={targetPomodoros}
-                                    onChange={(e) => setTargetPomodoros(Number(e.target.value))}
-                                    className="priority-select"
-                                >
-                                    {[1, 2, 3, 4, 5, 6].map(num => (
-                                        <option key={num} value={num}>
-                                            {num} {'🍅'.repeat(num)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <button type="submit" className="save-btn">{t('tasks.save')}</button>
-                    </div>
-                </form>
-            )}
+            {/* Task Modal Replacement */}
+            <TaskModal
+                isOpen={isFormOpen}
+                onClose={() => setIsFormOpen(false)}
+                onSubmit={handleAddTask}
+            />
 
             <div className="tasks-list">
                 {filteredAndSortedTasks.length === 0 ? (

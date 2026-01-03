@@ -94,7 +94,13 @@ const translations = {
             lockedArea: 'ロックされたエリア',
             unlockHint: '前のレベルの条件を達成して解放',
             harvestLocked: '収穫する（ロック中）',
-            harvestLimit: '収穫済み'
+            harvestLimit: '収穫済み',
+            themes: 'テーマ設定',
+            themeNames: {
+                default: 'スタンダード',
+                wood: '木の温もり',
+                cafe: 'リラックスカフェ'
+            }
         },
         crops: {
             weed: '雑草',
@@ -231,7 +237,13 @@ const translations = {
             lockedArea: 'Locked Area',
             unlockHint: 'Complete requirements in previous level to unlock',
             harvestLocked: 'Harvest (Locked)',
-            harvestLimit: 'Harvested'
+            harvestLimit: 'Harvested',
+            themes: 'Themes',
+            themeNames: {
+                default: 'Standard',
+                wood: 'Wood Cabin',
+                cafe: 'Relax Cafe'
+            }
         },
         crops: {
             weed: 'Weed',

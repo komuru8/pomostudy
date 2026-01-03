@@ -27,12 +27,20 @@
   --font-main: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: var(--font-main);
   background: var(--bg-gradient);
   color: var(--text-color);
   min-height: 100vh;
+  overflow-x: hidden;
+  /* Fix horizontal scroll */
   /* Add subtle texture */
   background-image:
     radial-gradient(#2ecc71 0.5px, transparent 0.5px),
@@ -40,12 +48,48 @@ body {
   background-size: 20px 20px;
   background-position: 0 0, 10px 10px;
   background-color: var(--bg-color);
+  transition: background 0.5s ease;
+  /* For Theme Switching */
+}
+
+/* Theme Classes */
+body.theme-wood {
+  --primary-color: #d35400;
+  --primary-dark: #a04000;
+  --bg-gradient: linear-gradient(135deg, #fcebb6 0%, #f8c291 100%);
+  background-image: repeating-linear-gradient(45deg, #e67e22 0, #e67e22 1px, transparent 0, transparent 50%);
+  background-size: 10px 10px;
+}
+
+body.theme-cafe {
+  --primary-color: #8e44ad;
+  --primary-dark: #5b2c6f;
+  --bg-gradient: linear-gradient(135deg, #f5eef8 0%, #d7bde2 100%);
+  background-image: none;
 }
 
 #root {
   width: 100%;
   display: flex;
   justify-content: center;
+}
+
+/* Prevent iOS Zoom on focus */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+}
+
+@media (max-width: 480px) {
+  #root {
+    padding: 12px;
+    /* Reduce padding on mobile */
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }
 
 /* Glass Card Global Style */
@@ -55,16 +99,18 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
-  padding: 2rem;
+  padding: 1.5rem;
+  /* Reduced padding */
   box-shadow: var(--glass-shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  width: 90%;
+  gap: 1.25rem;
+  width: 100%;
+  /* Use 100% instead of 90% + max-width strategy for better fit */
   max-width: 450px;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .glass-container:hover {

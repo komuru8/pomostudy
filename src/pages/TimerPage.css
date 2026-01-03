@@ -1,13 +1,19 @@
 .timer-page {
-    padding: 24px;
+    padding: 16px 24px;
+    /* Reduced top padding */
     max-width: 600px;
     margin: 0 auto;
     min-height: 80vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    /* Align to top to reduce gap */
+    padding-top: 10px;
+    /* Explicit small top padding */
     position: relative;
+    gap: 1rem;
+    /* Add gap between elements */
 }
 
 /* Active Task Banner */
