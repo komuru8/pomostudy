@@ -16,6 +16,17 @@
     /* Add gap between elements */
 }
 
+@media (max-width: 480px) {
+    .timer-page {
+        min-height: 60vh;
+        /* Allow it to be shorter on mobile */
+        padding: 12px 16px;
+        padding-top: 4px;
+        /* Tighter top spacing */
+        gap: 0.5rem;
+    }
+}
+
 /* Active Task Banner */
 .active-task-card {
     background: white;

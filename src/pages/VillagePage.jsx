@@ -145,7 +145,7 @@ const VillagePage = () => {
                                                 <div className="level-requirements-box">
                                                     <h4>{t('village.toNextLevel') || 'To Next Level'}</h4>
 
-                                                    {/* Study Time Progress */}
+                                                    {/* Study Time Progress Only */}
                                                     <div className="req-row">
                                                         <div className="req-header">
                                                             <span className={reqTime <= 0 ? 'done' : ''}>
@@ -166,45 +166,12 @@ const VillagePage = () => {
                                                             ></div>
                                                         </div>
                                                     </div>
-
-                                                    {/* Tasks Progress */}
-                                                    <div className="req-row">
-                                                        <div className="req-header">
-                                                            <span className={reqTasks <= 0 ? 'done' : ''}>
-                                                                ・ {t('village.tasks') || 'Tasks Completed'}:
-                                                                {` ${Math.min(gameState.completedTasksCount, nextLevelTarget.reqTasks)}/${nextLevelTarget.reqTasks}`}
-                                                                {reqTasks <= 0 && ' ✅'}
-                                                            </span>
-                                                            <span className="req-percent">
-                                                                {nextLevelTarget.reqTasks > 0
-                                                                    ? Math.min(100, Math.floor((gameState.completedTasksCount / nextLevelTarget.reqTasks) * 100))
-                                                                    : 100}%
-                                                            </span>
-                                                        </div>
-                                                        <div className="req-progress-track">
-                                                            <div
-                                                                className="req-progress-fill"
-                                                                style={{ width: `${nextLevelTarget.reqTasks > 0 ? Math.min(100, (gameState.completedTasksCount / nextLevelTarget.reqTasks) * 100) : 100}%` }}
-                                                            ></div>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             ) : (
                                                 <div className="level-max">MAX LEVEL REACHED</div>
                                             )}
 
-                                            <div className="resources-row">
-                                                <div className="resource-item">
-                                                    <CloudRain size={20} color="#4ecdc4" />
-                                                    <span className="res-count">{gameState.water || 0}</span>
-                                                    <div className="res-details" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginLeft: '6px' }}>
-                                                        <span className="res-name">{t('village.water')}</span>
-                                                        <span className="res-note" style={{ fontSize: '0.65rem', opacity: 0.8 }}>{t('village.waterNote')}</span>
-                                                    </div>
-                                                </div>
 
-
-                                            </div>
 
                                             <div className="field-section">
                                                 <h3>{t('field.yourField')}</h3>

@@ -26,16 +26,16 @@ const INITIAL_STATE = {
 
 // Simplified Requirement Schema for auto-check or manual check
 const LEVELS = [
-    { level: 1, label: '荒れ地', reqTime: 0, reqTasks: 0 },
-    { level: 2, label: '耕された土', reqTime: 25, reqTasks: 3, reqChat: 1 }, // 25min (1 Pomo), 3 Tasks
-    { level: 3, label: '小さな芽', reqTime: 600, reqTasks: 10 }, // 10 hours
-    { level: 4, label: '実りの農家', reqTime: 1800, reqTasks: 10 }, // 30 hours
-    { level: 5, label: '集いの集落', reqTime: 3600, reqTasks: 10 }, // 60 hours
-    { level: 6, label: '賑わいの市場', reqTime: 9000, reqTasks: 10 }, // 150 hours
-    { level: 7, label: '学園都市', reqTime: 0, reqTasks: 300 }, // 300 tasks implies high hours usually
-    { level: 8, label: '賢者の城下町', reqTime: 30000, reqTasks: 300 }, // 500 hours
-    { level: 9, label: '天空の庭園', reqTime: 48000, reqTasks: 300 }, // 800 hours
-    { level: 10, label: '叡智のユートピア', reqTime: 60000, reqTasks: 300 } // 1000 hours
+    { level: 1, label: '荒れ地', reqTime: 0 },
+    { level: 2, label: '耕された土', reqTime: 25 }, // 25min (1 Pomo)
+    { level: 3, label: '小さな芽', reqTime: 180 }, // 3 hours
+    { level: 4, label: '実りの農家', reqTime: 600 }, // 10 hours
+    { level: 5, label: '集いの集落', reqTime: 1800 }, // 30 hours
+    { level: 6, label: '賑わいの市場', reqTime: 3600 }, // 60 hours
+    { level: 7, label: '学園都市', reqTime: 9000 }, // 150 hours
+    { level: 8, label: '賢者の城下町', reqTime: 18000 }, // 300 hours
+    { level: 9, label: '天空の庭園', reqTime: 30000 }, // 500 hours
+    { level: 10, label: '叡智のユートピア', reqTime: 60000 } // 1000 hours
 ];
 
 export const GameProvider = ({ children }) => {
