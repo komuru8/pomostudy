@@ -28,7 +28,8 @@ const translations = {
             total: '累計',
             focusSessions: '集中回数',
             shortBreaks: '休憩回数',
-            longBreaks: '長い休憩回数'
+            longBreaks: '長い休憩回数',
+            companionMsg: '頑張って！村は順調に育っていますよ。'
         },
         timer: {
             focus: '集中',
@@ -148,6 +149,12 @@ const translations = {
                 tired: 'お疲れのようですね。5分間の小休憩はいかがですか？ストレッチもおすすめですよ！🧘',
                 plan: '今日のおすすめプランです：\n1. 🍅 集中 (25分) - 最難関のタスク\n2. ☕ 休憩 (5分)\n3. 🍅 集中 (25分) - 継続\n4. 🥗 長休憩 (15分)\n頑張りましょう！',
                 hello: 'こんにちは！今日も村を育てましょう🌱'
+            },
+            suggestions: {
+                plan: '📅 毎日の計画を立てて',
+                tips: '💡 勉強のコツを教えて',
+                motivation: '🔥 やる気が出ない...',
+                focus5: '⏱️ 5分だけ集中したい'
             }
         }
     },
@@ -174,7 +181,8 @@ const translations = {
             total: 'Total',
             focusSessions: 'Focus Sessions',
             shortBreaks: 'Short Breaks',
-            longBreaks: 'Long Breaks'
+            longBreaks: 'Long Breaks',
+            companionMsg: 'Keep going! Your village is growing nicely.'
         },
         timer: {
             focus: 'Focus',
@@ -307,11 +315,13 @@ export const LanguageProvider = ({ children }) => {
         localStorage.setItem('pomodoro_lang', language);
     }, [language]);
 
-    const t = (path) => {
+    const t = (path, defaultValue) => {
         const keys = path.split('.');
         let current = translations[language];
         for (const key of keys) {
-            if (current === undefined || current[key] === undefined) return path;
+            if (current === undefined || current[key] === undefined) {
+                return defaultValue !== undefined ? defaultValue : path;
+            }
             current = current[key];
         }
         return current;

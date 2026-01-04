@@ -272,7 +272,7 @@ const HistoryPage = () => {
                 <div className="tomato-companion-card mb-24">
                     <div className="companion-avatar">🍅</div>
                     <div className="companion-speech">
-                        <p>{t('history.companionMsg') || 'Keep going! Your village is growing nicely.'}</p>
+                        <p>{t('history.companionMsg', '頑張って！村は順調に育っていますよ。')}</p>
                     </div>
                 </div>
             )}
