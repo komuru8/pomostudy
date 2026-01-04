@@ -67,12 +67,7 @@
     box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5);
 }
 
-@media (max-width: 480px) {
-    .chat-container {
-        height: 30vh;
-        /* Shorter for mobile */
-    }
-}
+/* Mobile logic moved to bottom media query */
 
 /* Messages */
 .message {
@@ -210,30 +205,52 @@
 
 @media (max-width: 480px) {
     .ai-page {
-        padding: 16px;
+        padding: 5px;
+        /* Extremely tight padding */
+        min-height: auto;
     }
 
     .ai-header {
-        padding: 12px;
-        border-radius: 16px;
+        padding: 8px;
+        border-radius: 12px;
+        margin-bottom: 5px;
+        flex-shrink: 0;
+    }
+
+    .ai-header h1 {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .status-indicator {
+        font-size: 0.7rem;
     }
 
     .chat-container {
-        padding: 16px;
+        padding: 10px;
+        height: 25vh;
+        /* Very aggressive reduction */
+        margin-bottom: 5px;
+        flex-shrink: 1;
+        /* Allow shrinking */
     }
 
     .input-area {
-        padding: 8px;
-        gap: 8px;
+        padding: 6px;
+        gap: 6px;
         width: 100%;
         box-sizing: border-box;
+        border-radius: 12px;
+        flex-shrink: 0;
+        margin-bottom: 5px;
     }
 
     .chat-input {
-        padding: 10px 14px;
-        font-size: 0.95rem;
+        padding: 8px 10px;
+        font-size: 0.9rem;
         min-width: 0;
-        /* Critical for flex container shrinking */
+        height: 40px;
+        /* Fixed height for input to prevent growth */
     }
 
     .send-btn {
@@ -241,6 +258,12 @@
         height: 40px;
         min-width: 40px;
         flex-shrink: 0;
-        /* Prevent button from squashing */
+    }
+
+    /* Reduce message text size */
+    .message {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        border-radius: 12px;
     }
 }

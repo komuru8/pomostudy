@@ -5,6 +5,7 @@ import TaskItem from '../components/TaskItem';
 import { useTimerContext } from '../context/TimerContext';
 import { useTasks } from '../context/TaskContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useGame } from '../context/GameContext'; // Import useGame
 import './TimerPage.css';
 
 const TimerPage = () => {

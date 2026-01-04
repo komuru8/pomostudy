@@ -43,7 +43,7 @@ const Controls = ({ isActive, toggleTimer, resetTimer, mode, switchMode, MODES }
                     className="reset-btn"
                     aria-label={t('timer.reset')}
                 >
-                    <RefreshCw size={20} />
+                    <RefreshCw size={20} style={{ pointerEvents: 'none' }} />
                 </button>
             </div>
         </div>

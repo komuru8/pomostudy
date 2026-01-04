@@ -27,6 +27,7 @@ export const TimerProvider = ({ children }) => {
     const [showConfetti, setShowConfetti] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    const ignoreSnapshotUntilRef = useRef(0); // Race condition protection
     const timerRef = useRef(null);
     const startTimeRef = useRef(null);
     const initialTimeRef = useRef(MODES.FOCUS.time);
@@ -87,6 +88,12 @@ export const TimerProvider = ({ children }) => {
             const userRef = doc(db, 'users', user.id);
 
             unsubscribe = onSnapshot(userRef, (docSnap) => {
+                // RACE CONDITION PROTECTION: Ignore updates immediately after local reset/switch
+                if (Date.now() < ignoreSnapshotUntilRef.current) {
+                    console.log("Ignoring Firestore update due to recent local action");
+                    return;
+                }
+
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     if (data.timerState) {
@@ -151,6 +158,17 @@ export const TimerProvider = ({ children }) => {
 
     }, [mode, timeLeft, isActive, user, loading]);
 
+    // Manual Save Helper (for explicit actions)
+    const saveStateEventually = useCallback(async (newState) => {
+        if (!user) return;
+        try {
+            const userRef = doc(db, 'users', user.id);
+            await setDoc(userRef, { timerState: { ...newState, lastUpdated: Date.now() } }, { merge: true });
+        } catch (e) {
+            console.error("Immediate save failed", e);
+        }
+    }, [user]);
+
 
     // Timer Interval Logic
     useEffect(() => {
@@ -182,23 +200,104 @@ export const TimerProvider = ({ children }) => {
         return () => clearInterval(timerRef.current);
     }, [isActive, handleCompletion]); // Removed timeLeft dependency to avoid interval reset jitter, but added internal check
 
+    // Save partial progress before resetting or switching
+    const savePartialProgress = useCallback(() => {
+        try {
+            if (mode !== 'FOCUS') return; // Only save focus sessions for now? Or breaks too? Usually only Focus counts for "Study Time".
+
+            const currentInitial = initialTimeRef.current;
+            const elapsedSeconds = currentInitial - timeLeft;
+
+            // Save if at least 1 second has passed (lowered for better UX/testing)
+            if (elapsedSeconds >= 1) {
+                // Allow partial minutes (e.g. 0 min) if we want to be strict, 
+                // but usually we want at least 1 min? 
+                // Wait, Math.floor(59/60) is 0. 0 minutes saved is useless.
+                // We need to support seconds? Or just round up/accumulate seconds?
+                // The history assumes minutes.
+                // If I change to 1s, I should probably ceil or round if it's significant?
+                // Or just keep the logic: if < 1 min, it records 0 min?
+                // User wants "5 mins + 3 mins = 8 mins".
+                // If they test "10s + 10s", they get 0.
+                // Let's stick to minute granularity but maybe round up if > 30s?
+                // Or accumulate seconds in a separate "partial buffer"? Too complex.
+                // Let's use Math.round? 30s -> 1m.
+
+                let minutesCompleted = Math.floor(elapsedSeconds / 60);
+
+                // Special case: If user deliberately did > 10s and reset, maybe give them 1m for effort?
+                // No, that cheats.
+                // Let's stick to: if >= 30s, round up.
+                if (elapsedSeconds < 60 && elapsedSeconds >= 30) {
+                    minutesCompleted = 1;
+                }
+
+                if (minutesCompleted > 0) {
+                    // Find active task category - handle tasks being undefined/loading
+                    let category = 'General';
+                    if (tasks && Array.isArray(tasks)) {
+                        const activeTask = tasks.find(t => t.id === activeTaskId);
+                        if (activeTask && activeTask.category) {
+                            category = activeTask.category;
+                        }
+                    }
+
+                    completeFocusSession(minutesCompleted, category);
+                    console.log(`Saved partial progress: ${minutesCompleted} minutes`);
+                }
+            }
+        } catch (error) {
+            console.error("Error saving partial progress:", error);
+        }
+    }, [mode, timeLeft, tasks, activeTaskId, completeFocusSession]);
+
     const switchMode = useCallback((newMode) => {
+        savePartialProgress(); // Save before switching
+
+        // Block Snapshot Listener
+        ignoreSnapshotUntilRef.current = Date.now() + 2000;
+
         setMode(newMode);
-        setTimeLeft(MODES[newMode].time);
-        initialTimeRef.current = MODES[newMode].time;
+        const newTime = MODES[newMode].time;
+        setTimeLeft(newTime);
+        initialTimeRef.current = newTime;
         setIsActive(false);
         endTimeRef.current = null;
-    }, []);
+
+        // Force save state to Firestore
+        saveStateEventually({
+            mode: newMode,
+            timeLeft: newTime,
+            isActive: false,
+            endTime: null
+        });
+    }, [savePartialProgress, MODES, saveStateEventually]);
 
     const toggleTimer = useCallback(() => {
         setIsActive((prev) => !prev);
     }, []);
 
     const resetTimer = useCallback(() => {
+        savePartialProgress(); // Save before resetting
+
+        // Block Snapshot Listener
+        ignoreSnapshotUntilRef.current = Date.now() + 2000;
+
+        // Reset Logic
         setIsActive(false);
-        setTimeLeft(MODES[mode].time);
+        const resetTime = MODES[mode].time;
+        setTimeLeft(resetTime);
+        initialTimeRef.current = resetTime; // Sync initial time ref!
         endTimeRef.current = null;
-    }, [mode]);
+
+        // Force save state to Firestore to verify reset
+        saveStateEventually({
+            mode: mode,
+            timeLeft: resetTime,
+            isActive: false,
+            endTime: null
+        });
+    }, [mode, savePartialProgress, MODES, saveStateEventually]);
 
     const setCustomTime = (minutes) => {
         const seconds = minutes * 60;
