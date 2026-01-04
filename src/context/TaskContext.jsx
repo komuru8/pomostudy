@@ -14,6 +14,12 @@ export const TaskProvider = ({ children }) => {
     const [activeTaskId, setActiveTaskId] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const ignoreSnapshotUntilRef = React.useRef(0); // Race condition protection
+
+    const notifyLocalChange = () => {
+        ignoreSnapshotUntilRef.current = Date.now() + 2000; // Lock snapshot for 2 seconds
+    };
+
     // Load/Listen to Firestore
     useEffect(() => {
         let unsubscribe = () => { };
@@ -23,6 +29,12 @@ export const TaskProvider = ({ children }) => {
             const userRef = doc(db, 'users', user.id);
 
             unsubscribe = onSnapshot(userRef, (docSnap) => {
+                // RACE CONDITION PROTECTION
+                if (Date.now() < ignoreSnapshotUntilRef.current) {
+                    console.log("Ignoring Firestore task update due to recent local action");
+                    return;
+                }
+
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     if (data.tasks && Array.isArray(data.tasks)) {
@@ -67,8 +79,9 @@ export const TaskProvider = ({ children }) => {
 
 
     const addTask = (taskData) => {
+        notifyLocalChange();
         const newTask = {
-            id: Date.now().toString(),
+            id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString() + Math.random().toString(36).substr(2, 9),
             createdAt: new Date().toISOString(),
             status: 'TODO', // TODO, IN_PROGRESS, DONE
             pomodorosSpent: 0,
@@ -80,15 +93,18 @@ export const TaskProvider = ({ children }) => {
     };
 
     const updateTask = (id, updates) => {
+        notifyLocalChange();
         setTasks((prev) => prev.map(t => t.id === id ? { ...t, ...updates } : t));
     };
 
     const deleteTask = (id) => {
+        notifyLocalChange();
         setTasks((prev) => prev.filter(t => t.id !== id));
         if (activeTaskId === id) setActiveTaskId(null);
     };
 
     const selectActiveTask = (id) => {
+        notifyLocalChange();
         setActiveTaskId(id);
         // Automatically set status to IN_PROGRESS if it was TODO
         const task = tasks.find(t => t.id === id);
@@ -98,6 +114,7 @@ export const TaskProvider = ({ children }) => {
     };
 
     const incrementPomodoroCount = (id) => {
+        // notifyLocalChange(); // OPTIONAL: Frequent updates might not need hard locking, but safer to have it
         setTasks((prev) => prev.map(t =>
             t.id === id ? { ...t, pomodorosSpent: (t.pomodorosSpent || 0) + 1 } : t
         ));
