@@ -62,9 +62,7 @@ const AuthPage = () => {
                     </button>
                 </div>
 
-                <p style={{ textAlign: 'center', marginTop: '24px', color: '#666', fontSize: '0.9rem' }}>
-                    * Email login is currently disabled while we migrate to the new cloudy farm database. ☁️
-                </p>
+
 
             </div>
         </div>

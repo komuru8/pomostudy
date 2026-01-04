@@ -6,7 +6,7 @@ import { CloudRain, Sprout, ChevronLeft, ChevronRight, Lock, Edit2, Check } from
 import './VillagePage.css';
 
 const VillagePage = () => {
-    const { gameState, LEVELS, harvestCrop, changeTheme, updateUsername } = useGame();
+    const { gameState, LEVELS, harvestCrop, changeTheme, updateUsername, checkCanLevelUp, upgradeLevel } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
     const [lastHarvest, setLastHarvest] = useState(null);
@@ -168,11 +168,10 @@ const VillagePage = () => {
 
                         // Harvest Button Logic
                         const cost = gameState.level >= 2 ? 25 : 0;
-                        // Check if Lv1 limit reached (Tutorial Weed)
-                        const hasWeed = gameState.level === 1 && gameState.harvested && gameState.harvested.some(c => c.type === 'weed' || c.name === 'Weed');
                         const canAfford = (gameState.water || 0) >= cost;
-                        // Disable if: Not enough water OR (Lv1 and already harvested)
-                        const isHarvestDisabled = !canAfford || hasWeed;
+
+                        // Disable if: Level 1 (Hard Lock) OR Not enough water
+                        const isHarvestDisabled = gameState.level === 1 || !canAfford;
 
                         return (
                             <div key={lvl.level} className={`carousel-slide ${isLocked ? 'locked' : ''}`} style={{ width: `${100 / visibleLevels.length}%` }}>
@@ -189,6 +188,60 @@ const VillagePage = () => {
                                         {levelData.icon}
                                     </div>
                                 </div>
+
+                                {/* Requirements Box (Moved Outside) */}
+                                {!isLocked && (
+                                    nextLevelTarget ? (
+                                        <div className="level-requirements-box detachable" style={{ marginBottom: '16px' }}>
+                                            {(() => {
+                                                const isEligible = checkCanLevelUp(gameState) && gameState.level < nextLevelTarget.level;
+
+                                                return isEligible ? (
+                                                    <div className="level-up-ready">
+                                                        <h3 className="ready-text">✨ Condition Met! ✨</h3>
+                                                        <button
+                                                            className="level-up-btn"
+                                                            onClick={() => {
+                                                                upgradeLevel();
+                                                                // Force refresh view to next level
+                                                                setTimeout(() => setViewLevel(l => l + 1), 500);
+                                                            }}
+                                                        >
+                                                            LEVEL UP!
+                                                            <span className="btn-shine"></span>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <h4>{t('village.toNextLevel') || 'To Next Level'}</h4>
+                                                        <div className="req-row">
+                                                            <div className="req-header">
+                                                                <span className={reqTime <= 0 ? 'done' : ''}>
+                                                                    ・ {(t('village.studyTime') || 'Study Time')}:
+                                                                    {` ${Math.min(totalStudyTime, nextLevelTarget.reqTime)}/${nextLevelTarget.reqTime}m`}
+                                                                    {reqTime <= 0 && ' ✅'}
+                                                                </span>
+                                                                <span className="req-percent">
+                                                                    {nextLevelTarget.reqTime > 0
+                                                                        ? Math.min(100, Math.floor((totalStudyTime / nextLevelTarget.reqTime) * 100))
+                                                                        : 100}%
+                                                                </span>
+                                                            </div>
+                                                            <div className="req-progress-track">
+                                                                <div
+                                                                    className="req-progress-fill"
+                                                                    style={{ width: `${nextLevelTarget.reqTime > 0 ? Math.min(100, (totalStudyTime / nextLevelTarget.reqTime) * 100) : 100}%` }}
+                                                                ></div>
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    ) : (
+                                        <div className="level-max" style={{ marginBottom: '16px' }}>MAX LEVEL REACHED</div>
+                                    )
+                                )}
 
                                 <div className="stats-card">
                                     {isLocked ? (
@@ -209,37 +262,6 @@ const VillagePage = () => {
                                     ) : (
                                         // UNLOCKED (Active) VIEW
                                         <div className="active-level-info">
-
-                                            {/* REQUIREMENTS BOX (Moved Here) */}
-                                            {nextLevelTarget ? (
-                                                <div className="level-requirements-box">
-                                                    <h4>{t('village.toNextLevel') || 'To Next Level'}</h4>
-
-                                                    {/* Study Time Progress Only */}
-                                                    <div className="req-row">
-                                                        <div className="req-header">
-                                                            <span className={reqTime <= 0 ? 'done' : ''}>
-                                                                ・ {(t('village.studyTime') || 'Study Time')}:
-                                                                {` ${Math.min(totalStudyTime, nextLevelTarget.reqTime)}/${nextLevelTarget.reqTime}m`}
-                                                                {reqTime <= 0 && ' ✅'}
-                                                            </span>
-                                                            <span className="req-percent">
-                                                                {nextLevelTarget.reqTime > 0
-                                                                    ? Math.min(100, Math.floor((totalStudyTime / nextLevelTarget.reqTime) * 100))
-                                                                    : 100}%
-                                                            </span>
-                                                        </div>
-                                                        <div className="req-progress-track">
-                                                            <div
-                                                                className="req-progress-fill"
-                                                                style={{ width: `${nextLevelTarget.reqTime > 0 ? Math.min(100, (totalStudyTime / nextLevelTarget.reqTime) * 100) : 100}%` }}
-                                                            ></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="level-max">MAX LEVEL REACHED</div>
-                                            )}
 
 
 
@@ -270,30 +292,41 @@ const VillagePage = () => {
                                                 >
                                                     <Sprout size={20} />
                                                     <span>
-                                                        {hasWeed ? t('village.harvestLimit') : (cost === 0 ? t('village.harvest') : `${t('village.harvest')} (${cost}💧)`)}
+                                                        {/* Level 1: Locked Text. Level 2+: Cost logic */}
+                                                        {gameState.level === 1
+                                                            ? (t('field.locked') || 'Locked')
+                                                            : (cost === 0 ? t('village.harvest') : `${t('village.harvest')} (${cost}💧)`)
+                                                        }
                                                     </span>
                                                 </button>
                                             </div>
 
                                             <div className="inventory-section">
                                                 <h3>{t('village.harvestCollection')}</h3>
-                                                <div className="crop-grid">
-                                                    {(gameState.harvested && gameState.harvested.length > 0) ? (
-                                                        gameState.harvested.map(crop => (
-                                                            <div key={crop.id} className="crop-item" title={new Date(crop.date).toLocaleDateString()}>
-                                                                {crop.icon}
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <div className="empty-crops">{t('village.emptyCollection')}</div>
-                                                    )}
-                                                </div>
+                                                {gameState.level === 1 ? (
+                                                    <div className="inventory-locked-panel">
+                                                        <Lock size={20} />
+                                                        <span>Lv2で開放</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="crop-grid">
+                                                        {(gameState.harvested && gameState.harvested.length > 0) ? (
+                                                            gameState.harvested.map(crop => (
+                                                                <div key={crop.id} className="crop-item" title={new Date(crop.date).toLocaleDateString()}>
+                                                                    {crop.icon}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="empty-crops">{t('village.emptyCollection')}</div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Theme Selector Section */}
-                                            <div className="theme-section" style={{ marginTop: '24px', width: '100%', paddingBottom: '20px' }}>
-                                                <h3>{t('village.themes') || 'Themes'}</h3>
-                                                <div className="theme-grid" style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                            <div className="theme-section" style={{ marginTop: '24px', width: '100%', paddingBottom: '20px', textAlign: 'left' }}>
+                                                <h3>{t('village.themes') || '背景設定'}</h3>
+                                                <div className="theme-grid" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                                                     {['default', 'wood', 'cafe'].map((themeName, idx) => {
                                                         const unlockLevel = idx + 1; // 1, 2, 3
                                                         const isLocked = gameState.level < unlockLevel;

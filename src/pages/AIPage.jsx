@@ -71,6 +71,7 @@ Current User Stats:
 You are supportive productivity coach "Pomodoro Farm". 
 Goal: help user focus, plan day, balance work-life.
 Concise, friendly, use emojis (🍅, 🌱, 🚜).
+IMPORTANT: Reply in the same language as the user's input (Japanese or English).
 Context: ${context}
             `;
 
@@ -82,9 +83,12 @@ Context: ${context}
 
         } catch (error) {
             console.error("Gemini API Error:", error);
+            if (error.message?.includes('403') || error.message?.includes('leaked')) {
+                return t('ai.system.apiKeyInvalid') || "System: API Key is invalid or has been revoked. Please check your settings.";
+            }
             if (error.message?.includes('429')) return t('ai.system.rateLimitError') || "System: Too many requests. Please wait a moment (Free Tier quota). ⏳";
             if (error.message?.includes('404')) return t('ai.system.modelNotFoundError') || "System: Model not found. Please check API key permissions.";
-            return t('ai.system.connectionError');
+            return t('ai.system.connectionError') || "System: Connection error.";
         }
     };
 

@@ -484,7 +484,7 @@
     color: var(--text-color);
     font-weight: 800;
     padding-left: 8px;
-    border-left: 4px solid var(--accent-color);
+    border-left: 4px solid var(--primary-color);
 }
 
 .field-locked-panel {
@@ -524,4 +524,36 @@
 .field-plot.empty:hover {
     background: #e0e6ed;
     border-color: #95a5a6;
+}
+
+/* Locked Inventory Panel (Matching Field Locked Panel) */
+.inventory-locked-panel {
+    background: rgba(236, 240, 241, 0.5);
+    border: 2px dashed #bdc3c7;
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #95a5a6;
+    font-weight: 700;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.inventory-locked-panel:hover {
+    background: rgba(236, 240, 241, 0.8);
+    border-color: #95a5a6;
+}
+
+/* Theme Section Title */
+.theme-section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    color: var(--text-color);
+    font-weight: 800;
+    padding-left: 8px;
+    border-left: 4px solid var(--primary-color);
 }

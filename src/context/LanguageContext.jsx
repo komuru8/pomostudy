@@ -27,8 +27,8 @@ const translations = {
             today: '今日',
             total: '累計',
             focusSessions: '集中回数',
-            shortBreaks: '休憩(5分)',
-            longBreaks: '長い休憩(15分)'
+            shortBreaks: '休憩回数',
+            longBreaks: '長い休憩回数'
         },
         timer: {
             focus: '集中',
@@ -116,7 +116,7 @@ const translations = {
         },
         auth: {
             welcomeBack: 'おかえりなさい',
-            joinVillage: '村へようこそ',
+            joinVillage: 'Farmへようこそ',
             continueJourney: '集中への旅を続けましょう',
             startJourney: '今日から習慣を育てましょう',
             email: 'メールアドレス',
@@ -127,7 +127,7 @@ const translations = {
             or: 'または',
             noAccount: 'アカウントをお持ちでないですか？',
             hasAccount: 'すでにアカウントをお持ちですか？',
-            google: 'Googleで続ける',
+            google: 'Googleでログイン',
             apple: 'Appleで続ける',
             loginRequired: 'ログインが必要です',
             loginRequiredMsg: 'この機能を利用するにはログインしてください。',

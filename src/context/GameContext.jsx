@@ -175,22 +175,34 @@ export const GameProvider = ({ children }) => {
         }
     }, [user, loading]);
 
-    const checkLevelUp = (currentState) => {
-        let newLevel = currentState.level;
+    // Check if eligible for next level (Return BOOLEAN or target level)
+    const checkCanLevelUp = (currentState) => {
+        const currentLevel = currentState.level;
         const totalMinutes = currentState.totalWP || 0;
         const tasks = currentState.completedTasksCount || 0;
+        const sessionHistory = currentState.sessionHistory || [];
 
-        // Lv 2: 3 Tasks, 1 Pomodoro
-        if (newLevel < 2) {
-            const pomoCount = currentState.sessionHistory?.filter(s => s.type === 'FOCUS' && s.duration >= 25).length || 0;
-            if (tasks >= 3 && pomoCount >= 1) newLevel = 2;
-        }
-        // Lv 3: 3 Hours (180m)
-        else if (newLevel < 3) {
-            if (totalMinutes >= 180) newLevel = 3;
-        }
+        let targetLevel = currentLevel;
 
-        return newLevel;
+        // Check conditions for next level ONLY
+        const nextLevelReq = LEVELS.find(l => l.level === currentLevel + 1);
+        if (!nextLevelReq) return false; // Max level
+
+        // Standard Time Check (Applied to ALL levels now)
+        if (totalMinutes >= nextLevelReq.reqTime) return true;
+
+        return false;
+    };
+
+    const upgradeLevel = () => {
+        setGameState(prev => {
+            if (!checkCanLevelUp(prev)) return prev;
+
+            const newLevel = prev.level + 1;
+            const newState = { ...prev, level: newLevel };
+            saveGameToFirestore(newState);
+            return newState;
+        });
     };
 
     const addXP = (amount) => {
@@ -214,10 +226,9 @@ export const GameProvider = ({ children }) => {
                 ...prev,
                 completedTasksCount: (prev.completedTasksCount || 0) + 1
             };
-            const nextLevel = checkLevelUp(newState);
-            const finalState = { ...newState, level: nextLevel };
-            saveGameToFirestore(finalState); // Immediate Save
-            return finalState;
+            // No auto level up
+            saveGameToFirestore(newState);
+            return newState;
         });
     };
 
@@ -264,10 +275,13 @@ export const GameProvider = ({ children }) => {
         setGameState(prev => {
             const currentHistory = prev.chatHistory || [];
             const newHistory = [...currentHistory, message];
+            let finalHistory = newHistory;
             if (newHistory.length > 50) {
-                return { ...prev, chatHistory: newHistory.slice(newHistory.length - 50) };
+                finalHistory = newHistory.slice(newHistory.length - 50);
             }
-            return { ...prev, chatHistory: newHistory };
+            const newState = { ...prev, chatHistory: finalHistory };
+            saveGameToFirestore(newState); // Immediate Save to prevent race conditions
+            return newState;
         });
     };
 
@@ -301,13 +315,12 @@ export const GameProvider = ({ children }) => {
                     ...(prev.sessionHistory || [])
                 ]
             };
-            const nextLevel = checkLevelUp(newState);
-            const finalState = { ...newState, level: nextLevel };
+            // No auto level up
 
             // CRITICAL: Save immediately to prevent data loss on close
-            saveGameToFirestore(finalState);
+            saveGameToFirestore(newState);
 
-            return finalState;
+            return newState;
         });
     };
 
@@ -344,6 +357,8 @@ export const GameProvider = ({ children }) => {
             addChatMessage,
             changeTheme,
             updateUsername,
+            checkCanLevelUp,
+            upgradeLevel,
             loading
         }}>
             {children}
