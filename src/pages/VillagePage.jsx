@@ -323,9 +323,8 @@ const VillagePage = () => {
                                                 )}
                                             </div>
 
-                                            {/* Theme Selector Section */}
                                             <div className="theme-section" style={{ marginTop: '24px', width: '100%', paddingBottom: '20px', textAlign: 'left' }}>
-                                                <h3>{t('village.themes') || '背景設定'}</h3>
+                                                <h3 style={{ color: 'var(--text-color)', fontWeight: 'bold' }}>{t('village.themes') || '背景設定'}</h3>
                                                 <div className="theme-grid" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                                                     {['default', 'wood', 'cafe'].map((themeName, idx) => {
                                                         const unlockLevel = idx + 1; // 1, 2, 3

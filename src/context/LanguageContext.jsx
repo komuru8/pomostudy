@@ -97,7 +97,7 @@ const translations = {
             unlockHint: '前のレベルの条件を達成して解放',
             harvestLocked: '収穫する（ロック中）',
             harvestLimit: '収穫済み',
-            themes: 'テーマ設定',
+            themes: '背景設定',
             themeNames: {
                 default: 'スタンダード',
                 wood: '木の温もり',

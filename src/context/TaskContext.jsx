@@ -37,11 +37,26 @@ export const TaskProvider = ({ children }) => {
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    // Merge/Load logic could be complex, for now simple overwrite from DB preferred source of truth
                     if (data.tasks && Array.isArray(data.tasks)) {
                         setTasks(data.tasks);
                     }
                     if (data.activeTaskId !== undefined) {
                         setActiveTaskId(data.activeTaskId);
+                    }
+                } else {
+                    // MIGRATION: Firestore empty -> Check LocalStorage guest data
+                    const saved = localStorage.getItem('pomodoro_tasks_guest');
+                    if (saved) {
+                        try {
+                            console.log("Migrating Guest Tasks to Firestore...");
+                            const parsed = JSON.parse(saved);
+                            setTasks(parsed.tasks || []);
+                            setActiveTaskId(parsed.activeTaskId || null);
+                            // It will be auto-saved to Firestore by the other useEffect
+                        } catch (e) {
+                            console.error("Task migration user error", e);
+                        }
                     }
                 }
                 setLoading(false);
@@ -50,29 +65,53 @@ export const TaskProvider = ({ children }) => {
                 setLoading(false);
             });
         } else {
-            setTasks([]);
-            setActiveTaskId(null);
+            // Guest Mode: Load from LocalStorage
+            setLoading(true);
+            const saved = localStorage.getItem('pomodoro_tasks_guest');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    setTasks(parsed.tasks || []);
+                    setActiveTaskId(parsed.activeTaskId || null);
+                } catch (e) {
+                    console.error("Failed to parse guest tasks", e);
+                    setTasks([]);
+                }
+            } else {
+                setTasks([]);
+                setActiveTaskId(null);
+            }
             setLoading(false);
         }
 
         return () => unsubscribe();
     }, [user]);
 
-    // Save to Firestore (Debounced)
+    // Save to Firestore OR LocalStorage (Debounced)
     useEffect(() => {
-        if (!user || loading) return;
+        if (loading) return;
 
-        const saveToFirestore = async () => {
-            try {
-                const userRef = doc(db, 'users', user.id);
-                // Save tasks and activeTaskId together
-                await setDoc(userRef, { tasks: tasks, activeTaskId: activeTaskId || null }, { merge: true });
-            } catch (e) {
-                console.error("Error saving tasks:", e);
+        const saveToStorage = async () => {
+            if (user) {
+                // Logged in: Sync to Firestore
+                try {
+                    const userRef = doc(db, 'users', user.id);
+                    await setDoc(userRef, { tasks: tasks, activeTaskId: activeTaskId || null }, { merge: true });
+                } catch (e) {
+                    console.error("Error saving tasks:", e);
+                }
+            } else {
+                // Guest: Sync to LocalStorage
+                try {
+                    const guestData = { tasks, activeTaskId };
+                    localStorage.setItem('pomodoro_tasks_guest', JSON.stringify(guestData));
+                } catch (e) {
+                    console.error("Error saving guest tasks:", e);
+                }
             }
         };
 
-        const timeoutId = setTimeout(saveToFirestore, 1000); // 1s debounce
+        const timeoutId = setTimeout(saveToStorage, 1000); // 1s debounce
         return () => clearTimeout(timeoutId);
 
     }, [tasks, activeTaskId, user, loading]);
