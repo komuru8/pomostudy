@@ -84,6 +84,7 @@ const translations = {
             logout: 'ログアウト',
             wasteland: '荒れ地',
             field: 'キャンプ地',
+            hut: '小さな小屋',
             garden: '小さな芽',
             farmhouse: '実り',
             villageStart: '村の始まり',
@@ -97,7 +98,7 @@ const translations = {
             unlockHint: '前のレベルの条件を達成して解放',
             harvestLocked: '収穫する（ロック中）',
             harvestLimit: '収穫済み',
-            themes: '背景設定',
+            themes: 'タイマーの背景',
             themeNames: {
                 default: 'スタンダード',
                 wood: '木の温もり',
@@ -250,7 +251,7 @@ const translations = {
             unlockHint: 'Complete requirements in previous level to unlock',
             harvestLocked: 'Harvest (Locked)',
             harvestLimit: 'Harvested',
-            themes: 'Themes',
+            themes: 'Timer Background',
             themeNames: {
                 default: 'Standard',
                 wood: 'Wood Cabin',

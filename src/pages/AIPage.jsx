@@ -14,9 +14,18 @@ const AIPage = () => {
     const [isTyping, setIsTyping] = useState(false);
     const [showScrollButton, setShowScrollButton] = useState(false);
     const messagesEndRef = useRef(null);
+    const hasInitialScrolled = useRef(false);
 
     // Use chatHistory from context.
     const messages = gameState.chatHistory || [];
+
+    // Scroll to bottom ONLY ONCE when messages are loaded
+    useEffect(() => {
+        if (messages.length > 0 && !hasInitialScrolled.current) {
+            messagesEndRef.current?.scrollIntoView({ behavior: "auto" }); // Instant or smooth? "Transition" implies smooth, but initial load usually wants instant. Auto is safer for "on load".
+            hasInitialScrolled.current = true;
+        }
+    }, [messages]);
 
     // Initialize with welcome message if absolutely empty
     useEffect(() => {

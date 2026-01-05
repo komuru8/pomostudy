@@ -233,28 +233,33 @@ export const GameProvider = ({ children }) => {
         });
     };
 
-    const harvestCrop = (cropType = 'random') => {
-        let cost = 0;
-        let crop = { type: 'weed', icon: '🌿', xp: 5 };
+    // Crop Definitions by Level
+    const LEVEL_CROPS = {
+        2: { type: 'radish', icon: '🥔', xp: 10, cost: 25 },
+        3: { type: 'potato', icon: '🥔', xp: 15, cost: 50 },
+        4: { type: 'carrot', icon: '🥕', xp: 20, cost: 75 },
+        5: { type: 'tomato', icon: '🍅', xp: 25, cost: 100 },
+        6: { type: 'corn', icon: '🌽', xp: 30, cost: 125 },
+        7: { type: 'pumpkin', icon: '🎃', xp: 40, cost: 150 },
+        8: { type: 'grapes', icon: '🍇', xp: 50, cost: 200 },
+        9: { type: 'melon', icon: '🍈', xp: 75, cost: 300 },
+        10: { type: 'diamond', icon: '💎', xp: 100, cost: 500 }
+    };
 
-        if (gameState.level >= 2) {
-            cost = 25;
-            crop = { type: 'radish', icon: '🥔', xp: 10 };
-        }
+    const harvestCrop = (cropData) => {
+        // Fallback for logic consistency
+        if (!cropData) return false;
 
-        if (gameState.level === 1) {
-            const hasWeed = gameState.harvested.some(c => c.type === 'weed' || c.name === 'Weed');
-            if (hasWeed) return false;
-        }
+        const cost = cropData.cost || 25;
 
         if ((gameState.water || 0) < cost) return false;
 
         const newCrop = {
             id: Date.now(),
-            icon: crop.icon,
-            name: crop.type,
-            type: crop.type,
-            xp: crop.xp,
+            icon: cropData.icon,
+            name: cropData.type,
+            type: cropData.type,
+            xp: cropData.xp || 10,
             date: new Date().toISOString()
         };
 
@@ -287,7 +292,11 @@ export const GameProvider = ({ children }) => {
     };
 
     const changeTheme = (themeName) => {
-        setGameState(prev => ({ ...prev, theme: themeName }));
+        setGameState(prev => {
+            const newState = { ...prev, theme: themeName };
+            saveGame(newState);
+            return newState;
+        });
     };
 
     const updateUsername = (name) => {
@@ -355,6 +364,7 @@ export const GameProvider = ({ children }) => {
             updateUsername,
             checkCanLevelUp,
             upgradeLevel,
+            LEVEL_CROPS,
             loading
         }}>
             {children}

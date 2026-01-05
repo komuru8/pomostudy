@@ -133,6 +133,88 @@
     transition: filter 0.3s;
 }
 
+/* Tomato Companion - Speech Bubble Layout (Fukidashi) */
+.tomato-companion-card {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+
+    padding: 0;
+    display: flex;
+    align-items: flex-start;
+    /* Top align for natural speaking */
+    gap: 16px;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: visible;
+    /* Allow tail to show if needed */
+}
+
+/* Remove Glass Shine from container */
+.tomato-companion-card::before {
+    display: none;
+}
+
+.companion-speech {
+    background: rgba(255, 255, 255, 0.95);
+    /* Nearly opaque white */
+    color: var(--text-color);
+    padding: 16px 20px;
+    border-radius: 20px;
+    border-top-left-radius: 4px;
+    /* Corner for tail */
+    font-size: 0.95rem;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    /* Soft shadow for bubble */
+    flex: 1;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    min-width: 0;
+    word-wrap: break-word;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    margin-top: 8px;
+    /* Slightly offset from top of avatar */
+}
+
+/* Speech Bubble Tail */
+.companion-speech::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -10px;
+    /* Poke out left */
+    width: 0;
+    height: 0;
+    border-top: 10px solid rgba(255, 255, 255, 0.95);
+    border-left: 10px solid transparent;
+    border-right: 0px solid transparent;
+    /* Right angle triangle style */
+    filter: drop-shadow(-2px 2px 2px rgba(0, 0, 0, 0.03));
+}
+
+.companion-avatar-container {
+    animation: bounce 2.5s infinite ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    /* Shadow on character itself */
+}
+
+.companion-avatar-img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
 .animate-bounce-slow {
     animation: bounce 3s infinite;
 }
@@ -184,6 +266,22 @@
     .stats-card {
         padding: 16px;
         min-height: auto;
+    }
+
+    /* Mobile Companion Card */
+    .tomato-companion-card {
+        padding: 12px 16px;
+        gap: 12px;
+        border-radius: 20px;
+    }
+
+    .companion-avatar-img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .companion-speech {
+        font-size: 0.85rem;
     }
 
     .nav-arrow {
@@ -293,23 +391,24 @@
 }
 
 .harvest-btn {
-    background: var(--accent-color);
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+    /* Tailwind Orange 400-600 */
     color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
+    padding: 12px 24px;
+    border-radius: 9999px;
     font-weight: 800;
     display: flex;
     align-items: center;
     gap: 8px;
     transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
     border: none;
+    font-size: 1rem;
 }
 
 .harvest-btn:hover:not(.disabled) {
     transform: translateY(-2px);
-    background: #d35400;
-    box-shadow: 0 6px 16px rgba(230, 126, 34, 0.4);
+    box-shadow: 0 8px 20px rgba(234, 88, 12, 0.35);
 }
 
 .harvest-btn.disabled {
@@ -513,12 +612,74 @@
     gap: 12px;
 }
 
-.field-plot.empty {
+.field-plot {
     aspect-ratio: 1;
-    background: #ecf0f1;
-    border: 2px dashed #bdc3c7;
-    border-radius: 12px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: none;
+    cursor: default;
     transition: all 0.2s;
+    padding: 4px;
+}
+
+.field-plot.ready {
+    background: white;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    border: 2px solid var(--primary-color);
+    cursor: pointer;
+    animation: popIn 0.3s;
+}
+
+.field-plot.ready:active {
+    transform: scale(0.95);
+}
+
+.field-plot.growing {
+    background: rgba(255, 255, 255, 0.4);
+    border: 2px dashed #bdc3c7;
+    color: #95a5a6;
+}
+
+.plot-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.field-plot.ready .plot-icon {
+    animation: bounce 2s infinite;
+}
+
+.harvest-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #e74c3c;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.plot-progress-text {
+    position: absolute;
+    bottom: 2px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1px 4px;
+    border-radius: 8px;
 }
 
 .field-plot.empty:hover {

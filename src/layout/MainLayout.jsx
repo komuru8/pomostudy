@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -14,14 +14,20 @@ const MainLayout = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
-    // Sync Theme with Body Class
+    const location = useLocation(); // Re-import at top if needed, but we have navigate from it usually? No, check imports.
+
+    // Sync Theme with Body Class (Only on Timer Page)
     React.useEffect(() => {
-        if (gameState?.theme) {
+        // Timer page is root '/' or potentially '/timer' if configured
+        const isTimerPage = location.pathname === '/' || location.pathname === '/timer';
+
+        if (isTimerPage && gameState?.theme) {
             document.body.className = `theme-${gameState.theme}`;
         } else {
+            // Revert to default/clean state on other pages
             document.body.className = '';
         }
-    }, [gameState?.theme]);
+    }, [gameState?.theme, location.pathname]);
 
     const handleAuthClick = () => {
         if (user) {

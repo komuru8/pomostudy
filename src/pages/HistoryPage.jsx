@@ -267,15 +267,7 @@ const HistoryPage = () => {
                 })()}
             </div>
 
-            {/* 3. Tomato Character (Unlocked at Lv.2) */}
-            {gameState.level >= 2 && (
-                <div className="tomato-companion-card mb-24">
-                    <div className="companion-avatar">🍅</div>
-                    <div className="companion-speech">
-                        <p>{t('history.companionMsg', '頑張って！村は順調に育っていますよ。')}</p>
-                    </div>
-                </div>
-            )}
+
 
             {/* Daily Focus Trend (Stacked Bar) */}
             <div className="chart-card mb-24">

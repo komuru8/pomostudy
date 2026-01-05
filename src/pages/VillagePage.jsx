@@ -6,7 +6,7 @@ import { CloudRain, Sprout, ChevronLeft, ChevronRight, Lock, Edit2, Check } from
 import './VillagePage.css';
 
 const VillagePage = () => {
-    const { gameState, LEVELS, harvestCrop, changeTheme, updateUsername, checkCanLevelUp, upgradeLevel } = useGame();
+    const { gameState, LEVELS, harvestCrop, changeTheme, updateUsername, checkCanLevelUp, upgradeLevel, LEVEL_CROPS } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
     const [lastHarvest, setLastHarvest] = useState(null);
@@ -28,7 +28,7 @@ const VillagePage = () => {
     const LEVEL_VISUALS = {
         1: { icon: '🏜️', label: t('village.wasteland') || 'Wasteland' },
         2: { icon: '🏕️', label: t('village.field') || 'Camping Ground' },
-        3: { icon: '🏡', label: t('village.garden') || 'Small Settlement' },
+        3: { icon: '🛖', label: t('village.hut', '小さな小屋') },
         4: { icon: '🚜', label: t('village.farmhouse') || 'Farm' },
         5: { icon: '🏘️', label: t('village.villageStart') || 'The Village' }
     };
@@ -64,8 +64,8 @@ const VillagePage = () => {
         if (viewLevel > 1) setViewLevel(l => l - 1);
     };
 
-    const handleHarvest = () => {
-        const crop = harvestCrop();
+    const handleHarvest = (cropData) => {
+        const crop = harvestCrop(cropData);
         if (crop) {
             setLastHarvest(crop);
             setTimeout(() => setLastHarvest(null), 3000);
@@ -243,6 +243,8 @@ const VillagePage = () => {
                                     )
                                 )}
 
+
+
                                 <div className="stats-card">
                                     {isLocked ? (
                                         // LOCKED VIEW: Just teaser information
@@ -274,32 +276,53 @@ const VillagePage = () => {
                                                     </div>
                                                 ) : (
                                                     <div className="field-grid">
-                                                        {/* Placeholder plots for Level 2+ */}
-                                                        {Array.from({ length: gameState.level + 2 }).map((_, i) => (
-                                                            <div key={i} className="field-plot empty"></div>
-                                                        ))}
+                                                        {/* Render Interactive Slots */}
+                                                        {Array.from({ length: gameState.level + 2 }).map((_, i) => {
+                                                            const levelCrop = LEVEL_CROPS?.[gameState.level] || LEVEL_CROPS?.[2]; // Fallback to Lv2 Radish
+                                                            const currentWater = gameState.water || 0;
+                                                            // Logic: If I have enough water to harvest ONE, does it show on all?
+                                                            // We want to simulate multiple plots.
+                                                            // Simple logic:
+                                                            // User has X water. Cost is Y.
+                                                            // Number of harvestable slots = floor(X / Y).
+                                                            // If i < numHarvestable, this slot is READY.
+                                                            // Else, it is growing.
+
+                                                            const cost = levelCrop.cost;
+                                                            const numHarvestable = Math.floor(currentWater / cost);
+                                                            const isReady = i < numHarvestable;
+
+                                                            // To make it feel like "individual" slots, we only allow clicking `isReady` ones.
+                                                            // And we show progress on the FIRST non-ready slot?
+                                                            // Or just show "Ready" on as many slots as we can afford? Yes.
+
+                                                            return (
+                                                                <button
+                                                                    key={i}
+                                                                    className={`field-plot ${isReady ? 'ready' : 'growing'}`}
+                                                                    onClick={() => isReady && handleHarvest(levelCrop)}
+                                                                    disabled={!isReady}
+                                                                    title={isReady ? t('village.harvest') : `${currentWater}/${cost} pts`}
+                                                                >
+                                                                    <div className="plot-icon">
+                                                                        {isReady ? levelCrop.icon : (i === numHarvestable ? '🌱' : '🕳️')}
+                                                                    </div>
+                                                                    {isReady && <div className="harvest-badge">!</div>}
+
+                                                                    {/* Show progress only on the next plot regarding points */}
+                                                                    {i === numHarvestable && (
+                                                                        <div className="plot-progress-text">
+                                                                            {currentWater % cost}/{cost}
+                                                                        </div>
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        })}
                                                     </div>
                                                 )}
                                             </div>
 
-                                            {/* Moved Harvest Button Here */}
-                                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-                                                <button
-                                                    className={`harvest-btn ${isHarvestDisabled ? 'disabled' : ''} `}
-                                                    onClick={handleHarvest}
-                                                    disabled={isHarvestDisabled}
-                                                    style={{ width: '100%', justifyContent: 'center' }}
-                                                >
-                                                    <Sprout size={20} />
-                                                    <span>
-                                                        {/* Level 1: Locked Text. Level 2+: Cost logic */}
-                                                        {gameState.level === 1
-                                                            ? (t('field.locked') || 'Locked')
-                                                            : (cost === 0 ? t('village.harvest') : `${t('village.harvest')} (${cost}💧)`)
-                                                        }
-                                                    </span>
-                                                </button>
-                                            </div>
+                                            {/* Removed Old Harvest Button */}
 
                                             <div className="inventory-section">
                                                 <h3>{t('village.harvestCollection')}</h3>
