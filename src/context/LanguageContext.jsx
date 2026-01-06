@@ -39,7 +39,9 @@ const translations = {
             start: '開始',
             pause: '一時停止',
             reset: 'リセット',
-            pomodoros: 'ポモドーロ'
+            pomodoros: 'ポモドーロ',
+            switchConfirmTitle: 'タイマーを切り替えますか？',
+            switchConfirmMsg: '進行中のタイマーはリセットされます。'
         },
         tasks: {
             title: 'タスク',
@@ -100,12 +102,17 @@ const translations = {
             harvestLimit: '収穫済み',
             themes: 'タイマーの背景',
             themeNames: {
-                default: 'スタンダード',
+                default: 'はじまりの森',
                 wood: '木の温もり',
                 cafe: 'リラックスカフェ'
             },
             defaultName: 'ゲスト',
-            titleFormat: '{{name}}の村'
+            titleFormat: '{{name}}の村',
+            vp: '野菜ポイント',
+            tradeShop: '野菜直売所',
+            shopDesc: '貯まったポイントで本物の野菜と交換！',
+            comingSoon: '機能開発中...',
+            sellConfirm: '1つ売却して {{price}} VPを獲得しますか？'
         },
         crops: {
             weed: '雑草',

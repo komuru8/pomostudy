@@ -19,7 +19,7 @@ const TimerDisplay = ({ timeLeft, totalTime }) => {
                     cx="120"
                     cy="120"
                     r={radius}
-                    stroke="#e0f2f1" /* Light teal/green background */
+                    stroke="var(--timer-bg-ring)" /* Dynamic theme color */
                     strokeWidth="8" /* Thinner */
                     fill="var(--bg-color)" /* Fill center with page bg or white */
                 />
@@ -37,6 +37,7 @@ const TimerDisplay = ({ timeLeft, totalTime }) => {
                     strokeDasharray={circumference}
                     strokeDashoffset={dashoffset}
                     strokeLinecap="round"
+                    style={{ transform: 'scaleY(-1)', transformOrigin: 'center' }}
                 />
             </svg>
             <div className="time-text" style={{ position: 'absolute', fontSize: '3.2rem', fontWeight: '800', color: 'var(--text-color)', letterSpacing: '-2px' }}>

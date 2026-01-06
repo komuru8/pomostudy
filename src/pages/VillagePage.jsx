@@ -6,11 +6,12 @@ import { CloudRain, Sprout, ChevronLeft, ChevronRight, Lock, Edit2, Check } from
 import './VillagePage.css';
 
 const VillagePage = () => {
-    const { gameState, LEVELS, harvestCrop, changeTheme, updateUsername, checkCanLevelUp, upgradeLevel, LEVEL_CROPS } = useGame();
+    const { gameState, LEVELS, harvestCrop, sellCrop, changeTheme, updateUsername, checkCanLevelUp, upgradeLevel, LEVEL_CROPS } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
     const [lastHarvest, setLastHarvest] = useState(null);
     const [viewLevel, setViewLevel] = useState(gameState.level);
+    const [pendingSell, setPendingSell] = useState(null);
     const [isEditingName, setIsEditingName] = useState(false);
     const [editName, setEditName] = useState('');
 
@@ -23,6 +24,23 @@ const VillagePage = () => {
     const saveName = () => {
         updateUsername(editName);
         setIsEditingName(false);
+    };
+
+    const handleSellRequest = (type) => {
+        const cropDef = Object.values(LEVEL_CROPS).find(c => c.type === type);
+        const price = cropDef?.price || 10;
+        setPendingSell({ type, price, icon: cropDef?.icon || '🥔', name: t(`crops.${type}`) });
+    };
+
+    const confirmSell = () => {
+        if (pendingSell) {
+            sellCrop(pendingSell.type);
+            setPendingSell(null);
+        }
+    };
+
+    const cancelSell = () => {
+        setPendingSell(null);
     };
 
     const LEVEL_VISUALS = {
@@ -332,22 +350,75 @@ const VillagePage = () => {
                                                         <span>Lv2で開放</span>
                                                     </div>
                                                 ) : (
-                                                    <div className="crop-grid">
-                                                        {(gameState.harvested && gameState.harvested.length > 0) ? (
-                                                            gameState.harvested.map(crop => (
-                                                                <div key={crop.id} className="crop-item" title={new Date(crop.date).toLocaleDateString()}>
-                                                                    {crop.icon}
+                                                    <>
+                                                        <div className="crop-grid">
+                                                            {(gameState.unlockedCrops || (gameState.harvested && gameState.harvested.length > 0)) ? (
+                                                                (() => {
+                                                                    // Get all unlocked types (from new state OR fallback to existing harvested)
+                                                                    const allUnlocked = gameState.unlockedCrops || [...new Set((gameState.harvested || []).map(c => c.type))];
+
+                                                                    // Count current inventory
+                                                                    const inventoryCounts = (gameState.harvested || []).reduce((acc, crop) => {
+                                                                        const type = crop.type || 'weed';
+                                                                        acc[type] = (acc[type] || 0) + 1;
+                                                                        return acc;
+                                                                    }, {});
+
+                                                                    if (allUnlocked.length === 0) return <div className="empty-crops">{t('village.emptyCollection')}</div>;
+
+                                                                    return allUnlocked.map(type => {
+                                                                        const count = inventoryCounts[type] || 0;
+                                                                        const cropDef = Object.values(LEVEL_CROPS).find(c => c.type === type);
+                                                                        const icon = cropDef ? cropDef.icon : '❓';
+
+                                                                        return (
+                                                                            <div
+                                                                                key={type}
+                                                                                className={`crop-item ${count > 0 ? 'clickable' : 'disabled'}`}
+                                                                                title={`${t(`crops.${type}`)} x${count}`}
+                                                                                onClick={() => count > 0 && handleSellRequest(type)}
+                                                                                style={{ opacity: count > 0 ? 1 : 0.6, cursor: count > 0 ? 'pointer' : 'default' }}
+                                                                            >
+                                                                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                                                                    {icon}
+                                                                                    {count >= 0 && (
+                                                                                        <div className="crop-count-badge">x{count}</div>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    });
+                                                                })()
+                                                            ) : (
+                                                                <div className="empty-crops">{t('village.emptyCollection')}</div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Shop Section */}
+                                                        <div className="shop-section">
+                                                            <h3 className="shop-title">{t('village.tradeShop')}</h3>
+
+                                                            <div className="shop-content-box">
+                                                                {/* VP Display Moved Here */}
+                                                                <div className="vp-display animate-pop">
+                                                                    <span className="vp-label">{t('village.vp')}:</span>
+                                                                    <span className="vp-value">{gameState.vp || 0}</span>
+                                                                    <span className="vp-unit">VP</span>
                                                                 </div>
-                                                            ))
-                                                        ) : (
-                                                            <div className="empty-crops">{t('village.emptyCollection')}</div>
-                                                        )}
-                                                    </div>
+                                                                <div style={{ margin: '16px 0', borderTop: '1px dashed #ddd' }}></div>
+
+                                                                <div className="coming-soon-container">
+                                                                    <p>{t('village.shopDesc')}</p>
+                                                                    <div className="coming-soon-badge">{t('village.comingSoon')}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </>
                                                 )}
                                             </div>
 
                                             <div className="theme-section" style={{ marginTop: '24px', width: '100%', paddingBottom: '20px', textAlign: 'left' }}>
-                                                <h3 style={{ color: 'var(--text-color)', fontWeight: 'bold' }}>{t('village.themes') || '背景設定'}</h3>
+                                                <h3 style={{ color: '#333', fontWeight: 'bold' }}>{t('village.themes') || 'タイマーの背景'}</h3>
                                                 <div className="theme-grid" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                                                     {['default', 'wood', 'cafe'].map((themeName, idx) => {
                                                         const unlockLevel = idx + 1; // 1, 2, 3
@@ -377,7 +448,8 @@ const VillagePage = () => {
                                                                     fontSize: '0.9rem',
                                                                     display: 'flex',
                                                                     alignItems: 'center',
-                                                                    gap: '4px'
+                                                                    gap: '4px',
+                                                                    color: '#333'
                                                                 }}
                                                             >
                                                                 {isLocked && <Lock size={12} />}
@@ -396,6 +468,7 @@ const VillagePage = () => {
                 </div>
             </div>
 
+            {/* Harvest Celebration Pop-up */}
             {lastHarvest && (
                 <div className="harvest-popup">
                     <div className="popup-content">
@@ -403,6 +476,49 @@ const VillagePage = () => {
                         <h2 style={{ marginTop: 0, fontSize: '1.5rem', color: '#27ae60' }}>
                             {t(`crops.${lastHarvest.type || 'weed'}`) || lastHarvest.name}
                         </h2>
+                    </div>
+                </div>
+            )}
+
+            {/* Sell Confirmation Modal */}
+            {pendingSell && (
+                <div className="harvest-popup">
+                    <div className="popup-content sell-modal">
+                        <div className="popup-icon">{pendingSell.icon}</div>
+                        <h3 style={{ margin: '0 0 16px', color: '#333' }}>
+                            {t('village.sellConfirm').replace('{{price}}', pendingSell.price)}
+                        </h3>
+                        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '16px' }}>
+                            <button
+                                onClick={cancelSell}
+                                style={{
+                                    padding: '10px 24px',
+                                    borderRadius: '12px',
+                                    border: 'none',
+                                    background: '#ecf0f1',
+                                    color: '#7f8c8d',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {t('tasks.no') || 'Cancel'}
+                            </button>
+                            <button
+                                onClick={confirmSell}
+                                style={{
+                                    padding: '10px 24px',
+                                    borderRadius: '12px',
+                                    border: 'none',
+                                    background: '#2ecc71',
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 0 #27ae60'
+                                }}
+                            >
+                                {t('tasks.yes') || 'Sell'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

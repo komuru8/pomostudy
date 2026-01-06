@@ -13,6 +13,8 @@ const TimerPage = () => {
     const { activeTask, tasks, selectActiveTask, updateTask, deleteTask, toggleToday } = useTasks();
     const { t } = useLanguage();
     const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [showModeConfirm, setShowModeConfirm] = useState(false);
+    const [pendingMode, setPendingMode] = useState(null);
 
     const todayTasks = tasks.filter(t => t.priority === 'TODAY' && t.status !== 'DONE');
 
@@ -38,6 +40,29 @@ const TimerPage = () => {
     const confirmReset = () => {
         resetTimer();
         setShowResetConfirm(false);
+    };
+
+    // New: Handle Mode Switch Request
+    const handleModeSwitchRequest = (newMode) => {
+        // If switching to the SAME mode, do nothing
+        if (newMode === mode) return;
+
+        // If timer is active OR has progress (timeLeft < totalTime), confirm
+        if (isActive || timeLeft < totalTime) {
+            setPendingMode(newMode);
+            setShowModeConfirm(true);
+        } else {
+            // Safe to switch
+            switchMode(newMode);
+        }
+    };
+
+    const confirmModeSwitch = () => {
+        if (pendingMode) {
+            switchMode(pendingMode);
+            setPendingMode(null);
+        }
+        setShowModeConfirm(false);
     };
 
     return (
@@ -82,7 +107,7 @@ const TimerPage = () => {
                     toggleTimer={toggleTimer}
                     resetTimer={handleResetRequest}
                     mode={mode}
-                    switchMode={switchMode}
+                    switchMode={handleModeSwitchRequest}
                     MODES={MODES}
                 />
             </div>
@@ -149,6 +174,46 @@ const TimerPage = () => {
                                     boxShadow: '0 4px 12px rgba(46, 204, 113, 0.3)', cursor: 'pointer', flex: 1
                                 }}>
                                 はい
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Mode Switch Confirmation Modal */}
+            {showModeConfirm && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 3000
+                }} onClick={() => setShowModeConfirm(false)}>
+                    <div style={{
+                        background: 'rgba(255,255,255,0.95)', padding: '24px', borderRadius: '24px',
+                        maxWidth: '300px', width: '85%', textAlign: 'center',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                        border: '1px solid rgba(255,255,255,0.8)'
+                    }} onClick={e => e.stopPropagation()}>
+                        <h3 style={{ marginTop: 0, marginBottom: '12px', color: 'var(--text-color)' }}>
+                            {t('timer.switchConfirmTitle', 'タイマーを切り替えますか？')}
+                        </h3>
+                        <p style={{ color: '#666', marginBottom: '24px', fontSize: '0.95rem' }}>
+                            {t('timer.switchConfirmMsg', '進行中のタイマーはリセットされます。')}
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                            <button onClick={() => setShowModeConfirm(false)}
+                                style={{
+                                    padding: '12px 24px', borderRadius: '16px', border: '1px solid #e0e0e0',
+                                    background: 'var(--bg-color)', color: '#666', fontWeight: 'bold', cursor: 'pointer', flex: 1
+                                }}>
+                                {t('tasks.no', 'いいえ')}
+                            </button>
+                            <button onClick={confirmModeSwitch}
+                                style={{
+                                    padding: '12px 24px', borderRadius: '16px', border: 'none',
+                                    background: 'var(--primary-color)', color: 'white', fontWeight: 'bold',
+                                    boxShadow: '0 4px 12px rgba(46, 204, 113, 0.3)', cursor: 'pointer', flex: 1
+                                }}>
+                                {t('tasks.yes', 'はい')}
                             </button>
                         </div>
                     </div>

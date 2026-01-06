@@ -26,6 +26,7 @@
   --glass-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.05);
   /* Very subtle grey shadow */
 
+  --timer-bg-ring: #e0f2f1;
   --font-main: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
 }
 
@@ -59,6 +60,8 @@ body.theme-wood {
   --primary-color: #d35400;
   --primary-dark: #a04000;
   --bg-gradient: linear-gradient(135deg, #fcebb6 0%, #f8c291 100%);
+  --bg-color: #fdf2e9;
+  --timer-bg-ring: #fae5d3;
   background-image: repeating-linear-gradient(45deg, #e67e22 0, #e67e22 1px, transparent 0, transparent 50%);
   background-size: 10px 10px;
 }

@@ -22,7 +22,9 @@ const INITIAL_STATE = {
     completedTasksCount: 0,
     chatHistory: [],
     theme: 'default',
-    username: ''
+    username: '',
+    vp: 0,
+    unlockedCrops: []
 };
 
 const LEVELS = [
@@ -85,6 +87,14 @@ export const GameProvider = ({ children }) => {
                     const loadedState = { ...INITIAL_STATE, ...docSnap.data().gameState };
                     if (!loadedState.username && user.displayName) {
                         loadedState.username = user.displayName;
+                    }
+                    if (!loadedState.unlockedCrops) {
+                        loadedState.unlockedCrops = [];
+                        // Migration: Backfill from harvested
+                        if (loadedState.harvested && loadedState.harvested.length > 0) {
+                            const uniqueTypes = [...new Set(loadedState.harvested.map(c => c.type))];
+                            loadedState.unlockedCrops = uniqueTypes;
+                        }
                     }
                     setGameState(loadedState);
                 } else {
@@ -235,15 +245,15 @@ export const GameProvider = ({ children }) => {
 
     // Crop Definitions by Level
     const LEVEL_CROPS = {
-        2: { type: 'radish', icon: '🥔', xp: 10, cost: 25 },
-        3: { type: 'potato', icon: '🥔', xp: 15, cost: 50 },
-        4: { type: 'carrot', icon: '🥕', xp: 20, cost: 75 },
-        5: { type: 'tomato', icon: '🍅', xp: 25, cost: 100 },
-        6: { type: 'corn', icon: '🌽', xp: 30, cost: 125 },
-        7: { type: 'pumpkin', icon: '🎃', xp: 40, cost: 150 },
-        8: { type: 'grapes', icon: '🍇', xp: 50, cost: 200 },
-        9: { type: 'melon', icon: '🍈', xp: 75, cost: 300 },
-        10: { type: 'diamond', icon: '💎', xp: 100, cost: 500 }
+        2: { type: 'potato', icon: '🥔', xp: 15, cost: 25, price: 10 },
+        3: { type: 'potato', icon: '🥔', xp: 15, cost: 50, price: 10 },
+        4: { type: 'carrot', icon: '🥕', xp: 20, cost: 75, price: 15 },
+        5: { type: 'tomato', icon: '🍅', xp: 25, cost: 100, price: 20 },
+        6: { type: 'corn', icon: '🌽', xp: 30, cost: 125, price: 25 },
+        7: { type: 'pumpkin', icon: '🎃', xp: 40, cost: 150, price: 30 },
+        8: { type: 'grapes', icon: '🍇', xp: 50, cost: 200, price: 40 },
+        9: { type: 'melon', icon: '🍈', xp: 75, cost: 300, price: 60 },
+        10: { type: 'diamond', icon: '💎', xp: 100, cost: 500, price: 100 }
     };
 
     const harvestCrop = (cropData) => {
@@ -264,17 +274,47 @@ export const GameProvider = ({ children }) => {
         };
 
         setGameState((prev) => {
+            const currentUnlocked = prev.unlockedCrops || [];
+            const newUnlocked = currentUnlocked.includes(newCrop.type)
+                ? currentUnlocked
+                : [...currentUnlocked, newCrop.type];
+
             const newState = {
                 ...prev,
                 water: (prev.water || 0) - cost,
                 harvested: [newCrop, ...(prev.harvested || [])],
                 xp: (prev.xp || 0) + newCrop.xp,
-                totalXP: (prev.totalXP || 0) + newCrop.xp
+                totalXP: (prev.totalXP || 0) + newCrop.xp,
+                unlockedCrops: newUnlocked
             };
             saveGame(newState);
             return newState;
         });
         return newCrop;
+    };
+
+    const sellCrop = (type) => {
+        setGameState(prev => {
+            const harvested = prev.harvested || [];
+            const index = harvested.findIndex(c => c.type === type);
+            // If not found, return state (or maybe we allow selling by ID, but Grouped View sends Type)
+            if (index === -1) return prev;
+
+            // Price lookup (fallback to 10 if not found)
+            const cropDef = Object.values(LEVEL_CROPS).find(c => c.type === type);
+            const price = cropDef?.price || 10;
+
+            const newHarvested = [...harvested];
+            newHarvested.splice(index, 1);
+
+            const newState = {
+                ...prev,
+                harvested: newHarvested,
+                vp: (prev.vp || 0) + price
+            };
+            saveGame(newState);
+            return newState;
+        });
     };
 
     const addChatMessage = (message) => {
@@ -359,6 +399,7 @@ export const GameProvider = ({ children }) => {
             completeFocusSession,
             completeBreakSession,
             harvestCrop,
+            sellCrop,
             addChatMessage,
             changeTheme,
             updateUsername,
