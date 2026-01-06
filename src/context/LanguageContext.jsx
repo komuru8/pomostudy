@@ -84,12 +84,12 @@ const translations = {
             harvestCollection: '収穫コレクション',
             emptyCollection: '野菜を収穫してコレクションを埋めましょう！',
             logout: 'ログアウト',
-            wasteland: '荒れ地',
-            field: 'キャンプ地',
-            hut: '小さな小屋',
-            garden: '小さな芽',
-            farmhouse: '実り',
-            villageStart: '村の始まり',
+            wasteland: '始まりの荒野',
+            field: '旅人の休息地',
+            hut: '芽吹きの庭',
+            garden: '緑の小道',
+            farmhouse: '豊穣の農園',
+            villageStart: '村の夜明け',
             nextLevel: '次のレベル',
             toNextLevel: '次のレベルまで',
             tips: 'ヒント',
@@ -102,7 +102,7 @@ const translations = {
             harvestLimit: '収穫済み',
             themes: 'タイマーの背景',
             themeNames: {
-                default: 'はじまりの森',
+                default: 'デフォルト',
                 wood: '木の温もり',
                 cafe: 'リラックスカフェ'
             },
@@ -112,7 +112,8 @@ const translations = {
             tradeShop: '野菜直売所',
             shopDesc: '貯まったポイントで本物の野菜と交換！',
             comingSoon: '機能開発中...',
-            sellConfirm: '1つ売却して {{price}} VPを獲得しますか？'
+            sellConfirm: '1つ売却して {{price}} VPを獲得しますか？',
+            sellMessage: '{{amount}}個の {{name}} を売却しますか？'
         },
         crops: {
             weed: '雑草',
@@ -243,11 +244,11 @@ const translations = {
             harvestCollection: 'Harvest Collection',
             emptyCollection: 'Harvest crops to fill your collection!',
             logout: 'Logout',
-            wasteland: 'Wasteland',
-            field: 'Camping Ground',
-            garden: 'Garden',
-            farmhouse: 'Farmhouse',
-            villageStart: 'Village',
+            wasteland: 'The Beginning Wilds',
+            field: "Traveler's Camp",
+            garden: 'Sprouting Garden',
+            farmhouse: 'Bountiful Farm',
+            villageStart: 'Dawn of the Village',
             nextLevel: 'Next Level',
             toNextLevel: 'To Next Level',
             tips: 'Tip',
@@ -265,7 +266,13 @@ const translations = {
                 cafe: 'Relax Cafe'
             },
             defaultName: 'Guest',
-            titleFormat: "{{name}}'s Village"
+            titleFormat: "{{name}}'s Village",
+            vp: 'Vegetable Points',
+            tradeShop: 'Farm Shop',
+            shopDesc: 'Exchange VP for real vegetables!',
+            comingSoon: 'Coming Soon...',
+            sellConfirm: 'Sell 1 for {{price}} VP?',
+            sellMessage: 'Sell {{amount}} {{name}}?'
         },
         crops: {
             weed: 'Weed',
@@ -323,16 +330,43 @@ export const LanguageProvider = ({ children }) => {
         localStorage.setItem('pomodoro_lang', language);
     }, [language]);
 
-    const t = (path, defaultValue) => {
+    const t = (path, paramsOrDefaultValue) => {
+        let defaultValue;
+        let params = {};
+
+        // Helper to determine arguments
+        if (typeof paramsOrDefaultValue === 'string') {
+            defaultValue = paramsOrDefaultValue;
+        } else if (typeof paramsOrDefaultValue === 'object') {
+            params = paramsOrDefaultValue;
+        }
+
         const keys = path.split('.');
         let current = translations[language];
+
         for (const key of keys) {
             if (current === undefined || current[key] === undefined) {
+                // If not found, look for defaultValue in arguments (legacy support)
+                // Note: The new signature basically deprecated passing defaultValue as 2nd arg if it's an object.
+                // But for compatibility with t('path', 'default'), we checked type above.
                 return defaultValue !== undefined ? defaultValue : path;
             }
             current = current[key];
         }
-        return current;
+
+        let result = current;
+
+        // Interpolation logic: Replaces {{key}} with params.key
+        if (typeof result === 'string' && params) {
+            Object.keys(params).forEach(key => {
+                const value = params[key];
+                // Ensure value is a string or number, not an object
+                const replacement = (typeof value === 'object') ? '' : String(value);
+                result = result.replace(new RegExp(`{{${key}}}`, 'g'), replacement);
+            });
+        }
+
+        return result;
     };
 
     const toggleLanguage = () => {

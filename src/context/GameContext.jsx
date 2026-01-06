@@ -24,7 +24,8 @@ const INITIAL_STATE = {
     theme: 'default',
     username: '',
     vp: 0,
-    unlockedCrops: []
+    unlockedCrops: [],
+    activeCoachId: 'neko'
 };
 
 const LEVELS = [
@@ -389,6 +390,14 @@ export const GameProvider = ({ children }) => {
         });
     };
 
+    const setActiveCoach = (coachId) => {
+        setGameState(prev => {
+            const newState = { ...prev, activeCoachId: coachId };
+            saveGame(newState);
+            return newState;
+        });
+    };
+
     return (
         <GameContext.Provider value={{
             gameState,
@@ -406,6 +415,7 @@ export const GameProvider = ({ children }) => {
             checkCanLevelUp,
             upgradeLevel,
             LEVEL_CROPS,
+            setActiveCoach,
             loading
         }}>
             {children}

@@ -27,6 +27,8 @@
   /* Very subtle grey shadow */
 
   --timer-bg-ring: #e0f2f1;
+  --shadow-color: rgba(46, 204, 113, 0.3);
+  /* Default Green Shadow */
   --font-main: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
 }
 
@@ -60,10 +62,15 @@ body.theme-wood {
   --primary-color: #d35400;
   --primary-dark: #a04000;
   --bg-gradient: linear-gradient(135deg, #fcebb6 0%, #f8c291 100%);
+  --primary-gradient: linear-gradient(135deg, #d35400 0%, #a04000 100%);
   --bg-color: #fdf2e9;
   --timer-bg-ring: #fae5d3;
-  background-image: repeating-linear-gradient(45deg, #e67e22 0, #e67e22 1px, transparent 0, transparent 50%);
-  background-size: 10px 10px;
+  --shadow-color: rgba(211, 84, 0, 0.3);
+  /* Brown Shadow */
+  background-image: url('./assets/wood_theme_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 body.theme-cafe {

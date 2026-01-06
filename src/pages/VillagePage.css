@@ -1,7 +1,7 @@
 /* ... (Same as Step 2109) ... */
 .village-page {
     padding: 24px;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
     text-align: center;
     position: relative;
@@ -11,9 +11,11 @@
 /* Navigation Arrows */
 .nav-arrow {
     position: absolute;
-    top: 250px;
-    /* Vertically aligned with visual roughly */
+    top: 50%;
+    /* Fallback */
+    /* Vertically aligned with visual roughly (Image Center Estimate) */
     transform: translateY(-50%);
+    top: 280px;
     background: rgba(255, 255, 255, 0.8);
     border: none;
     border-radius: 50%;
@@ -81,7 +83,7 @@
 
 /* Reused Styles */
 .level-header {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
 .level-badge {
@@ -97,7 +99,8 @@
 }
 
 .level-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    /* Reduced from 2rem */
     font-weight: 800;
     color: var(--text-color);
     letter-spacing: -0.02em;
@@ -107,24 +110,21 @@
 }
 
 .village-visual {
-    height: 220px;
+    height: auto;
+    min-height: 320px;
+    /* Increased from 220px */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 0.25rem;
     position: relative;
+    padding-bottom: 20px;
     user-select: none;
 }
 
+/* Green shadow removed */
 .village-visual::before {
-    content: '';
-    position: absolute;
-    width: 180px;
-    height: 60px;
-    background: rgba(46, 204, 113, 0.1);
-    border-radius: 50%;
-    bottom: 20px;
-    z-index: -1;
+    display: none;
 }
 
 .main-emoji {
@@ -144,6 +144,8 @@
     padding: 0;
     display: flex;
     align-items: flex-start;
+    justify-content: center;
+    /* Center the avatar and bubble */
     /* Top align for natural speaking */
     gap: 16px;
     margin-bottom: 24px;
@@ -161,8 +163,8 @@
 }
 
 .companion-speech {
-    background: rgba(255, 255, 255, 0.95);
-    /* Nearly opaque white */
+    background: #ffffff;
+    /* Pure white */
     color: var(--text-color);
     padding: 16px 20px;
     border-radius: 20px;
@@ -170,146 +172,31 @@
     /* Corner for tail */
     font-size: 0.95rem;
     font-weight: 700;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    /* Soft shadow for bubble */
+    box-shadow: none;
+    /* Removed shadow for flat look */
     flex: 1;
     line-height: 1.6;
     letter-spacing: 0.02em;
     min-width: 0;
     word-wrap: break-word;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 2px solid var(--primary-color);
+    /* Restored Green Border */
     margin-top: 8px;
     /* Slightly offset from top of avatar */
 }
 
-/* Speech Bubble Tail */
-.companion-speech::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -10px;
-    /* Poke out left */
-    width: 0;
-    height: 0;
-    border-top: 10px solid rgba(255, 255, 255, 0.95);
-    border-left: 10px solid transparent;
-    border-right: 0px solid transparent;
-    /* Right angle triangle style */
-    filter: drop-shadow(-2px 2px 2px rgba(0, 0, 0, 0.03));
-}
-
-.companion-avatar-container {
-    animation: bounce 2.5s infinite ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
-    /* Shadow on character itself */
-}
-
-.companion-avatar-img {
-    width: 72px;
-    height: 72px;
-    object-fit: contain;
-}
-
-.animate-bounce-slow {
-    animation: bounce 3s infinite;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-12px);
-    }
-}
-
-/* Mobile Compression for Village */
-@media (max-width: 480px) {
-    .village-page {
-        padding: 12px 0;
-        /* Minimal Horizontal Padding */
-    }
-
-    .level-header {
-        margin-bottom: 0.5rem;
-        /* Drastic reduction */
-    }
-
-    .village-visual {
-        height: 140px;
-        /* Reduced from 220px */
-        margin-bottom: 0.5rem;
-    }
-
-    .village-visual::before {
-        width: 120px;
-        height: 40px;
-    }
-
-    .main-emoji {
-        font-size: 5rem;
-        /* Reduced from 8rem */
-    }
-
-    .level-title {
-        font-size: 1.5rem;
-    }
-
-    .stats-card {
-        padding: 16px;
-        min-height: auto;
-    }
-
-    /* Mobile Companion Card */
-    .tomato-companion-card {
-        padding: 12px 16px;
-        gap: 12px;
-        border-radius: 20px;
-    }
-
-    .companion-avatar-img {
-        width: 50px;
-        height: 50px;
-    }
-
-    .companion-speech {
-        font-size: 0.85rem;
-    }
-
-    .nav-arrow {
-        top: 180px;
-        /* Adjust arrow position for new visual height */
-        width: 36px;
-        height: 36px;
-    }
-}
-
-.stats-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    padding: 24px;
-    border-radius: 24px;
-    box-shadow: 0 8px 32px var(--glass-shadow);
-    border: 1px solid var(--glass-border);
-    margin-bottom: 24px;
-    min-height: 200px;
-    /* Prevent layout jump */
-}
+/* ... */
 
 .level-requirements-box {
     text-align: left;
-    background: rgba(46, 204, 113, 0.1);
+    background: transparent;
+    /* Removed Green Tint (Pink?) */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    /* Minimal border */
     padding: 16px;
     border-radius: 16px;
-    margin-top: 12px;
+    margin-top: 4px;
     font-size: 0.9rem;
     color: var(--text-color);
 }
@@ -784,6 +671,29 @@
     position: relative;
 }
 
+/* Unified Card Container */
+.unified-card {
+    background: rgba(255, 255, 255, 0.92);
+    /* Restore Explicit White Background */
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    /* Restore Shadow */
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    /* Restore Border */
+    margin-bottom: 24px;
+    position: relative;
+    overflow: visible;
+    /* Prevent cutting off shadows or popouts */
+}
+
+.shop-section h4 {
+    margin: 0 0 8px 0;
+    color: #34495e;
+    font-size: 1.1rem;
+}
+
 .shop-content-box {
     margin-top: 10px;
     background: #fdfefe;
@@ -792,12 +702,6 @@
     padding: 20px;
     position: relative;
     overflow: hidden;
-}
-
-.shop-section h4 {
-    margin: 0 0 8px 0;
-    color: #34495e;
-    font-size: 1.1rem;
 }
 
 .shop-section p {
@@ -814,4 +718,75 @@
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: bold;
+}
+
+.tomato-companion-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Villager Speech Bubble (Per-Character) */
+.villager-bubble {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 2px solid var(--primary-color);
+    z-index: 10;
+    width: 120px;
+    text-align: center;
+    font-size: 0.75rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}
+
+/* Triangle Pointers via CSS */
+.villager-bubble::after,
+.villager-bubble::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+/* Border Triangle */
+.villager-bubble::before {
+    top: -6px;
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent var(--primary-color) transparent;
+}
+
+/* White Inner Triangle */
+.villager-bubble::after {
+    top: -3px;
+    border-width: 0 4px 4px 4px;
+    border-color: transparent transparent white transparent;
+}
+
+/* Mobile Fix: Prevent Overlap by using flow layout */
+@media (max-width: 600px) {
+    .villager-bubble {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        margin-top: 12px;
+        z-index: 1;
+    }
+}
+
+.user-greeting-section {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

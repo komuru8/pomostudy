@@ -4,7 +4,7 @@ import BottomNav from '../components/BottomNav';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameContext';
-import { Globe, LogIn, LogOut, Menu, X } from 'lucide-react';
+import { Globe, LogIn, LogOut, Menu, X, Trees } from 'lucide-react';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -50,7 +50,12 @@ const MainLayout = () => {
             <header className="app-header">
                 {/* App Logo */}
                 <div className="app-logo">
-                    <span style={{ fontSize: '1.8rem' }}>🌱</span>
+                    <span style={{ fontSize: '1.8rem', display: 'flex', alignItems: 'center' }}>
+                        {/* Only show Tree on Timer page with Wood theme */}
+                        {(location.pathname === '/' || location.pathname === '/timer') && gameState?.theme === 'wood'
+                            ? <Trees color="#d35400" size={28} />
+                            : '🌱'}
+                    </span>
                     <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary-dark)', letterSpacing: '-0.5px' }}>
                         Pomodoro Farm
                     </span>

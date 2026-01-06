@@ -29,7 +29,10 @@
 
 /* Active Task Banner */
 .active-task-card {
-    background: white;
+    background: rgba(255, 255, 255, 0.85);
+    /* Slightly more opaque than standard glass for text readability */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 16px 24px;
     border-radius: 20px;
     display: flex;
@@ -39,8 +42,19 @@
     max-width: 450px;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     animation: slideDown 0.4s ease-out;
+}
+
+.today-tasks-section {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes slideDown {
@@ -71,8 +85,8 @@
 }
 
 .pomodoro-badge {
-    background: #fff0f0;
-    color: #e74c3c;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--primary-color);
     padding: 6px 12px;
     border-radius: 12px;
     font-weight: 800;

@@ -3,12 +3,13 @@ import { Send, Bot, ArrowDown } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useGame } from '../context/GameContext';
 import { useTasks } from '../context/TaskContext';
+import { COACHES, getCoachById } from '../constants/coaches';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import './AIPage.css';
 
 const AIPage = () => {
     const { t } = useLanguage();
-    const { gameState, addChatMessage } = useGame();
+    const { gameState, addChatMessage, setActiveCoach } = useGame();
     const { tasks } = useTasks();
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -69,37 +70,26 @@ const AIPage = () => {
             const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
             const pendingTasks = tasks.filter(t => !t.completed).map(t => `- ${t.title} (${t.priority})`).join('\n');
-            const context = `
-Current User Stats:
-- Level: ${gameState.level}
-- Total Focus Time: ${gameState.totalWP} minutes
-- Total XP: ${gameState.totalXP}
-- Harvested Crops: ${gameState.harvested?.length || 0}
-- Pending Tasks:\n${pendingTasks || "None"}
-            `;
+
+            const activeCoach = getCoachById(gameState.activeCoachId || 'neko');
 
             const systemPrompt = `
-You are a highly experienced "Educational Coach & Life Strategist".
-Your mission is to help the user achieve their personal, academic, and professional goals.
+${activeCoach.systemPrompt}
 
-## Your Role:
-- Act as a dedicated mentor who cares deeply about the user's success.
-- Help the user create study plans, manage time, and overcome procrastination.
-- Provide life advice, career guidance, and mental support.
-- Be a sounding board for their ideas and plans.
+[Context Info]
+User Name: ${gameState.username || 'User'}
+Current Level: ${gameState.level}
+Total Focus Time: ${gameState.totalWP} minutes
+Total XP: ${gameState.totalXP}
+Harvested Crops: ${gameState.harvested?.length || 0}
+Pending Tasks:
+${pendingTasks || "None"}
 
-## Guidelines:
-- **Do NOT** feel restricted to the "Pomodoro Farm" app context. You can discuss anything.
-- **Do NOT** force gamification or farming metaphors unless the user enjoys them.
-- Use the provided context (stats, tasks) *only* to give personalized advice (e.g., "I see you're busy with X...").
-- Tone: Professional, warm, encouraging, and insightful. 
-- You can use emojis to be friendly, but maintain a coaching demeanor.
+Please strictly adhere to the persona defined above.
+`;
 
-IMPORTANT: Reply in the same language as the user's input (Japanese or English).
-Context: ${context}
-            `;
 
-            const fullPrompt = `${systemPrompt}\n\nUser: ${userText}`;
+            const fullPrompt = `${systemPrompt} \n\nUser: ${userText} `;
 
             const result = await model.generateContent(fullPrompt);
             const response = await result.response;
@@ -147,18 +137,60 @@ Context: ${context}
     return (
         <div className="ai-page">
             <header className="ai-header">
-                <div className="ai-avatar">
-                    <Bot size={24} color="#fff" />
-                </div>
-                <div style={{ flex: 1 }}>
-                    <h1>{t('ai.title')}</h1>
-                    <span className="status-indicator">{t('ai.status')}</span>
+                <div className="coach-display-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+                    <div style={{
+                        width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden',
+                        border: '2px solid white', boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                        background: 'white'
+                    }}>
+                        <img
+                            src={getCoachById(gameState.activeCoachId).iconPath}
+                            alt="Coach"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
+                            <select
+                                value={gameState.activeCoachId || 'neko'}
+                                onChange={(e) => setActiveCoach && setActiveCoach(e.target.value)}
+                                style={{
+                                    fontSize: '1rem',
+                                    fontWeight: 'bold',
+                                    color: 'var(--primary-dark)',
+                                    border: 'none',
+                                    background: 'transparent',
+                                    cursor: 'pointer',
+                                    appearance: 'none',
+                                    width: '100%',
+                                    zIndex: 2,
+                                    textAlign: 'left'
+                                }}
+                            >
+                                {Object.values(COACHES).map(coach => {
+                                    const isLocked = gameState.level < coach.unlockLevel;
+                                    return (
+                                        <option key={coach.id} value={coach.id} disabled={isLocked}>
+                                            {isLocked ? `??? (Locked)` : coach.name}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <div style={{ position: 'absolute', right: 0, zIndex: 1, pointerEvents: 'none', color: '#666', display: 'flex' }}>
+                                <span style={{ fontSize: '0.8rem' }}>▼</span>
+                            </div>
+                        </div>
+                        <span style={{ fontSize: '0.7rem', color: '#7f8c8d' }}>
+                            {getCoachById(gameState.activeCoachId).shortDescription}
+                        </span>
+                    </div>
                 </div>
             </header>
 
             <div className="chat-container" onScroll={handleScroll}>
                 {messages.map(msg => (
-                    <div key={msg.id} className={`message ${msg.sender}`}>
+                    <div key={msg.id} className={`message ${msg.sender} `}>
                         <div className="message-bubble">
                             {msg.text.split('\n').map((line, i) => (
                                 <React.Fragment key={i}>

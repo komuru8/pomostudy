@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Palette } from 'lucide-react';
 import TimerDisplay from '../components/TimerDisplay';
 import Controls from '../components/Controls';
 import TaskItem from '../components/TaskItem';
@@ -9,6 +10,7 @@ import { useGame } from '../context/GameContext'; // Import useGame
 import './TimerPage.css';
 
 const TimerPage = () => {
+    const { gameState, changeTheme } = useGame();
     const { timeLeft, isActive, mode, MODES, switchMode, toggleTimer, resetTimer, totalTime, showConfetti } = useTimerContext();
     const { activeTask, tasks, selectActiveTask, updateTask, deleteTask, toggleToday } = useTasks();
     const { t } = useLanguage();
@@ -72,7 +74,94 @@ const TimerPage = () => {
 
 
             {/* Timer Card */}
-            <div className="glass-container" style={{ margin: 0, width: '100%' }}>
+            <div className="glass-container" style={{ margin: 0, width: '100%', position: 'relative' }}>
+
+                {/* Background Settings Button */}
+                <div style={{ position: 'absolute', top: '15px', right: '15px', zIndex: 10 }}>
+                    <div className="bg-selector-wrapper" style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setPendingMode(pendingMode === 'THEME' ? null : 'THEME')}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                width: '40px',
+                                height: '40px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                color: '#95a5a6', // Gray color
+                                transition: 'color 0.2s',
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#7f8c8d'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = '#95a5a6'}
+                            title={t('village.themes')}
+                        >
+                            <Palette size={24} />
+                        </button>
+
+                        {/* Theme Dropdown */}
+                        {pendingMode === 'THEME' && (
+                            <div style={{
+                                position: 'absolute',
+                                top: '40px',
+                                right: '0',
+                                background: 'white',
+                                borderRadius: '12px',
+                                padding: '8px',
+                                boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+                                width: '180px',
+                                zIndex: 20
+                            }}>
+                                <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.85rem', color: '#666' }}>{t('village.themes')}</h4>
+                                {['default', 'wood', 'cafe'].map((themeName, idx) => {
+                                    const unlockLevel = idx + 1;
+                                    const isLocked = (gameState.level || 1) < unlockLevel;
+                                    const isActive = (gameState.theme || 'default') === themeName;
+                                    const themeLabels = {
+                                        default: t('village.themeNames.default'),
+                                        wood: t('village.themeNames.wood'),
+                                        cafe: t('village.themeNames.cafe')
+                                    };
+
+                                    return (
+                                        <button
+                                            key={themeName}
+                                            onClick={() => {
+                                                if (!isLocked) {
+                                                    changeTheme(themeName);
+                                                    setPendingMode(null);
+                                                }
+                                            }}
+                                            disabled={isLocked}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                width: '100%',
+                                                padding: '8px 12px',
+                                                marginBottom: '4px',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                background: isActive ? '#e8f8f5' : 'transparent',
+                                                color: isLocked ? '#ccc' : '#333',
+                                                cursor: isLocked ? 'not-allowed' : 'pointer',
+                                                fontSize: '0.9rem',
+                                                fontWeight: isActive ? 'bold' : 'normal',
+                                                textAlign: 'left'
+                                            }}
+                                        >
+                                            <span>{themeLabels[themeName]}</span>
+                                            {isLocked && <span>🔒</span>}
+                                            {isActive && !isLocked && <span style={{ color: '#2ecc71' }}>✓</span>}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {activeTask && mode === 'FOCUS' ? (
                     <div style={{
                         fontSize: '1.3rem',
@@ -84,7 +173,7 @@ const TimerPage = () => {
                         padding: '10px 30px',
                         borderRadius: '30px',
                         display: 'inline-block',
-                        boxShadow: '0 4px 15px rgba(46, 204, 113, 0.4)',
+                        boxShadow: '0 4px 15px var(--shadow-color)',
                         maxWidth: '90%',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -116,7 +205,7 @@ const TimerPage = () => {
             {todayTasks.length > 0 && (
                 <div className="today-tasks-section" style={{ width: '90%', maxWidth: '450px', marginTop: '2rem' }}>
                     <h2 style={{ fontSize: '1.2rem', color: 'var(--primary-dark)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        ☀️ 今日やるタスク
+                        今日やるタスク
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {todayTasks.map(task => (
