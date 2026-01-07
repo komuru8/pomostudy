@@ -74,10 +74,22 @@ body.theme-wood {
 }
 
 body.theme-cafe {
-  --primary-color: #8e44ad;
-  --primary-dark: #5b2c6f;
-  --bg-gradient: linear-gradient(135deg, #f5eef8 0%, #d7bde2 100%);
-  background-image: none;
+  --primary-color: #6d4c41;
+  /* Coffee Brown */
+  --primary-dark: #3e2723;
+  /* Dark Espresso */
+  --text-color: #2c2c2c;
+  /* Softer black */
+  --bg-gradient: linear-gradient(135deg, #efebe9 0%, #d7ccc8 100%);
+  /* Latte Foam */
+  --primary-gradient: linear-gradient(135deg, #8d6e63 0%, #5d4037 100%);
+  /* Warm Wood/Coffee Gradient */
+  --shadow-color: rgba(109, 76, 65, 0.4);
+  /* Brown Shadow */
+  background-image: url('./assets/cafe_bg_real.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 #root {

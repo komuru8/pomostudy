@@ -40,6 +40,9 @@ const VillagersSection = () => {
             }}>
                 村の住人たち
             </h3>
+            <p className="section-desc" style={{ paddingLeft: '8px', marginBottom: '16px', fontSize: '0.85rem', color: '#666' }}>
+                村の住人をタップして指名するとAIコーチタブで勉強のサポートをしてくれます。
+            </p>
 
             <div className="villagers-grid" style={{
                 display: 'grid',

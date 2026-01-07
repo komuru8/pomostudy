@@ -17,13 +17,13 @@ const BottomNav = () => {
                 <CheckSquare size={24} />
                 <span>{t('nav.tasks')}</span>
             </NavLink>
-            <NavLink to="/village" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                <Tent size={24} />
-                <span>{t('nav.base') || 'Base'}</span>
-            </NavLink>
             <NavLink to="/history" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                 <BookOpen size={24} />
                 <span>{t('nav.history')}</span>
+            </NavLink>
+            <NavLink to="/village" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+                <Tent size={24} />
+                <span>{t('nav.base') || 'Base'}</span>
             </NavLink>
             <NavLink to="/ai" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                 <Bot size={24} />

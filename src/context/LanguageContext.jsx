@@ -86,7 +86,7 @@ const translations = {
             logout: 'ログアウト',
             wasteland: '始まりの荒野',
             field: '旅人の休息地',
-            hut: '芽吹きの庭',
+            hut: '小さな畑のある家',
             garden: '緑の小道',
             farmhouse: '豊穣の農園',
             villageStart: '村の夜明け',

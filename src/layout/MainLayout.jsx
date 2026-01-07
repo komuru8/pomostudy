@@ -4,7 +4,7 @@ import BottomNav from '../components/BottomNav';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameContext';
-import { Globe, LogIn, LogOut, Menu, X, Trees } from 'lucide-react';
+import { Globe, LogIn, LogOut, Menu, X, Trees, Coffee } from 'lucide-react';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -14,7 +14,7 @@ const MainLayout = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
-    const location = useLocation(); // Re-import at top if needed, but we have navigate from it usually? No, check imports.
+    const location = useLocation();
 
     // Sync Theme with Body Class (Only on Timer Page)
     React.useEffect(() => {
@@ -41,7 +41,6 @@ const MainLayout = () => {
 
     const handleLanguageClick = () => {
         toggleLanguage();
-        // setIsMenuOpen(false); // Optional: Keep open to toggle back? Or close. Let's keep open for easier switching.
     };
 
     return (
@@ -54,7 +53,9 @@ const MainLayout = () => {
                         {/* Only show Tree on Timer page with Wood theme */}
                         {(location.pathname === '/' || location.pathname === '/timer') && gameState?.theme === 'wood'
                             ? <Trees color="#d35400" size={28} />
-                            : '🌱'}
+                            : (location.pathname === '/' || location.pathname === '/timer') && gameState?.theme === 'cafe'
+                                ? <Coffee color="#6d4c41" size={28} />
+                                : '🌱'}
                     </span>
                     <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary-dark)', letterSpacing: '-0.5px' }}>
                         Pomodoro Farm

@@ -201,26 +201,6 @@ const TimerPage = () => {
                 />
             </div>
 
-            {/* Today's Tasks List */}
-            {todayTasks.length > 0 && (
-                <div className="today-tasks-section" style={{ width: '90%', maxWidth: '450px', marginTop: '2rem' }}>
-                    <h2 style={{ fontSize: '1.2rem', color: 'var(--primary-dark)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        今日やるタスク
-                    </h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {todayTasks.map(task => (
-                            <TaskItem
-                                key={task.id}
-                                task={task}
-                                isActive={task.id === activeTask?.id}
-                                onSelect={selectActiveTask}
-                                onDelete={deleteTask}
-                                onComplete={handleComplete}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
 
             {/* Celebration Overlay */}
             {showConfetti && (

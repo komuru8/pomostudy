@@ -78,8 +78,17 @@ const HistoryPage = () => {
         let totalMinutes = 0;
 
         daySessions.forEach(s => {
-            const cat = s.category || 'General';
-            const normCat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+            let cat = s.category || 'General';
+            // Exclude breaks from "Focus Time" graph
+            if (cat.toLowerCase().includes('break')) return;
+
+            let normCat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+
+            // If category is not in our standard list, group it under 'General' to avoid invisible gaps
+            if (!CATEGORIES.includes(normCat)) {
+                normCat = 'General';
+            }
+
             breakdown[normCat] = (breakdown[normCat] || 0) + s.duration;
             totalMinutes += s.duration;
         });

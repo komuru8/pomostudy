@@ -13,9 +13,11 @@ const TasksPage = () => {
     const { t } = useLanguage();
 
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    // Removed searchQuery
     const [filterCategory, setFilterCategory] = useState('ALL');
     const [sortBy, setSortBy] = useState('PRIORITY');
+    const [showTodayOnly, setShowTodayOnly] = useState(false);
+    const [showIncompleteOnly, setShowIncompleteOnly] = useState(false);
 
     const CATEGORIES = ['Study', 'Health', 'Hobby', 'Work', 'General'];
 
@@ -43,7 +45,8 @@ const TasksPage = () => {
     const filteredAndSortedTasks = tasks
         .filter(task => {
             if (filterCategory !== 'ALL' && task.category !== filterCategory) return false;
-            if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            if (showTodayOnly && task.priority !== 'TODAY') return false;
+            if (showIncompleteOnly && task.status === 'DONE') return false;
             return true;
         })
         .sort((a, b) => {
@@ -74,14 +77,7 @@ const TasksPage = () => {
             </header>
 
             <div className="tasks-controls">
-                <input
-                    type="search"
-                    placeholder={t('tasks.searchPlaceholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="search-input"
-                />
-                <div className="filters-row">
+                <div className="filters-row" style={{ width: '100%', flexWrap: 'wrap' }}>
                     <select
                         value={filterCategory}
                         onChange={(e) => setFilterCategory(e.target.value)}
@@ -103,6 +99,41 @@ const TasksPage = () => {
                         <option value="NEWEST">{t('tasks.sort.newest')}</option>
                         <option value="OLDEST">{t('tasks.sort.oldest')}</option>
                     </select>
+                </div>
+                {/* Filter Toggles */}
+                <div style={{ display: 'flex', gap: '8px', marginTop: '8px', width: '100%', overflowX: 'auto', paddingBottom: '4px' }}>
+                    <button
+                        onClick={() => setShowTodayOnly(!showTodayOnly)}
+                        style={{
+                            padding: '6px 12px',
+                            borderRadius: '16px',
+                            border: showTodayOnly ? 'none' : '1px solid #ddd',
+                            background: showTodayOnly ? 'var(--primary-color)' : 'white',
+                            color: showTodayOnly ? 'white' : '#666',
+                            fontSize: '0.85rem',
+                            whiteSpace: 'nowrap',
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            cursor: 'pointer', flexShrink: 0
+                        }}
+                    >
+                        {showTodayOnly && <span>✓</span>} 今日やる
+                    </button>
+                    <button
+                        onClick={() => setShowIncompleteOnly(!showIncompleteOnly)}
+                        style={{
+                            padding: '6px 12px',
+                            borderRadius: '16px',
+                            border: showIncompleteOnly ? 'none' : '1px solid #ddd',
+                            background: showIncompleteOnly ? 'var(--primary-color)' : 'white',
+                            color: showIncompleteOnly ? 'white' : '#666',
+                            fontSize: '0.85rem',
+                            whiteSpace: 'nowrap',
+                            display: 'flex', alignItems: 'center', gap: '4px',
+                            cursor: 'pointer', flexShrink: 0
+                        }}
+                    >
+                        {showIncompleteOnly && <span>✓</span>} 未完了のみ
+                    </button>
                 </div>
             </div>
 

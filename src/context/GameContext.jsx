@@ -24,8 +24,9 @@ const INITIAL_STATE = {
     theme: 'default',
     username: '',
     vp: 0,
-    unlockedCrops: [],
-    activeCoachId: 'neko'
+    activeCoachId: 'neko',
+    fieldPlots: [], // Array of { id, type, plantDate, stage }
+    lastSeedDate: null // ISO String of last daily seed
 };
 
 const LEVELS = [
@@ -197,6 +198,64 @@ export const GameProvider = ({ children }) => {
         }
     }, [user, loading]);
 
+    // Daily Seed Logic
+    useEffect(() => {
+        if (!user || loading) return;
+        const todayStr = new Date().toDateString();
+        const lastSeedStr = gameState.lastSeedDate ? new Date(gameState.lastSeedDate).toDateString() : '';
+
+        if (todayStr !== lastSeedStr) {
+            // It's a new day! Add a seed if there's space.
+            const maxSlots = gameState.level + 2;
+            const currentPlots = gameState.fieldPlots || [];
+
+            if (currentPlots.length < maxSlots) {
+                // Determine available crops based on level
+                const availableLevelCrops = Object.values(LEVEL_CROPS).filter(c => {
+                    // Find the level this crop belongs to. 
+                    // Note: LEVEL_CROPS key is level. We need to check key <= gameState.level.
+                    // But LEVEL_CROPS is object. Let's iterate keys.
+                    return true; // We'll refine filtration inside the reduce/map or just pick from current level downwards
+                });
+
+                // Actually, let's just pick a random level from 2 up to currentLevel (max 10)
+                // Then pick the crop for that level.
+                // Simple logic: Candidate levels = [2 ... currentLevel]
+                const candidateLevels = Object.keys(LEVEL_CROPS)
+                    .map(Number)
+                    .filter(l => l <= gameState.level);
+
+                if (candidateLevels.length > 0) {
+                    const randomLevel = candidateLevels[Math.floor(Math.random() * candidateLevels.length)];
+                    const cropDef = LEVEL_CROPS[randomLevel];
+
+                    if (cropDef) {
+                        const newPlot = {
+                            id: Date.now(), // Unique ID for the plot
+                            type: cropDef.type,
+                            icon: '🌱', // Start as seed
+                            realIcon: cropDef.icon, // Reveal later? Or show immediately? User said "Seed added". Let's show Seed always for now or Growing.
+                            // User said "Seed added". Let's use 'Growing' stage.
+                            stage: 'growing',
+                            cost: cropDef.cost,
+                            xp: cropDef.xp
+                        };
+
+                        setGameState(prev => ({
+                            ...prev,
+                            lastSeedDate: new Date().toISOString(),
+                            fieldPlots: [...(prev.fieldPlots || []), newPlot]
+                        }));
+                        console.log("Daily Seed Added:", newPlot);
+                    }
+                }
+            } else {
+                // Even if full, mark today as checked so we don't retry loop
+                setGameState(prev => ({ ...prev, lastSeedDate: new Date().toISOString() }));
+            }
+        }
+    }, [user, loading, gameState.lastSeedDate]); // Depend on lastSeedDate to prevent loops, but verify logic carefully.
+
     const checkCanLevelUp = (currentState) => {
         const currentLevel = currentState.level;
         const totalMinutes = currentState.totalWP || 0;
@@ -257,24 +316,30 @@ export const GameProvider = ({ children }) => {
         10: { type: 'diamond', icon: '💎', xp: 100, cost: 500, price: 100 }
     };
 
-    const harvestCrop = (cropData) => {
-        // Fallback for logic consistency
-        if (!cropData) return false;
+    const harvestPlot = (plotIndex) => {
+        setGameState(prev => {
+            const plots = [...(prev.fieldPlots || [])];
+            if (!plots[plotIndex]) return prev;
 
-        const cost = cropData.cost || 25;
+            const plot = plots[plotIndex];
+            const cost = plot.cost || 25;
 
-        if ((gameState.water || 0) < cost) return false;
+            // Check money
+            if ((prev.water || 0) < cost) return prev; // Should be handled by UI, but safety check
 
-        const newCrop = {
-            id: Date.now(),
-            icon: cropData.icon,
-            name: cropData.type,
-            type: cropData.type,
-            xp: cropData.xp || 10,
-            date: new Date().toISOString()
-        };
+            // Remove from plots
+            plots.splice(plotIndex, 1);
 
-        setGameState((prev) => {
+            // Add to harvested
+            const newCrop = {
+                id: Date.now(),
+                icon: plot.realIcon || plot.icon, // Ensure we get the real icon if it was hidden
+                name: plot.type,
+                type: plot.type,
+                xp: plot.xp || 10,
+                date: new Date().toISOString()
+            };
+
             const currentUnlocked = prev.unlockedCrops || [];
             const newUnlocked = currentUnlocked.includes(newCrop.type)
                 ? currentUnlocked
@@ -283,6 +348,7 @@ export const GameProvider = ({ children }) => {
             const newState = {
                 ...prev,
                 water: (prev.water || 0) - cost,
+                fieldPlots: plots,
                 harvested: [newCrop, ...(prev.harvested || [])],
                 xp: (prev.xp || 0) + newCrop.xp,
                 totalXP: (prev.totalXP || 0) + newCrop.xp,
@@ -291,7 +357,13 @@ export const GameProvider = ({ children }) => {
             saveGame(newState);
             return newState;
         });
-        return newCrop;
+        return true;
+    };
+
+    // Deprecated procedural harvest - keeping for safety but not used in UI
+    const harvestCrop = (cropData) => {
+        // ... (Old logic, effectively replaced by harvestPlot)
+        return false;
     };
 
     const sellCrop = (type) => {
@@ -408,6 +480,7 @@ export const GameProvider = ({ children }) => {
             completeFocusSession,
             completeBreakSession,
             harvestCrop,
+            harvestPlot,
             sellCrop,
             addChatMessage,
             changeTheme,
