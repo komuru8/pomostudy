@@ -86,7 +86,7 @@ body.theme-cafe {
   /* Warm Wood/Coffee Gradient */
   --shadow-color: rgba(109, 76, 65, 0.4);
   /* Brown Shadow */
-  background-image: url('./assets/cafe_bg_real.png');
+  background-image: url('/assets/cafe_bg_real.png');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
