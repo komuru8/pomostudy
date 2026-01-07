@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import VillagersSection from '../components/VillagersSection';
 import { useGame } from '../context/GameContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTimerContext } from '../context/TimerContext';
-import { Droplets, Sprout, Store, ArrowUpCircle, Trophy, ShoppingBag, CloudRain, ChevronLeft, ChevronRight, Lock, Edit2, Check } from 'lucide-react';
+import hippoMerchant from '../assets/hippo_merchant.jpg';
+import {
+    Lock,
+    Droplets,
+    ShoppingBag,
+    Star,
+    Trophy,
+    Map as MapIcon,
+    ArrowLeft,
+    ArrowRight,
+    Sprout, Store, ArrowUpCircle, CloudRain, ChevronLeft, ChevronRight, Edit2, Check
+} from 'lucide-react';
 import { CROP_TRIVIA } from '../constants/cropTrivia';
 import './VillagePage.css';
 
@@ -64,9 +75,38 @@ const VillagePage = () => {
     const [viewLevel, setViewLevel] = useState(gameState.level);
     const [pendingSell, setPendingSell] = useState(null);
     const [pendingHarvest, setPendingHarvest] = useState(null); // { plot, index }
+    const [showMerchantInfo, setShowMerchantInfo] = useState(false); // Merchant popup state
     const [isEditingName, setIsEditingName] = useState(false);
     const [editName, setEditName] = useState('');
     const [flyingCrops, setFlyingCrops] = useState([]); // Flying animation state
+    const [timeToNextSeed, setTimeToNextSeed] = useState('');
+
+    useEffect(() => {
+        const updateTimer = () => {
+            const now = new Date();
+            // Targets: Today 9:00, Today 21:00, Tomorrow 9:00
+            const t1 = new Date(now); t1.setHours(9, 0, 0, 0);
+            const t2 = new Date(now); t2.setHours(21, 0, 0, 0);
+            const t3 = new Date(now); t3.setDate(t3.getDate() + 1); t3.setHours(9, 0, 0, 0);
+
+            let target = t1;
+            if (now >= t1) target = t2;
+            if (now >= t2) target = t3;
+
+            const diff = target - now;
+            if (diff <= 0) {
+                setTimeToNextSeed("まもなく");
+                return;
+            }
+
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            setTimeToNextSeed(`${h}時間${m}分`);
+        };
+        updateTimer();
+        const interval = setInterval(updateTimer, 60000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Init edit name when editing starts
     const startEditing = () => {
@@ -157,6 +197,37 @@ const VillagePage = () => {
             // Removed pop-up: setLastHarvest(crop);
             // setTimeout(() => setLastHarvest(null), 3000);
         }
+    };
+
+    // --- Harvest Logic ---
+    const commitHarvest = () => {
+        if (!pendingHarvest) return;
+        const { plot, index } = pendingHarvest;
+
+        // Perform Harvest
+        const harvestedItem = harvestPlot(index); // This now returns the crop object with realIcon
+
+        if (harvestedItem) {
+            // Trigger Flying Animation with the REVEALED icon
+            const startElem = document.querySelector(`.field-plot[data-index="${index}"]`); // Need to add data-index
+            const startRect = startElem ? startElem.getBoundingClientRect() : { top: window.innerHeight / 2, left: window.innerWidth / 2 };
+            const targetElem = document.querySelector('.inventory-section'); // Fly to inventory
+            const targetRect = targetElem ? targetElem.getBoundingClientRect() : { top: window.innerHeight - 50, left: window.innerWidth / 2 };
+
+            const newFlying = {
+                id: Date.now(),
+                icon: harvestedItem.icon, // REAL icon
+                start: { x: startRect.left, y: startRect.top },
+                target: { x: targetRect.left, y: targetRect.top }
+            };
+            setFlyingCrops(prev => [...prev, newFlying]);
+
+            // OPTIONAL: Show a "Result" popup? 
+            // User said: "See what vegetable it is only after confirming".
+            // The flying animation usually does this well. The item "pops" out and flies.
+        }
+
+        setPendingHarvest(null);
     };
 
     return (
@@ -409,7 +480,7 @@ const VillagePage = () => {
 
                                                 <div className="field-section">
                                                     <h3>{t('field.yourField')}</h3>
-                                                    <p className="section-desc">畑には毎日新しい苗がランダムで1つ増えます。学習時間に応じて水ポイントが貯まり、消費することで作物を収穫できます。</p>
+                                                    <p className="section-desc">畑には毎日新しい苗がランダムで届きます。学習時間に応じて水ポイントが貯まり、消費して作物を収穫できます。</p>
                                                     {gameState.level === 1 ? (
                                                         <div className="field-locked-panel">
                                                             <Lock size={20} />
@@ -431,40 +502,86 @@ const VillagePage = () => {
                                                                 fontSize: '0.9rem'
                                                             }}>
                                                                 <span>水ポイント</span>
-                                                                <span>{gameState.water || 0} pts</span>
+                                                                <span>{gameState.water || 0}💧</span>
                                                             </div>
+
+                                                            <div className="merchant-section" style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '16px',
+                                                                padding: '0 8px',
+                                                                marginBottom: '16px'
+                                                                // Removed BG, border, shadow
+                                                            }}>
+                                                                <div
+                                                                    onClick={() => setShowMerchantInfo(true)}
+                                                                    style={{ cursor: 'pointer', transition: 'transform 0.1s' }}
+                                                                    onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+                                                                    onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                                                                >
+                                                                    <img src={hippoMerchant} alt="Seed Merchant" style={{ width: '80px', height: 'auto', borderRadius: '12px' }} />
+                                                                </div>
+                                                                <div className="merchant-info" style={{ textAlign: 'left' }}>
+                                                                    <div style={{ fontWeight: 'bold', color: '#5d4037', fontSize: '0.9rem' }}>カバの商人</div>
+                                                                    <div style={{ fontSize: '0.9rem', color: '#795548', marginTop: '4px' }}>
+                                                                        あと<span style={{ fontSize: '1.0rem', color: '#e67e22', fontWeight: '800', margin: '0 4px' }}>{timeToNextSeed}</span>で苗が届きます
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Render Merchant Popup */}
+                                                            {showMerchantInfo && ReactDOM.createPortal(
+                                                                <div className="harvest-popup" onClick={() => setShowMerchantInfo(false)}>
+                                                                    <div className="popup-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '340px', padding: '24px' }}>
+                                                                        <h3 style={{ color: '#5d4037', margin: '0 0 16px 0', fontSize: '1.4rem' }}>カバの商人</h3>
+                                                                        <img src={hippoMerchant} alt="Merchant" style={{ width: '120px', borderRadius: '16px', marginBottom: '16px' }} />
+                                                                        <p style={{ textAlign: 'left', lineHeight: '1.6', color: '#5d4037', fontSize: '0.95rem', background: '#f5f5f5', padding: '16px', borderRadius: '12px' }}>
+                                                                            朝9時と夜9時、決まった時間に苗を届けてくれる野菜大好き商人。<br /><br />
+                                                                            「この時間は人間がタスクに集中しやすいゴールデンタイムだからね」と片眼鏡を光らせるが、実は彼自身がその時間にお腹が空くだけという噂も...？
+                                                                        </p>
+                                                                        <button
+                                                                            className="harvest-btn"
+                                                                            onClick={() => setShowMerchantInfo(false)}
+                                                                            style={{ marginTop: '20px', width: '100%', justifyContent: 'center' }}
+                                                                        >
+                                                                            閉じる
+                                                                        </button>
+                                                                    </div>
+                                                                </div>,
+                                                                document.body
+                                                            )}
 
                                                             <div className="field-grid">
                                                                 {/* Render STATEFUL Field Plots */}
                                                                 {(gameState.fieldPlots || []).length === 0 ? (
-                                                                    <div className="empty-field-msg" style={{ gridColumn: '1/-1', textAlign: 'center', padding: '20px', color: '#95a5a6' }}>
-                                                                        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🍃</div>
-                                                                        新しい種を待っています...<br />
-                                                                        <span style={{ fontSize: '0.8rem' }}>(毎日新しい種が届きます！)</span>
-                                                                    </div>
+                                                                    // Completely hidden as requested
+                                                                    null
                                                                 ) : (
                                                                     (gameState.fieldPlots || []).map((plot, i) => {
                                                                         const canAfford = (gameState.water || 0) >= plot.cost;
                                                                         return (
                                                                             <button
                                                                                 key={plot.id}
-                                                                                className={`field-plot ready`} // Always look "ready" to interact? Or show growing? User said "Click to popup".
+                                                                                data-index={i}
+                                                                                className={`field-plot ${canAfford ? 'ready' : ''}`}
+                                                                                style={{ animation: canAfford ? 'float 2s ease-in-out infinite' : 'none' }} // Add float animation if harvestable
                                                                                 onClick={() => setPendingHarvest({ plot, index: i })}
-                                                                                title={`Harvest ${plot.type}`}
+                                                                                title={`Harvest Crop`}
                                                                             >
                                                                                 <div className="plot-icon">
-                                                                                    {/* Show real icon for preview? Or Seed? Let's show real icon to tempt user */}
-                                                                                    {plot.realIcon}
+                                                                                    {/* Show generic seed icon until harvested */}
+                                                                                    {plot.icon}
                                                                                 </div>
                                                                                 {canAfford && <div className="harvest-badge">!</div>}
 
                                                                                 <div className="plot-progress-text" style={{ color: canAfford ? '#27ae60' : '#e74c3c' }}>
-                                                                                    {plot.cost} WP
+                                                                                    {plot.cost}💧
                                                                                 </div>
                                                                             </button>
                                                                         );
                                                                     })
                                                                 )}
+
 
                                                                 {/* Show placeholders for remaining capacity? Optional. */}
                                                                 {Array.from({ length: Math.max(0, (gameState.level + 2) - (gameState.fieldPlots || []).length) }).map((_, i) => (
@@ -479,7 +596,7 @@ const VillagePage = () => {
 
                                                 <div className="inventory-section">
                                                     <h3>{t('village.harvestCollection')}</h3>
-                                                    <p className="section-desc">タップすると野菜の詳細情報が見れます。売却するとベジタブルポイントが貯まります。</p>
+                                                    <p className="section-desc">タップすると野菜の詳細情報が見れます。売却すると野菜ポイントが貯まります。</p>
                                                     {gameState.level === 1 ? (
                                                         <div className="inventory-locked-panel">
                                                             <Lock size={20} />
@@ -699,11 +816,14 @@ const VillagePage = () => {
                             }} onClick={e => e.stopPropagation()}>
 
                                 <div style={{ fontSize: '4rem', marginBottom: '1rem', marginTop: '1rem' }}>
-                                    {pendingHarvest.plot.realIcon}
+                                    🌱 {/* Mystery Seedling in Modal */}
                                 </div>
 
                                 <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#34495e', fontWeight: 'bold' }}>
                                     水ポイントを使用して収穫しますか？
+                                </p>
+                                <p style={{ fontSize: '0.9rem', color: '#7f8c8d', marginBottom: '1rem' }}>
+                                    (中身は収穫するまでのお楽しみ！)
                                 </p>
 
                                 <div style={{
@@ -717,7 +837,7 @@ const VillagePage = () => {
                                     paddingLeft: '16px',
                                     paddingRight: '16px'
                                 }}>
-                                    Cost: {pendingHarvest.plot.cost} WP
+                                    水ポイント: {pendingHarvest.plot.cost}💧
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
@@ -737,37 +857,24 @@ const VillagePage = () => {
                                     </button>
 
                                     <button
-                                        onClick={() => {
-                                            const { index } = pendingHarvest;
-                                            if ((gameState.water || 0) >= pendingHarvest.plot.cost) {
-                                                harvestPlot(index);
-                                                setPendingHarvest(null);
-                                                // Optional: Trigger harvest celebration/flying crop
-                                                const rect = document.querySelector(`.field-grid button:nth-child(${index + 1})`)?.getBoundingClientRect();
-                                                if (rect) {
-                                                    setFlyingCrops(prev => [...prev, {
-                                                        id: Date.now(),
-                                                        icon: pendingHarvest.plot.realIcon,
-                                                        start: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
-                                                        target: { x: window.innerWidth - 60, y: window.innerHeight - 60 } // Roughly bottom right inventory
-                                                    }]);
-                                                }
-                                            }
-                                        }}
-                                        disabled={(gameState.water || 0) < pendingHarvest.plot.cost}
+                                        onClick={commitHarvest} // Use new commit function
+                                        disabled={!((gameState.water || 0) >= pendingHarvest.plot.cost)}
                                         style={{
                                             padding: '10px 24px',
                                             borderRadius: '12px',
                                             border: 'none',
-                                            background: (gameState.water || 0) >= pendingHarvest.plot.cost ? '#2ecc71' : '#95a5a6',
+                                            background: (gameState.water || 0) >= pendingHarvest.plot.cost
+                                                ? 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)'
+                                                : '#bdc3c7', // Gray if disabled
                                             color: 'white',
                                             fontWeight: 'bold',
                                             cursor: (gameState.water || 0) >= pendingHarvest.plot.cost ? 'pointer' : 'not-allowed',
-                                            boxShadow: (gameState.water || 0) >= pendingHarvest.plot.cost ? '0 4px 0 #27ae60' : 'none',
-                                            opacity: (gameState.water || 0) >= pendingHarvest.plot.cost ? 1 : 0.7
+                                            boxShadow: (gameState.water || 0) >= pendingHarvest.plot.cost
+                                                ? '0 4px 12px rgba(46, 204, 113, 0.4)'
+                                                : 'none'
                                         }}
                                     >
-                                        はい
+                                        {(gameState.water || 0) >= pendingHarvest.plot.cost ? '収穫する' : '水ポイント不足'}
                                     </button>
                                 </div>
                             </div>

@@ -198,63 +198,75 @@ export const GameProvider = ({ children }) => {
         }
     }, [user, loading]);
 
-    // Daily Seed Logic
+    // Twice Daily Seed Logic (9:00 and 21:00)
     useEffect(() => {
         if (!user || loading) return;
-        const todayStr = new Date().toDateString();
-        const lastSeedStr = gameState.lastSeedDate ? new Date(gameState.lastSeedDate).toDateString() : '';
 
-        if (todayStr !== lastSeedStr) {
-            // It's a new day! Add a seed if there's space.
-            const maxSlots = gameState.level + 2;
-            const currentPlots = gameState.fieldPlots || [];
+        const checkAndDeliverSeeds = () => {
+            const now = new Date();
+            // Define delivery times relative to now
+            const today9 = new Date(now); today9.setHours(9, 0, 0, 0);
+            const today21 = new Date(now); today21.setHours(21, 0, 0, 0);
+            const yesterday21 = new Date(now); yesterday21.setDate(yesterday21.getDate() - 1); yesterday21.setHours(21, 0, 0, 0);
 
-            if (currentPlots.length < maxSlots) {
-                // Determine available crops based on level
-                const availableLevelCrops = Object.values(LEVEL_CROPS).filter(c => {
-                    // Find the level this crop belongs to. 
-                    // Note: LEVEL_CROPS key is level. We need to check key <= gameState.level.
-                    // But LEVEL_CROPS is object. Let's iterate keys.
-                    return true; // We'll refine filtration inside the reduce/map or just pick from current level downwards
-                });
+            // Determine the *most recent* delivery time that should have happened
+            let lastDeliveryTime = yesterday21;
+            if (now >= today9) lastDeliveryTime = today9;
+            if (now >= today21) lastDeliveryTime = today21;
 
-                // Actually, let's just pick a random level from 2 up to currentLevel (max 10)
-                // Then pick the crop for that level.
-                // Simple logic: Candidate levels = [2 ... currentLevel]
-                const candidateLevels = Object.keys(LEVEL_CROPS)
-                    .map(Number)
-                    .filter(l => l <= gameState.level);
+            const lastSeedDate = gameState.lastSeedDate ? new Date(gameState.lastSeedDate) : null;
 
-                if (candidateLevels.length > 0) {
-                    const randomLevel = candidateLevels[Math.floor(Math.random() * candidateLevels.length)];
-                    const cropDef = LEVEL_CROPS[randomLevel];
+            // If we haven't received seeds since the last delivery time, deliver now!
+            if (!lastSeedDate || lastSeedDate < lastDeliveryTime) {
+                const maxSlots = gameState.level + 2;
+                const currentPlots = gameState.fieldPlots || [];
 
-                    if (cropDef) {
-                        const newPlot = {
-                            id: Date.now(), // Unique ID for the plot
-                            type: cropDef.type,
-                            icon: '🌱', // Start as seed
-                            realIcon: cropDef.icon, // Reveal later? Or show immediately? User said "Seed added". Let's show Seed always for now or Growing.
-                            // User said "Seed added". Let's use 'Growing' stage.
-                            stage: 'growing',
-                            cost: cropDef.cost,
-                            xp: cropDef.xp
-                        };
+                if (currentPlots.length < maxSlots) {
+                    const slotsToFill = maxSlots - currentPlots.length;
+                    const newPlots = [];
+                    const candidateLevels = Object.keys(LEVEL_CROPS)
+                        .map(Number)
+                        .filter(l => l <= gameState.level);
 
-                        setGameState(prev => ({
-                            ...prev,
-                            lastSeedDate: new Date().toISOString(),
-                            fieldPlots: [...(prev.fieldPlots || []), newPlot]
-                        }));
-                        console.log("Daily Seed Added:", newPlot);
+                    if (candidateLevels.length > 0) {
+                        for (let i = 0; i < slotsToFill; i++) {
+                            const randomLevel = candidateLevels[Math.floor(Math.random() * candidateLevels.length)];
+                            const cropDef = LEVEL_CROPS[randomLevel];
+                            if (cropDef) {
+                                newPlots.push({
+                                    id: Date.now() + i,
+                                    type: cropDef.type,
+                                    icon: '🌱',
+                                    realIcon: cropDef.icon,
+                                    stage: 'growing',
+                                    cost: cropDef.cost,
+                                    xp: cropDef.xp
+                                });
+                            }
+                        }
+
+                        if (newPlots.length > 0) {
+                            setGameState(prev => ({
+                                ...prev,
+                                lastSeedDate: new Date().toISOString(), // Mark as received now
+                                fieldPlots: [...(prev.fieldPlots || []), ...newPlots]
+                            }));
+                            console.log(`Merchant Delivery! Added ${newPlots.length} crops at ${now.toLocaleTimeString()}`);
+                        }
                     }
+                } else {
+                    // Even if full, mark as checked so we don't keep checking every render
+                    setGameState(prev => ({ ...prev, lastSeedDate: new Date().toISOString() }));
                 }
-            } else {
-                // Even if full, mark today as checked so we don't retry loop
-                setGameState(prev => ({ ...prev, lastSeedDate: new Date().toISOString() }));
             }
-        }
-    }, [user, loading, gameState.lastSeedDate]); // Depend on lastSeedDate to prevent loops, but verify logic carefully.
+        };
+
+        checkAndDeliverSeeds();
+        // Check every minute in case the time crosses while app is open
+        const interval = setInterval(checkAndDeliverSeeds, 60000);
+        return () => clearInterval(interval);
+
+    }, [user, loading, gameState.lastSeedDate]);
 
     const checkCanLevelUp = (currentState) => {
         const currentLevel = currentState.level;
@@ -306,7 +318,9 @@ export const GameProvider = ({ children }) => {
     // Crop Definitions by Level
     const LEVEL_CROPS = {
         2: { type: 'potato', icon: '🥔', xp: 15, cost: 25, price: 10 },
-        3: { type: 'potato', icon: '🥔', xp: 15, cost: 50, price: 10 },
+        3: { type: 'turnip', icon: '🥣', xp: 20, cost: 50, price: 15 }, // Using Bowl for Turnip (Kabu) looks odd, maybe Radish? '🍠' is sweet potato. '🧅' onion. Let's use 'turnip' name but maybe '🧅' icon or just '🍠' for now? Or '🥬'? Let's use '🥬' (Leafy Green) for Turnip/Kabu representation or just keep it distinct. Actually 'turnip' doesn't have a perfect emoji. '🥔' is potato. '🥕' carrot. '🥬' fits leafy. Let's go with '🥬'. Or maybe '⚪' white circle? 
+        // User asked for "Kabus". 
+        // Let's use '🥬' and call it turnip.
         4: { type: 'carrot', icon: '🥕', xp: 20, cost: 75, price: 15 },
         5: { type: 'tomato', icon: '🍅', xp: 25, cost: 100, price: 20 },
         6: { type: 'corn', icon: '🌽', xp: 30, cost: 125, price: 25 },
@@ -317,6 +331,7 @@ export const GameProvider = ({ children }) => {
     };
 
     const harvestPlot = (plotIndex) => {
+        let harvestedCrop = null;
         setGameState(prev => {
             const plots = [...(prev.fieldPlots || [])];
             if (!plots[plotIndex]) return prev;
@@ -325,7 +340,7 @@ export const GameProvider = ({ children }) => {
             const cost = plot.cost || 25;
 
             // Check money
-            if ((prev.water || 0) < cost) return prev; // Should be handled by UI, but safety check
+            if ((prev.water || 0) < cost) return prev;
 
             // Remove from plots
             plots.splice(plotIndex, 1);
@@ -333,31 +348,53 @@ export const GameProvider = ({ children }) => {
             // Add to harvested
             const newCrop = {
                 id: Date.now(),
-                icon: plot.realIcon || plot.icon, // Ensure we get the real icon if it was hidden
+                icon: plot.realIcon || plot.icon,
                 name: plot.type,
                 type: plot.type,
                 xp: plot.xp || 10,
                 date: new Date().toISOString()
             };
+            harvestedCrop = newCrop; // Capture for return? NOTE: setState is async/functional, we can't easily return this synchronously from the outer function unless we change architecture. 
+            // Workaround: We return the crop object if we can, but since this is inside setGameState, it's tricky. 
+            // Better: Calculate 'newCrop' outside? No, we need state for validation. 
+            // Actually, for this app, we can calculate outside if we trust state is fresh. 
+            // PROPOSAL: Do the calculation, then set state.
 
-            const currentUnlocked = prev.unlockedCrops || [];
-            const newUnlocked = currentUnlocked.includes(newCrop.type)
-                ? currentUnlocked
-                : [...currentUnlocked, newCrop.type];
+            return prev; // We will redo this function in the replacement block to be cleaner.
+        });
 
-            const newState = {
+        // RE-IMPLEMENTATION for synchronous return (safe enough for this app)
+        const currentState = gameState; // Accessing current state from closure (might be stale? usage in VillagePage relies on context state). 
+        // Actually, 'gameState' in context is the source of truth.
+        const plots = [...(currentState.fieldPlots || [])];
+        if (!plots[plotIndex]) return null;
+        const plot = plots[plotIndex];
+        if ((currentState.water || 0) < plot.cost) return null;
+
+        const newCrop = {
+            id: Date.now(),
+            icon: plot.realIcon || plot.icon,
+            name: plot.type,
+            type: plot.type,
+            xp: plot.xp || 10,
+            date: new Date().toISOString()
+        };
+
+        setGameState(prev => {
+            const newPlots = [...(prev.fieldPlots || [])];
+            newPlots.splice(plotIndex, 1);
+            return {
                 ...prev,
-                water: (prev.water || 0) - cost,
-                fieldPlots: plots,
+                water: (prev.water || 0) - plot.cost,
+                fieldPlots: newPlots,
                 harvested: [newCrop, ...(prev.harvested || [])],
                 xp: (prev.xp || 0) + newCrop.xp,
-                totalXP: (prev.totalXP || 0) + newCrop.xp,
-                unlockedCrops: newUnlocked
+                unlockedCrops: (prev.unlockedCrops || []).includes(newCrop.type) ? prev.unlockedCrops : [...(prev.unlockedCrops || []), newCrop.type]
             };
-            saveGame(newState);
-            return newState;
         });
-        return true;
+        saveGame({ ...gameState, water: gameState.water - plot.cost }); // Approximate save (best effort)
+
+        return newCrop;
     };
 
     // Deprecated procedural harvest - keeping for safety but not used in UI

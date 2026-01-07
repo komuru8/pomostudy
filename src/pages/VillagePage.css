@@ -794,6 +794,19 @@
     font-size: 0.85rem;
     color: #666;
     margin-top: -8px;
-    margin-bottom: 16px;
     line-height: 1.4;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
