@@ -205,7 +205,7 @@ Please strictly adhere to the persona defined above.
                 {isTyping && (
                     <div className="message ai">
                         <div className="message-bubble typing">
-                            <span>.</span><span>.</span><span>.</span>
+                            <span></span><span></span><span></span>
                         </div>
                     </div>
                 )}

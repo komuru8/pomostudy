@@ -406,8 +406,8 @@ export const GameProvider = ({ children }) => {
             const currentHistory = prev.chatHistory || [];
             const newHistory = [...currentHistory, message];
             let finalHistory = newHistory;
-            if (newHistory.length > 50) {
-                finalHistory = newHistory.slice(newHistory.length - 50);
+            if (newHistory.length > 20) {
+                finalHistory = newHistory.slice(newHistory.length - 20);
             }
             const newState = { ...prev, chatHistory: finalHistory };
             saveGame(newState);
