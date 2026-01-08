@@ -978,35 +978,36 @@ const VillagePage = () => {
                     <div className="harvest-popup" onClick={() => setSelectedLevelInfo(null)}>
                         <div className="popup-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', padding: '0', overflow: 'hidden', background: '#fff', borderRadius: '32px' }}>
                             {/* Image Header */}
-                            <div style={{ width: '100%', height: '280px', overflow: 'hidden', position: 'relative' }}>
+                            <div style={{ width: '100%', height: '250px', position: 'relative', background: '#fff', padding: '16px', boxSizing: 'border-box' }}>
                                 {selectedLevelInfo.visual.type === 'image' ? (
-                                    <img src={selectedLevelInfo.visual.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img src={selectedLevelInfo.visual.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '16px' }} />
                                 ) : (
-                                    <div style={{ width: '100%', height: '100%', background: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>
+                                    <div style={{ width: '100%', height: '100%', background: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem', borderRadius: '16px' }}>
                                         {selectedLevelInfo.visual.icon}
                                     </div>
                                 )}
                                 <button
                                     onClick={() => setSelectedLevelInfo(null)}
                                     style={{
-                                        position: 'absolute', top: '16px', right: '16px',
-                                        background: 'rgba(0,0,0,0.5)', color: 'white',
+                                        position: 'absolute', top: '12px', right: '12px',
+                                        background: 'rgba(0,0,0,0.1)', color: '#555',
                                         border: 'none', borderRadius: '50%', width: '32px', height: '32px',
-                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        zIndex: 10
                                     }}
                                 >✕</button>
                             </div>
 
                             {/* Content Body */}
                             {/* Content Body */}
-                            <div style={{ padding: '24px 32px' }}>
+                            <div style={{ padding: '12px 32px 32px' }}>
                                 {/* Meta Row: Level & Time */}
                                 <div style={{
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     gap: '12px',
-                                    marginBottom: '12px',
+                                    marginBottom: '8px',
                                     flexWrap: 'wrap'
                                 }}>
                                     <div style={{
@@ -1032,7 +1033,7 @@ const VillagePage = () => {
 
                                 {/* Title */}
                                 <h3 style={{
-                                    margin: '0 0 16px 0',
+                                    margin: '0 0 8px 0',
                                     fontSize: '1.5rem',
                                     color: '#2c3e50',
                                     fontWeight: '800',
@@ -1047,7 +1048,7 @@ const VillagePage = () => {
                                     color: '#7f8c8d',
                                     lineHeight: '1.8',
                                     fontSize: '0.95rem',
-                                    marginBottom: '24px'
+                                    marginBottom: '40px'
                                 }}>
                                     {LEVELS[selectedLevelInfo.level - 1]?.description || "No description available."}
                                 </p>
@@ -1077,7 +1078,6 @@ const VillagePage = () => {
                                             borderRadius: '16px',
                                             borderTopLeftRadius: '4px',
                                             fontSize: '0.85rem',
-                                            fontWeight: 'bold',
                                             lineHeight: '1.4',
                                             textAlign: 'left',
                                             maxWidth: '85%'
@@ -1100,12 +1100,11 @@ const VillagePage = () => {
                                         <div style={{
                                             position: 'relative',
                                             background: '#e8f5e9', // Light green
-                                            color: '#27ae60', // Darker green text
+                                            color: '#2f3542', // Standard dark text
                                             padding: '10px 14px',
                                             borderRadius: '16px',
                                             borderTopRightRadius: '4px',
                                             fontSize: '0.85rem',
-                                            fontWeight: 'bold',
                                             lineHeight: '1.4',
                                             textAlign: 'left',
                                             maxWidth: '85%'
