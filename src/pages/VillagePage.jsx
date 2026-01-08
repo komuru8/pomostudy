@@ -14,7 +14,7 @@ import {
     Map as MapIcon,
     ArrowLeft,
     ArrowRight,
-    Sprout, Store, ArrowUpCircle, CloudRain, ChevronLeft, ChevronRight, Edit2, Check
+    Sprout, Store, ArrowUpCircle, CloudRain, ChevronLeft, ChevronRight, Edit2, Check, Clock
 } from 'lucide-react';
 import { CROP_TRIVIA } from '../constants/cropTrivia';
 import './VillagePage.css';
@@ -68,7 +68,13 @@ const FlyingObject = ({ start, target, icon, onComplete }) => {
 };
 
 const VillagePage = () => {
-    const { gameState, LEVELS, harvestCrop, harvestPlot, sellCrop, changeTheme, updateUsername, checkCanLevelUp, upgradeLevel, LEVEL_CROPS } = useGame();
+    const { gameState, LEVELS, harvestCrop, harvestPlot, sellCrop, changeTheme, updateUsername, checkCanLevelUp,
+        upgradeLevel,
+        LEVEL_CROPS,
+        setActiveCoach,
+        debugResetField,
+        debugAddWater
+    } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
     const [lastHarvest, setLastHarvest] = useState(null);
@@ -80,6 +86,7 @@ const VillagePage = () => {
     const [editName, setEditName] = useState('');
     const [flyingCrops, setFlyingCrops] = useState([]); // Flying animation state
     const [timeToNextSeed, setTimeToNextSeed] = useState('');
+    const [selectedLevelInfo, setSelectedLevelInfo] = useState(null); // For Village Popup
 
     useEffect(() => {
         const updateTimer = () => {
@@ -336,29 +343,64 @@ const VillagePage = () => {
                                         </h1>
                                     </header>
 
-                                    <div className="village-visual" style={{ position: 'relative', overflow: 'visible', marginBottom: '16px' }}>
-                                        <div className={`main-visual-container ${isLocked ? 'locked-visual' : ''}`}>
+                                    <div className="village-visual" style={{
+                                        position: 'relative',
+                                        overflow: 'visible',
+                                        marginBottom: '16px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div className={`main-visual-container ${isLocked ? 'locked-visual' : ''}`} style={{ width: '100%' }}>
+
                                             {levelData.type === 'image' ? (
                                                 <img
                                                     src={levelData.src}
                                                     alt={levelData.label}
                                                     className="level-image"
+                                                    onClick={() => !isLocked && setSelectedLevelInfo({ ...lvl, visual: levelData })}
                                                     style={{
                                                         width: '100%',
                                                         height: 'auto',
-                                                        borderRadius: '24px', // Increased rounding
+                                                        borderRadius: '24px',
                                                         boxShadow: 'none',
                                                         filter: isLocked ? 'grayscale(100%) brightness(0.4)' : 'none',
                                                         transition: 'all 0.5s ease',
-                                                        display: 'block' // Remove inline gap
+                                                        display: 'block',
+                                                        cursor: isLocked ? 'default' : 'pointer'
                                                     }}
                                                 />
                                             ) : (
-                                                <div className={`main-emoji ${isLocked ? 'grayscale' : 'animate-bounce-slow'}`}>
+                                                <div
+                                                    className={`main-emoji ${isLocked ? 'grayscale' : 'animate-bounce-slow'}`}
+                                                    onClick={() => !isLocked && setSelectedLevelInfo({ ...lvl, visual: levelData })}
+                                                    style={{ cursor: isLocked ? 'default' : 'pointer' }}
+                                                >
                                                     {levelData.icon}
                                                 </div>
                                             )}
                                         </div>
+                                        {!isLocked && (
+                                            <button
+                                                onClick={() => setSelectedLevelInfo({ ...lvl, visual: levelData })}
+                                                style={{
+                                                    marginTop: '8px',
+                                                    padding: '4px 16px',
+                                                    background: '#f8f9fa',
+                                                    border: '1px solid #dee2e6',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.8rem',
+                                                    color: '#7f8c8d',
+                                                    cursor: 'pointer',
+                                                    display: 'block',
+                                                    marginLeft: 'auto',
+                                                    marginRight: 'auto',
+                                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                                }}
+                                            >
+                                                詳細
+                                            </button>
+                                        )}
                                         {isLocked && (
                                             <div className="locked-overlay" style={{
                                                 position: 'absolute',
@@ -522,7 +564,21 @@ const VillagePage = () => {
                                                                     <img src={hippoMerchant} alt="Seed Merchant" style={{ width: '80px', height: 'auto', borderRadius: '12px' }} />
                                                                 </div>
                                                                 <div className="merchant-info" style={{ textAlign: 'left' }}>
-                                                                    <div style={{ fontWeight: 'bold', color: '#5d4037', fontSize: '0.9rem' }}>カバの商人</div>
+                                                                    {/* Debug Actions (Temporary) */}
+                                                                    <div style={{ position: 'fixed', bottom: '10px', left: '10px', opacity: 0.5, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                        <button
+                                                                            onClick={debugResetField}
+                                                                            style={{ fontSize: '0.8rem', padding: '4px', background: '#333', color: '#fff' }}
+                                                                        >
+                                                                            debug:苗リセット
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={debugAddWater}
+                                                                            style={{ fontSize: '0.8rem', padding: '4px', background: '#2980b9', color: '#fff' }}
+                                                                        >
+                                                                            debug:+1000水
+                                                                        </button>
+                                                                    </div>                                                                    <div style={{ fontWeight: 'bold', color: '#5d4037', fontSize: '0.9rem' }}>カバの商人</div>
                                                                     <div style={{ fontSize: '0.9rem', color: '#795548', marginTop: '4px' }}>
                                                                         あと<span style={{ fontSize: '1.0rem', color: '#e67e22', fontWeight: '800', margin: '0 4px' }}>{timeToNextSeed}</span>で苗が届きます
                                                                     </div>
@@ -559,6 +615,9 @@ const VillagePage = () => {
                                                                 ) : (
                                                                     (gameState.fieldPlots || []).map((plot, i) => {
                                                                         const canAfford = (gameState.water || 0) >= plot.cost;
+                                                                        // Check if this crop type has ever been mocked/unlocked
+                                                                        const isNew = !(gameState.unlockedCrops || []).includes(plot.type);
+
                                                                         return (
                                                                             <button
                                                                                 key={plot.id}
@@ -572,6 +631,27 @@ const VillagePage = () => {
                                                                                     {/* Show generic seed icon until harvested */}
                                                                                     {plot.icon}
                                                                                 </div>
+                                                                                {/* Harvest Badge takes priority, but let's show NEW if not ready yet? Or both? */}
+                                                                                {/* User said "Display NEW icon when unharvested seeds arrive". Usually this overrides or sits alongside. */}
+                                                                                {/* Let's positioning "NEW" at top-left and "!" at top-right or similar. */}
+                                                                                {isNew && (
+                                                                                    <div style={{
+                                                                                        position: 'absolute',
+                                                                                        top: '-5px',
+                                                                                        left: '-5px',
+                                                                                        background: '#fdcb6e', // New Color (Yellow/Orange)
+                                                                                        color: '#d35400',
+                                                                                        fontSize: '0.6rem',
+                                                                                        fontWeight: '800',
+                                                                                        padding: '2px 6px',
+                                                                                        borderRadius: '8px',
+                                                                                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                                                                        zIndex: 2,
+                                                                                        transform: 'rotate(-10deg)'
+                                                                                    }}>
+                                                                                        NEW
+                                                                                    </div>
+                                                                                )}
                                                                                 {canAfford && <div className="harvest-badge">!</div>}
 
                                                                                 <div className="plot-progress-text" style={{ color: canAfford ? '#27ae60' : '#e74c3c' }}>
@@ -893,6 +973,153 @@ const VillagePage = () => {
                         onComplete={() => setFlyingCrops(prev => prev.filter(p => p.id !== item.id))}
                     />
                 ))}
+                {/* Village Level Info Modal */}
+                {selectedLevelInfo && ReactDOM.createPortal(
+                    <div className="harvest-popup" onClick={() => setSelectedLevelInfo(null)}>
+                        <div className="popup-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', padding: '0', overflow: 'hidden', background: '#fff', borderRadius: '32px' }}>
+                            {/* Image Header */}
+                            <div style={{ width: '100%', height: '280px', overflow: 'hidden', position: 'relative' }}>
+                                {selectedLevelInfo.visual.type === 'image' ? (
+                                    <img src={selectedLevelInfo.visual.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', background: '#e0f7fa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem' }}>
+                                        {selectedLevelInfo.visual.icon}
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => setSelectedLevelInfo(null)}
+                                    style={{
+                                        position: 'absolute', top: '16px', right: '16px',
+                                        background: 'rgba(0,0,0,0.5)', color: 'white',
+                                        border: 'none', borderRadius: '50%', width: '32px', height: '32px',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}
+                                >✕</button>
+                            </div>
+
+                            {/* Content Body */}
+                            {/* Content Body */}
+                            <div style={{ padding: '24px 32px' }}>
+                                {/* Meta Row: Level & Time */}
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    marginBottom: '12px',
+                                    flexWrap: 'wrap'
+                                }}>
+                                    <div style={{
+                                        background: '#2ecc71', color: 'white',
+                                        padding: '4px 12px',
+                                        borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800',
+                                        letterSpacing: '0.5px'
+                                    }}>
+                                        LEVEL {selectedLevelInfo.level}
+                                    </div>
+                                    <div style={{
+                                        fontSize: '0.8rem', color: '#95a5a6', fontWeight: '600',
+                                        display: 'flex', alignItems: 'center', gap: '4px'
+                                    }}>
+                                        <Clock size={14} />
+                                        {(() => {
+                                            const currentReq = LEVELS[selectedLevelInfo.level - 1]?.reqTime || 0;
+                                            const nextReq = LEVELS[selectedLevelInfo.level]?.reqTime;
+                                            return `${currentReq}m - ${nextReq ? nextReq + 'm' : '∞'}`;
+                                        })()}
+                                    </div>
+                                </div>
+
+                                {/* Title */}
+                                <h3 style={{
+                                    margin: '0 0 16px 0',
+                                    fontSize: '1.5rem',
+                                    color: '#2c3e50',
+                                    fontWeight: '800',
+                                    lineHeight: '1.3'
+                                }}>
+                                    {LEVELS[selectedLevelInfo.level - 1]?.label}
+                                </h3>
+
+                                {/* Description (Clean Text) */}
+                                <p style={{
+                                    textAlign: 'center',
+                                    color: '#7f8c8d',
+                                    lineHeight: '1.8',
+                                    fontSize: '0.95rem',
+                                    marginBottom: '24px'
+                                }}>
+                                    {LEVELS[selectedLevelInfo.level - 1]?.description || "No description available."}
+                                </p>
+
+                                {/* Divider */}
+                                <div style={{ height: '1px', background: '#f0f0f0', width: '100%', marginBottom: '24px' }} />
+
+                                {/* Guide Characters Interaction Footer */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                                    {/* Boy (Boke) - Left Aligned */}
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                                        <img
+                                            src="/assets/guide_character.jpg"
+                                            alt="Guide Boy"
+                                            style={{
+                                                width: '48px', height: '48px',
+                                                borderRadius: '50%', objectFit: 'cover',
+                                                border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                            }}
+                                        />
+                                        <div style={{
+                                            position: 'relative',
+                                            background: '#f1f2f6',
+                                            color: '#2f3542',
+                                            padding: '10px 14px',
+                                            borderRadius: '16px',
+                                            borderTopLeftRadius: '4px',
+                                            fontSize: '0.85rem',
+                                            fontWeight: 'bold',
+                                            lineHeight: '1.4',
+                                            textAlign: 'left',
+                                            maxWidth: '85%'
+                                        }}>
+                                            {LEVELS[selectedLevelInfo.level - 1]?.quote || "一緒に村を育てていこう！"}
+                                        </div>
+                                    </div>
+
+                                    {/* Girl (Tsukkomi) - Right Aligned */}
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flexDirection: 'row-reverse' }}>
+                                        <img
+                                            src="/assets/guide_female.jpg"
+                                            alt="Guide Girl"
+                                            style={{
+                                                width: '48px', height: '48px',
+                                                borderRadius: '50%', objectFit: 'cover',
+                                                border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                            }}
+                                        />
+                                        <div style={{
+                                            position: 'relative',
+                                            background: '#e8f5e9', // Light green
+                                            color: '#27ae60', // Darker green text
+                                            padding: '10px 14px',
+                                            borderRadius: '16px',
+                                            borderTopRightRadius: '4px',
+                                            fontSize: '0.85rem',
+                                            fontWeight: 'bold',
+                                            lineHeight: '1.4',
+                                            textAlign: 'left',
+                                            maxWidth: '85%'
+                                        }}>
+                                            {LEVELS[selectedLevelInfo.level - 1]?.tsukkomi || "はいはい、頑張りましょ。"}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
             </div >
         </div >
     );
