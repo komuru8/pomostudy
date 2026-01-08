@@ -29,6 +29,13 @@ const MainLayout = () => {
         }
     }, [gameState?.theme, location.pathname]);
 
+    // Scroll To Top on Route Change (Except AI Chat which handles its own scroll)
+    React.useEffect(() => {
+        if (location.pathname !== '/ai') {
+            window.scrollTo(0, 0);
+        }
+    }, [location.pathname]);
+
     const handleAuthClick = () => {
         if (user) {
             logout();
