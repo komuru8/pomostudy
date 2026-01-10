@@ -73,7 +73,8 @@ const VillagePage = () => {
         LEVEL_CROPS,
         setActiveCoach,
         debugResetField,
-        debugAddWater
+        debugAddWater,
+        debugAddStudyTime
     } = useGame();
     const { t } = useLanguage();
     const { timeLeft, totalTime, mode } = useTimerContext();
@@ -147,8 +148,13 @@ const VillagePage = () => {
         1: { type: 'image', src: '/assets/levels/wasteland.jpg', label: t('village.wasteland') },
         2: { type: 'image', src: '/assets/levels/camp.jpg', label: t('village.field') },
         3: { type: 'image', src: '/assets/levels/farm.jpg', label: t('village.hut') },
-        4: { type: 'image', src: '/assets/level_4_update.jpg', label: t('village.farmhouse') },
-        5: { type: 'image', src: '/assets/levels/farm.jpg', label: t('village.villageStart') }
+        4: { type: 'image', src: '/assets/level_4_update.jpg', label: 'こがねに揺れる庭' },
+        5: { type: 'image', src: '/assets/levels/level_5.jpg', label: '風が通る冒険者の家' },
+        6: { type: 'image', src: '/assets/levels/level_6.jpg', label: '清流を臨む水辺の宿' },
+        7: { type: 'image', src: '/assets/levels/level_7.jpg', label: 'ときわ色の苗木屋' },
+        8: { type: 'image', src: '/assets/levels/level_8.jpg', label: '琥珀色のミルク牧場' },
+        9: { type: 'image', src: '/assets/levels/level_9.jpg', label: '陽だまりの公会堂' },
+        10: { type: 'image', src: '/assets/levels/level_10.jpg', label: '七色のパレットタウン' }
     };
 
     // Calculate Total Study Time from History to match History Tab
@@ -320,7 +326,7 @@ const VillagePage = () => {
                     >
                         {visibleLevels.map((lvl) => {
                             const isLocked = lvl.level > gameState.level;
-                            const levelData = LEVEL_VISUALS[Math.min(lvl.level, 5)] || { icon: '❓', label: '???' };
+                            const levelData = LEVEL_VISUALS[lvl.level] || LEVEL_VISUALS[Math.min(lvl.level, 10)] || { icon: '❓', label: '???' };
 
                             // Identify Next Level relative to THIS slide's level (for requirements)
                             const nextLevelTarget = LEVELS.find(l => l.level === lvl.level + 1);
@@ -471,7 +477,6 @@ const VillagePage = () => {
                                                                         onClick={(e) => {
                                                                             e.currentTarget.style.transform = 'scale(0.95)';
                                                                             upgradeLevel();
-                                                                            setTimeout(() => setViewLevel(l => l + 1), 500);
                                                                         }}
                                                                     >
                                                                         村をグレードアップ
@@ -565,7 +570,7 @@ const VillagePage = () => {
                                                                 </div>
                                                                 <div className="merchant-info" style={{ textAlign: 'left' }}>
                                                                     {/* Debug Actions (Temporary) */}
-                                                                    <div style={{ position: 'fixed', bottom: '10px', left: '10px', opacity: 0.5, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                                    <div style={{ position: 'fixed', bottom: '10px', left: '10px', opacity: 0.5, display: 'none', flexDirection: 'column', gap: '8px' }}>
                                                                         <button
                                                                             onClick={debugResetField}
                                                                             style={{ fontSize: '0.8rem', padding: '4px', background: '#333', color: '#fff' }}
@@ -578,7 +583,13 @@ const VillagePage = () => {
                                                                         >
                                                                             debug:+1000水
                                                                         </button>
-                                                                    </div>                                                                    <div style={{ fontWeight: 'bold', color: '#5d4037', fontSize: '0.9rem' }}>カバの商人</div>
+                                                                        <button
+                                                                            onClick={debugAddStudyTime}
+                                                                            style={{ fontSize: '0.8rem', padding: '4px', background: '#8e44ad', color: '#fff' }}
+                                                                        >
+                                                                            debug:+100h勉強
+                                                                        </button>
+                                                                    </div>                                                                    <div style={{ fontWeight: 'bold', color: '#5d4037', fontSize: '0.9rem' }}>カバの園芸店</div>
                                                                     <div style={{ fontSize: '0.9rem', color: '#795548', marginTop: '4px' }}>
                                                                         あと<span style={{ fontSize: '1.0rem', color: '#e67e22', fontWeight: '800', margin: '0 4px' }}>{timeToNextSeed}</span>で苗が届きます
                                                                     </div>
@@ -589,8 +600,8 @@ const VillagePage = () => {
                                                             {showMerchantInfo && ReactDOM.createPortal(
                                                                 <div className="harvest-popup" onClick={() => setShowMerchantInfo(false)}>
                                                                     <div className="popup-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '340px', padding: '24px' }}>
-                                                                        <h3 style={{ color: '#5d4037', margin: '0 0 16px 0', fontSize: '1.4rem' }}>カバの商人</h3>
-                                                                        <img src={hippoMerchant} alt="Merchant" style={{ width: '120px', borderRadius: '16px', marginBottom: '16px' }} />
+                                                                        <h3 style={{ color: '#5d4037', margin: '0 0 16px 0', fontSize: '1.4rem' }}>カバの園芸店</h3>
+                                                                        <img src={hippoMerchant} alt="Merchant" style={{ width: '200px', borderRadius: '16px', marginBottom: '16px' }} />
                                                                         <p style={{ textAlign: 'left', lineHeight: '1.6', color: '#5d4037', fontSize: '0.95rem', background: '#f5f5f5', padding: '16px', borderRadius: '12px' }}>
                                                                             朝9時と夜9時、決まった時間に苗を届けてくれる野菜大好き商人。<br /><br />
                                                                             「この時間は人間がタスクに集中しやすいゴールデンタイムだからね」と片眼鏡を光らせるが、実は彼自身がその時間にお腹が空くだけという噂も...？
@@ -713,7 +724,11 @@ const VillagePage = () => {
                                                                                     style={{ opacity: count > 0 ? 1 : 0.6, cursor: count > 0 ? 'pointer' : 'default' }}
                                                                                 >
                                                                                     <div style={{ position: 'relative', display: 'inline-block' }}>
-                                                                                        {icon}
+                                                                                        {(typeof icon === 'string' && (icon.startsWith('/') || icon.includes('data:image'))) ? (
+                                                                                            <img src={icon} alt={type} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                                                                                        ) : (
+                                                                                            <span style={{ fontSize: '2.5rem' }}>{icon}</span>
+                                                                                        )}
                                                                                         {count >= 0 && (
                                                                                             <div className="crop-count-badge">x{count}</div>
                                                                                         )}
@@ -793,8 +808,12 @@ const VillagePage = () => {
                                 maxHeight: '90vh',
                                 overflowY: 'auto'
                             }} onClick={e => e.stopPropagation()}>
-                                <div style={{ fontSize: '4rem', marginBottom: '1rem', marginTop: '1rem' }}>
-                                    {pendingSell.icon}
+                                <div style={{ marginBottom: '1rem', marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                                    {(typeof pendingSell.icon === 'string' && (pendingSell.icon.startsWith('/') || pendingSell.icon.includes('data:image'))) ? (
+                                        <img src={pendingSell.icon} alt={pendingSell.type} style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+                                    ) : (
+                                        <span style={{ fontSize: '4rem' }}>{pendingSell.icon}</span>
+                                    )}
                                 </div>
 
                                 <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', color: '#34495e', fontWeight: 'bold' }}>

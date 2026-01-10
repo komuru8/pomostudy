@@ -227,25 +227,25 @@
 }
 
 .category-badge.work {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, #7F9CF5, #667EEA);
 }
 
 .category-badge.study {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    background: linear-gradient(135deg, #9F7AEA, #805AD5);
 }
 
 .category-badge.health {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    background: linear-gradient(135deg, #FB7185, #E11D48);
 }
 
 .category-badge.hobby {
-    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    background: linear-gradient(135deg, #FBBF24, #D97706);
     color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .category-badge.general {
-    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    background: linear-gradient(135deg, #9CA3AF, #6B7280);
 }
 
 /* Task Item Container States */

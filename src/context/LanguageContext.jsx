@@ -118,7 +118,16 @@ const translations = {
         crops: {
             weed: '雑草',
             radish: 'ラディッシュ',
-            potato: 'ジャガイモ'
+            potato: 'ジャガイモ',
+            turnip: 'カブ',
+            carrot: 'ニンジン',
+            corn: 'トウモロコシ',
+            pumpkin: 'カボチャ',
+            grapes: 'ブドウ',
+            melon: 'メロン',
+            tomato: 'トマト',
+            strawberry: 'イチゴ',
+            diamond: 'ダイヤモンド'
         },
         field: {
             yourField: 'あなたの畑',
@@ -277,7 +286,16 @@ const translations = {
         crops: {
             weed: 'Weed',
             radish: 'Radish',
-            potato: 'Potato'
+            potato: 'Potato',
+            turnip: 'Turnip',
+            carrot: 'Carrot',
+            corn: 'Corn',
+            pumpkin: 'Pumpkin',
+            grapes: 'Grapes',
+            melon: 'Melon',
+            tomato: 'Tomato',
+            strawberry: 'Strawberry',
+            diamond: 'Diamond'
         },
         field: {
             yourField: 'Your Field',

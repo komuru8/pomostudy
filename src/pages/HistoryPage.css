@@ -95,6 +95,7 @@
     justify-content: flex-end;
 }
 
+
 .bar-chart {
     flex: 1;
     display: flex;
@@ -105,6 +106,40 @@
     padding-bottom: 0;
     /* Handled by tick alignment */
     position: relative;
+    overflow-y: hidden;
+    /* Fix vertical scrollbar */
+}
+
+/* ... existing content ... */
+@media (max-width: 480px) {
+    .x-label {
+        font-size: 0.5rem;
+        /* Smaller font as requested */
+        transform: rotate(-30deg);
+        /* Less steep rotation */
+        transform-origin: top center;
+        bottom: 0px;
+        /* Pull up to avoid clipping */
+        white-space: nowrap;
+        width: 100%;
+        left: 0;
+        text-align: center;
+    }
+
+    .chart-column {
+        padding-bottom: 60px;
+        /* Significantly more space for rotated labels */
+    }
+
+    .chart-with-axis {
+        gap: 4px;
+        /* Tighter gap on mobile */
+    }
+
+    .y-axis {
+        min-width: 25px;
+        /* Smaller axis area */
+    }
 }
 
 .grid-lines {
@@ -249,24 +284,24 @@
 
 @media (max-width: 480px) {
     .x-label {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
         /* Smaller font */
         transform: rotate(-45deg);
         /* Steeper rotation to fit more */
         transform-origin: top center;
-        bottom: -8px;
-        /* Push down to avoid overlap */
+        bottom: 20px;
+        /* Move UP into view */
         white-space: nowrap;
         width: 150%;
         /* Allow wider flow when rotated */
         left: -25%;
-        /* Center the wider box */
+        /* Center the wide box relative to column */
         text-align: center;
     }
 
     .chart-column {
-        padding-bottom: 32px;
-        /* More space for rotated labels */
+        padding-bottom: 60px;
+        /* Significantly more space for rotated labels */
     }
 
     .chart-with-axis {
@@ -277,28 +312,40 @@
     .y-axis {
         min-width: 25px;
         /* Smaller axis area */
+        padding-bottom: 60px;
+        /* Match chart-column padding */
+    }
+
+    .grid-lines {
+        bottom: 60px;
+        /* Match chart-column padding */
     }
 }
 
 /* Color mappings matching TaskItem.css */
 .bar-fill.work {
-    background: #3498db;
+    background: #7F9CF5;
+    /* Soft Indigo */
 }
 
 .bar-fill.study {
-    background: #9b59b6;
+    background: #9F7AEA;
+    /* Elegant Purple */
 }
 
 .bar-fill.health {
-    background: #e74c3c;
+    background: #FB7185;
+    /* Soft Rose */
 }
 
 .bar-fill.hobby {
-    background: #f1c40f;
+    background: #F59E0B;
+    /* Warm Amber */
 }
 
 .bar-fill.general {
-    background: #95a5a6;
+    background: #9CA3AF;
+    /* Cool Grey */
 }
 
 /* Stacked Bar Chart Styles */
@@ -330,23 +377,23 @@
 
 /* Reusing colors for segments */
 .bar-segment.work {
-    background: #3498db;
+    background: #7F9CF5;
 }
 
 .bar-segment.study {
-    background: #9b59b6;
+    background: #9F7AEA;
 }
 
 .bar-segment.health {
-    background: #e74c3c;
+    background: #FB7185;
 }
 
 .bar-segment.hobby {
-    background: #f1c40f;
+    background: #F59E0B;
 }
 
 .bar-segment.general {
-    background: #95a5a6;
+    background: #9CA3AF;
 }
 
 .bar-value.top {

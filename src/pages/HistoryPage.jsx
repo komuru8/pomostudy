@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useTimerContext } from '../context/TimerContext';
 import { useGame } from '../context/GameContext';
 import { useTasks } from '../context/TaskContext';
@@ -52,70 +53,113 @@ const HistoryPage = () => {
 
     const maxVal = Math.max(...Object.values(stats), 1);
 
-
-    // --- 2. Daily Focus Time Stats (New) ---
-    // Generate last 7 days
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    });
-
-    const todayStr = last7Days[6]; // Last element is today
-
-    // Process session history
+    // --- 0. Session History (Global for Component) ---
     const sessionHistory = gameState.sessionHistory || [];
-    const dailyStats = last7Days.map(dateStr => {
-        // Filter sessions for this date (in local time)
-        const daySessions = sessionHistory.filter(s => {
-            const d = new Date(s.date);
-            const localYMD = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            return localYMD === dateStr;
-        });
 
-        // Sum minutes per category
-        const breakdown = {};
-        let totalMinutes = 0;
+    const [timeRange, setTimeRange] = React.useState('week'); // 'week', 'month', 'year'
+    const chartScrollRef = React.useRef(null);
 
-        daySessions.forEach(s => {
-            let cat = s.category || 'General';
-            // Exclude breaks from "Focus Time" graph
-            if (cat.toLowerCase().includes('break')) return;
+    // Auto-scroll to end (current date) when switching to Month view
+    React.useEffect(() => {
+        if (timeRange === 'month' && chartScrollRef.current) {
+            setTimeout(() => {
+                if (chartScrollRef.current) {
+                    chartScrollRef.current.scrollLeft = chartScrollRef.current.scrollWidth;
+                }
+            }, 0);
+        }
+    }, [timeRange]);
 
-            let normCat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+    // --- 2. Focus Time Stats (Dynamic Range) ---
+    const generateChartData = () => {
+        const labels = [];
+        const today = new Date();
+        const dataMap = {};
 
-            // If category is not in our standard list, group it under 'General' to avoid invisible gaps
-            if (!CATEGORIES.includes(normCat)) {
-                normCat = 'General';
+        if (timeRange === 'week') {
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                labels.push({ key, label: `${d.getMonth() + 1}/${d.getDate()}` });
+                dataMap[key] = { total: 0, breakdown: {} };
             }
-
-            breakdown[normCat] = (breakdown[normCat] || 0) + s.duration;
-            totalMinutes += s.duration;
-        });
-
-        // --- INJECT LIVE SESSION ---
-        // If today, check if timer is running/paused and has progress > 1 min
-        if (dateStr === todayStr && mode === 'FOCUS') {
-            const elapsedSeconds = totalTime - timeLeft;
-            if (elapsedSeconds >= 60) {
-                const activeCat = activeTask?.category || 'General';
-                const activeNormCat = activeCat.charAt(0).toUpperCase() + activeCat.slice(1).toLowerCase();
-                const sessionMins = Math.floor(elapsedSeconds / 60);
-
-                breakdown[activeNormCat] = (breakdown[activeNormCat] || 0) + sessionMins;
-                totalMinutes += sessionMins;
+        } else if (timeRange === 'month') {
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                // Show label only every 5 days to avoid crowding
+                const showLabel = i % 5 === 0 || i === 0;
+                labels.push({ key, label: showLabel ? `${d.getMonth() + 1}/${d.getDate()}` : '' });
+                dataMap[key] = { total: 0, breakdown: {} };
+            }
+        } else if (timeRange === 'year') {
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(today);
+                d.setMonth(today.getMonth() - i);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                labels.push({ key, label: `${d.getMonth() + 1}月` });
+                dataMap[key] = { total: 0, breakdown: {} };
             }
         }
 
-        return { date: dateStr, total: totalMinutes, breakdown };
-    });
+        // Process History
+        // sessionHistory is now available in scope
+        sessionHistory.forEach(s => {
+            const d = new Date(s.date);
+            let key;
+            if (timeRange === 'year') {
+                key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            } else {
+                key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            }
 
-    const maxDailyTotal = Math.max(...dailyStats.map(d => d.total), 60); // Min 60 mins scale
+            if (dataMap[key]) {
+                let cat = s.category || 'General';
+                if (cat.toLowerCase().includes('break')) return;
+                let normCat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+                if (!CATEGORIES.includes(normCat)) normCat = 'General';
 
-    const getDayLabel = (dateStr) => {
-        const d = new Date(dateStr);
-        return `${d.getMonth() + 1}/${d.getDate()}`;
+                dataMap[key].breakdown[normCat] = (dataMap[key].breakdown[normCat] || 0) + s.duration;
+                dataMap[key].total += s.duration;
+            }
+        });
+
+        // Add Live Session (If Today/Current Month matches)
+        if (mode === 'FOCUS' && (totalTime - timeLeft) >= 60) {
+            const now = new Date();
+            let key;
+            if (timeRange === 'year') {
+                key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            } else {
+                key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            }
+
+            if (dataMap[key]) {
+                const elapsedMins = Math.floor((totalTime - timeLeft) / 60);
+                const activeCat = activeTask?.category || 'General';
+                const activeNormCat = activeCat.charAt(0).toUpperCase() + activeCat.slice(1).toLowerCase();
+
+                dataMap[key].breakdown[activeNormCat] = (dataMap[key].breakdown[activeNormCat] || 0) + elapsedMins;
+                dataMap[key].total += elapsedMins;
+            }
+        }
+
+        return labels.map(l => ({
+            date: l.key,
+            label: l.label,
+            total: dataMap[l.key].total,
+            breakdown: dataMap[l.key].breakdown
+        }));
     };
+
+    const chartData = generateChartData();
+    const maxDailyTotal = Math.max(...chartData.map(d => d.total), 60);
+
+    // Keep "todayStr" for the summary stats at top (independent of chart range)
+    const todayDate = new Date();
+    const todayStr = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
 
     return (
         <div className="history-page">
@@ -137,7 +181,7 @@ const HistoryPage = () => {
 
                     // ---- Today's Stats ----
                     // 1. Focus Time
-                    const todayFocusMins = dailyStats[6]?.breakdown?.['Focus'] || 0; // dailyStats[6] is today
+
                     // Need to check if 'Focus' key matches normalization.
                     // breakdown keys are capitalized 'Focus', 'Short break'? No, 'Focus', 'Short break' keys come from categories?
                     // Wait, dailyStats logic uses categories.
@@ -280,7 +324,33 @@ const HistoryPage = () => {
 
             {/* Daily Focus Trend (Stacked Bar) */}
             <div className="chart-card mb-24">
-                <h2>{t('history.dailyFocus') || 'Daily Focus Time'}</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                    <h2 style={{ margin: 0 }}>{t('history.dailyFocus') || 'Focus Trend'}</h2>
+                    {/* Time Range Switcher */}
+                    <div className="time-range-switcher" style={{ display: 'flex', background: '#f1f2f6', borderRadius: '8px', padding: '2px' }}>
+                        {['week', 'month', 'year'].map(r => (
+                            <button
+                                key={r}
+                                onClick={() => setTimeRange(r)}
+                                style={{
+                                    border: 'none',
+                                    background: timeRange === r ? '#fff' : 'transparent',
+                                    color: timeRange === r ? 'var(--primary-color)' : '#95a5a6',
+                                    padding: '4px 12px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    boxShadow: timeRange === r ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {r === 'week' ? '週' : r === 'month' ? '月' : '年'}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="chart-with-axis">
                     {/* Y-Axis */}
                     <div className="y-axis">
@@ -292,7 +362,7 @@ const HistoryPage = () => {
                     </div>
 
                     {/* Chart Area */}
-                    <div className="bar-chart stacked">
+                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ overflowX: timeRange === 'month' ? 'auto' : 'hidden' }}>
                         {/* Horizontal Grid Lines */}
                         <div className="grid-lines">
                             <div className="grid-line"></div>
@@ -302,20 +372,20 @@ const HistoryPage = () => {
                             <div className="grid-line"></div>
                         </div>
 
-                        {dailyStats.map(day => {
-                            const heightPct = (day.total / maxDailyTotal) * 100;
+                        {chartData.map(day => {
+                            const heightPct = day.total > 0 ? (day.total / maxDailyTotal) * 100 : 0;
                             return (
-                                <div key={day.date} className="chart-column">
+                                <div key={day.date} className="chart-column" style={{ minWidth: timeRange === 'month' ? '12px' : 'auto' }}>
                                     <div className="bar-container">
                                         <div
                                             className="stacked-bar-group"
                                             style={{ height: `${heightPct}%` }}
-                                            title={`${Math.round(day.total)} minutes`}
+                                            title={`${day.label}: ${Math.round(day.total)} mins`}
                                         >
                                             {CATEGORIES.map(cat => {
                                                 const mins = day.breakdown[cat] || 0;
                                                 if (mins === 0) return null;
-                                                const segmentHeight = (mins / day.total) * 100;
+                                                const segmentHeight = day.total > 0 ? (mins / day.total) * 100 : 0;
                                                 return (
                                                     <div
                                                         key={cat}
@@ -326,7 +396,7 @@ const HistoryPage = () => {
                                             })}
                                         </div>
                                     </div>
-                                    <span className="x-label">{getDayLabel(day.date)}</span>
+                                    <span className="x-label" style={{ fontSize: timeRange === 'month' ? '0.55rem' : '0.7rem' }}>{day.label}</span>
                                 </div>
                             );
                         })}
@@ -387,7 +457,7 @@ const HistoryPage = () => {
                                 <div className="y-tick"><span>0</span></div>
                             </div>
 
-                            <div className="bar-chart">
+                            <div className="bar-chart" style={{ overflowX: 'hidden' }}>
                                 <div className="grid-lines">
                                     <div className="grid-line"></div>
                                     <div className="grid-line"></div>

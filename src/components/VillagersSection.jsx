@@ -59,7 +59,7 @@ const VillagersSection = () => {
                     // Quickest is string manipulation: /assets/coach_[id].png -> /assets/coach_[id]_silhouette.png
                     const imageSrc = isUnlocked
                         ? coach.iconPath
-                        : coach.iconPath.replace('.png', '_silhouette.png');
+                        : coach.iconPath.replace(/(\.[\w]+)$/, '_silhouette$1');
 
                     return (
                         <div

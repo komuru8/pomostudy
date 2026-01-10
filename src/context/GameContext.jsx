@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
+import turnipIcon from '../assets/crops/turnip.png';
 
 const GameContext = createContext();
 
@@ -33,14 +34,28 @@ const LEVELS = [
     { level: 1, label: '始まりの荒野', reqTime: 0, description: '何もないからこそ、何でもできる場所。', quote: '俺はレオ！君と一緒に伝説の村を目指す冒険者さ。これからよろしくな！', tsukkomi: '私はノア。この方向音痴のガイド役よ。……ま、悪いようにはしないから、よろしくね。' },
     { level: 2, label: '旅人の休息地', reqTime: 25, description: '焚き火を囲み、冒険の疲れを癒やす拠点。', quote: '休むのも戦略のうちさ。研いでない剣じゃ、ドラゴンどころか雑草も切れないからね。', tsukkomi: 'その剣、そもそも抜いたことあったっけ？まあ、お茶でも飲みましょ。' },
     { level: 3, label: '若草色のミニ農園', reqTime: 180, description: '荒野に初めて生まれた、小さな緑の奇跡。', quote: 'あの小さな芽を見てよ。自分が小さいなんて気にしてない、ただ空に届きたいだけさ。僕らみたいにね。', tsukkomi: 'ポエムはいいけど、水やり忘れてるわよ。夢を見る前に、まずは現実を見てよね、、' },
-    { level: 4, label: 'こがねに揺れる豊穣の庭', reqTime: 600, description: '収穫の喜びを知り、一面がキラキラと輝く畑。', quote: 'キラキラしてるだろ？あれはただの野菜じゃない、君が流した汗の結晶さ。だから格別に美味いんだ。', tsukkomi: '泥だらけの手で食べないでね。結晶というか、ただの立派なカボチャよ。' },
-    { level: 5, label: '風が通る冒険者の邸宅', reqTime: 1800, description: '柱の匂いと風が心地よい、自慢の大きな我が家。', quote: '雨風をしのぐだけなら洞窟でいい。でも、心を温めるには『家』が必要だ。戦利品を飾る壁もね！', tsukkomi: '掃除が大変なだけでしょう？ 私は洞窟の方がミニマリストで好きかもしれないわ。' },
+    { level: 4, label: 'こがねに揺れる庭', reqTime: 600, description: '収穫の喜びを知り、一面がキラキラと輝く畑。', quote: 'キラキラしてるだろ？あれはただの野菜じゃない、君が流した汗の結晶さ。だから格別に美味いんだ。', tsukkomi: '泥だらけの手で食べないでね。結晶というか、ただの立派なカボチャよ。' },
+    { level: 5, label: '風が通る冒険者の家', reqTime: 1800, description: '柱の匂いと風が心地よい、自慢の大きな我が家。', quote: '雨風をしのぐだけなら洞窟でいい。でも、心を温めるには『家』が必要だ。戦利品を飾る壁もね！', tsukkomi: '掃除が大変なだけでしょう？ 私は洞窟の方がミニマリストで好きかもしれないわ。' },
     { level: 6, label: '清流を臨む水辺の宿', reqTime: 3600, description: '川のせせらぎが聞こえ、涼やかな空気が満ちる場所。', quote: '耳を澄ませて。川はずっと流れてるけど、決して急いじゃいない。遠くまで行く秘訣、かもね。', tsukkomi: '流されているだけに見えるけど。まあ、たまには流れに身を任せるのも悪くないわね。' },
-    { level: 7, label: 'ときわいろの苗木屋さん', reqTime: 9000, description: '職人が育てた苗木が並び、村に彩りが定着する。', quote: '木を植えるってのは、未来への約束さ。「大きくなったお前を見に、必ずまた来るよ」っていうね。', tsukkomi: '気が早いわね。まずは枯らさないこと。約束より毎日の手入れが大事よ。' },
-    { level: 8, label: '琥珀色のミルクファーム', reqTime: 18000, description: '動物の温もりと、搾りたてのミルクの甘い香り。', quote: '強さってのは、剣の腕だけじゃない。温かいミルクと柔らかなベッド、それが一番の「無敵」を作るのさ。', tsukkomi: '結局、寝たいだけでしょ？ でも、温かいミルクは賛成。半分もらうわね。' },
+    { level: 7, label: 'ときわ色の苗木屋', reqTime: 9000, description: '職人が育てた苗木が並び、村に彩りが定着する。', quote: '木を植えるってのは、未来への約束さ。「大きくなったお前を見に、必ずまた来るよ」っていうね。', tsukkomi: '気が早いわね。まずは枯らさないこと。約束より毎日の手入れが大事よ。' },
+    { level: 8, label: '琥珀色のミルク牧場', reqTime: 18000, description: '動物の温もりと、搾りたてのミルクの甘い香り。', quote: '強さってのは、剣の腕だけじゃない。温かいミルクと柔らかなベッド、それが一番の「無敵」を作るのさ。', tsukkomi: '結局、寝たいだけでしょ？ でも、温かいミルクは賛成。半分もらうわね。' },
     { level: 9, label: '陽だまりの公会堂', reqTime: 30000, description: '街灯が灯り、夜な夜な仲間が笑い合う村の中心。', quote: 'あの灯りを見て。人が集まってくる。君の頑張りが、誰かの足元まで照らし始めた証拠だよ。', tsukkomi: '良いこと言うじゃない。でも、燃料代の心配もしてね。現実はシビアよ。' },
-    { level: 10, label: 'なないろのパレットタウン', reqTime: 60000, description: 'どんな夢も描ける、世界で一番鮮やかな僕らの村。', quote: '見てよ、この景色！景色が変わったんじゃない、君が歩き続けたから、君が世界を変えたんだ。', tsukkomi: '大袈裟ね。でも…悪くない景色だわ。ここまで連れてきてくれて、少しだけ感謝してる。' }
+    { level: 10, label: '七色のパレットタウン', reqTime: 60000, description: 'どんな夢も描ける、世界で一番鮮やかな僕らの村。', quote: '見てよ、この景色！景色が変わったんじゃない、君が歩き続けたから、君が世界を変えたんだ。', tsukkomi: '大袈裟ね。でも…悪くない景色だわ。ここまで連れてきてくれて、少しだけ感謝してる。' }
 ];
+
+// Crop Definitions by Level
+const LEVEL_CROPS = {
+    1: { type: 'potato', icon: '🥔', xp: 15, cost: 25, price: 10 },
+    2: { type: 'turnip', icon: turnipIcon, xp: 20, cost: 30, price: 15 },
+    3: { type: 'carrot', icon: '🥕', xp: 25, cost: 40, price: 20 },
+    4: { type: 'corn', icon: '🌽', xp: 30, cost: 50, price: 30 },
+    5: { type: 'pumpkin', icon: '🎃', xp: 35, cost: 55, price: 35 },
+    6: { type: 'grapes', icon: '🍇', xp: 40, cost: 70, price: 40 },
+    7: { type: 'melon', icon: '🍈', xp: 50, cost: 90, price: 60 },
+    8: { type: 'tomato', icon: '🍅', xp: 60, cost: 120, price: 80 },
+    9: { type: 'strawberry', icon: '🍓', xp: 80, cost: 150, price: 100 },
+    10: { type: 'diamond', icon: '💎', xp: 100, cost: 500, price: 200 }
+};
 
 export const GameProvider = ({ children }) => {
     const { user } = useAuth();
@@ -270,7 +285,17 @@ export const GameProvider = ({ children }) => {
 
     const checkCanLevelUp = (currentState) => {
         const currentLevel = currentState.level;
-        const totalMinutes = currentState.totalWP || 0;
+
+        // STRICT CALCULATION: Sum from history to match UI
+        const sessionHistory = currentState.sessionHistory || [];
+        let totalMinutes = 0;
+        sessionHistory.forEach(s => {
+            // Match VillagePage logic: FOCUS type or non-break category
+            let isFocus = s.type === 'FOCUS' || (!s.type && s.category !== 'Break');
+            if (isFocus) {
+                totalMinutes += (s.duration || 0);
+            }
+        });
 
         const nextLevelReq = LEVELS.find(l => l.level === currentLevel + 1);
         if (!nextLevelReq) return false;
@@ -316,19 +341,8 @@ export const GameProvider = ({ children }) => {
     };
 
     // Crop Definitions by Level
-    // Crop Definitions by Level
-    const LEVEL_CROPS = {
-        1: { type: 'potato', icon: '🥔', xp: 15, cost: 25, price: 10 },
-        2: { type: 'turnip', icon: '🥬', xp: 20, cost: 30, price: 15 },
-        3: { type: 'carrot', icon: '🥕', xp: 25, cost: 40, price: 20 },
-        4: { type: 'corn', icon: '🌽', xp: 30, cost: 50, price: 30 },
-        5: { type: 'pumpkin', icon: '🎃', xp: 35, cost: 55, price: 35 },
-        6: { type: 'grapes', icon: '🍇', xp: 40, cost: 70, price: 40 },
-        7: { type: 'melon', icon: '🍈', xp: 50, cost: 90, price: 60 },
-        8: { type: 'tomato', icon: '🍅', xp: 60, cost: 120, price: 80 },
-        9: { type: 'strawberry', icon: '🍓', xp: 80, cost: 150, price: 100 },
-        10: { type: 'diamond', icon: '💎', xp: 100, cost: 500, price: 200 }
-    };
+    // Crop Definitions (Moved to top-level)
+
 
     const harvestPlot = (plotIndex) => {
         const currentState = gameState;
@@ -500,6 +514,20 @@ export const GameProvider = ({ children }) => {
         });
     };
 
+    const debugAddStudyTime = () => {
+        setGameState(prev => {
+            const addedMinutes = 6000; // 100 hours
+            const newState = {
+                ...prev,
+                totalWP: (prev.totalWP || 0) + addedMinutes, // Level progress
+                water: (prev.water || 0) + addedMinutes,     // Currency
+                xp: (prev.xp || 0) + (addedMinutes * 0.5)    // Some XP too?
+            };
+            saveGame(newState);
+            return newState;
+        });
+    };
+
     return (
         <GameContext.Provider value={{
             gameState,
@@ -521,6 +549,7 @@ export const GameProvider = ({ children }) => {
             setActiveCoach,
             debugResetField,
             debugAddWater,
+            debugAddStudyTime,
             loading
         }}>
             {children}

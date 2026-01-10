@@ -159,6 +159,13 @@
         /* Larger touch target */
         background: white;
     }
+
+    /* Fix: Ensure Login Button stays colored in mobile menu */
+    .menu-items .control-btn.login {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+    }
 }
 
 @keyframes slideIn {
