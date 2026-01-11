@@ -373,7 +373,8 @@ const VillagePage = () => {
                                                         filter: isLocked ? 'grayscale(100%) brightness(0.4)' : 'none',
                                                         transition: 'all 0.5s ease',
                                                         display: 'block',
-                                                        cursor: isLocked ? 'default' : 'pointer'
+                                                        cursor: isLocked ? 'default' : 'pointer',
+                                                        mixBlendMode: lvl.level >= 3 ? 'multiply' : 'normal'
                                                     }}
                                                 />
                                             ) : (
