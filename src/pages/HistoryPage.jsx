@@ -4,6 +4,7 @@ import { useGame } from '../context/GameContext';
 import { useTasks } from '../context/TaskContext';
 import { useLanguage } from '../context/LanguageContext';
 import './HistoryPage.css';
+import './HistoryPage_Scrollbar.css';
 
 const HistoryPage = () => {
     const { tasks, activeTask } = useTasks();
@@ -57,11 +58,12 @@ const HistoryPage = () => {
     const sessionHistory = gameState.sessionHistory || [];
 
     const [timeRange, setTimeRange] = React.useState('week'); // 'week', 'month', 'year'
+    const [selectedCategory, setSelectedCategory] = useState('All');
     const chartScrollRef = React.useRef(null);
 
-    // Auto-scroll to end (current date) when switching to Month view
+    // Auto-scroll to end (current date) when switching views
     React.useEffect(() => {
-        if (timeRange === 'month' && chartScrollRef.current) {
+        if (chartScrollRef.current) {
             setTimeout(() => {
                 if (chartScrollRef.current) {
                     chartScrollRef.current.scrollLeft = chartScrollRef.current.scrollWidth;
@@ -85,13 +87,21 @@ const HistoryPage = () => {
                 dataMap[key] = { total: 0, breakdown: {} };
             }
         } else if (timeRange === 'month') {
-            for (let i = 29; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                // Show label only every 5 days to avoid crowding
-                const showLabel = i % 5 === 0 || i === 0;
-                labels.push({ key, label: showLabel ? `${d.getMonth() + 1}/${d.getDate()}` : '' });
+            const y = today.getFullYear();
+            const m = today.getMonth(); // 0-indexed
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+            // Generate weeks (1st to 5th)
+            // 1-7, 8-14, 15-21, 22-28, 29+
+            for (let w = 1; w <= 5; w++) {
+                // Skip 5th week if month has 28 days
+                if (w === 5 && daysInMonth <= 28) continue;
+
+                const key = `${y}-${String(m + 1).padStart(2, '0')}-W${w}`;
+                // User request: "1月" on top, "1週目" on bottom for every column
+                const label = `${m + 1}月`;
+                const subLabel = `${w}週目`;
+                labels.push({ key, label, subLabel });
                 dataMap[key] = { total: 0, breakdown: {} };
             }
         } else if (timeRange === 'year') {
@@ -111,7 +121,16 @@ const HistoryPage = () => {
             let key;
             if (timeRange === 'year') {
                 key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            } else if (timeRange === 'month') {
+                const now = new Date();
+                if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+                    const day = d.getDate();
+                    const w = Math.floor((day - 1) / 7) + 1;
+                    // Cap at 5 for sanity, though logic shouldn't exceed
+                    key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-W${w}`;
+                }
             } else {
+                // week (daily)
                 key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             }
 
@@ -132,6 +151,10 @@ const HistoryPage = () => {
             let key;
             if (timeRange === 'year') {
                 key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            } else if (timeRange === 'month') {
+                const day = now.getDate();
+                const w = Math.floor((day - 1) / 7) + 1;
+                key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-W${w}`;
             } else {
                 key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             }
@@ -149,6 +172,7 @@ const HistoryPage = () => {
         return labels.map(l => ({
             date: l.key,
             label: l.label,
+            subLabel: l.subLabel,
             total: dataMap[l.key].total,
             breakdown: dataMap[l.key].breakdown
         }));
@@ -324,10 +348,10 @@ const HistoryPage = () => {
 
             {/* Daily Focus Trend (Stacked Bar) */}
             <div className="chart-card mb-24">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px', gap: '12px' }}>
                     <h2 style={{ margin: 0 }}>{t('history.dailyFocus') || 'Focus Trend'}</h2>
                     {/* Time Range Switcher */}
-                    <div className="time-range-switcher" style={{ display: 'flex', background: '#f1f2f6', borderRadius: '8px', padding: '2px' }}>
+                    <div className="time-range-switcher" style={{ display: 'inline-flex', background: '#f1f2f6', borderRadius: '8px', padding: '4px' }}>
                         {['week', 'month', 'year'].map(r => (
                             <button
                                 key={r}
@@ -336,13 +360,14 @@ const HistoryPage = () => {
                                     border: 'none',
                                     background: timeRange === r ? '#fff' : 'transparent',
                                     color: timeRange === r ? 'var(--primary-color)' : '#95a5a6',
-                                    padding: '4px 12px',
+                                    padding: '6px 16px',
                                     borderRadius: '6px',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.85rem',
                                     fontWeight: 'bold',
                                     cursor: 'pointer',
                                     boxShadow: timeRange === r ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    textAlign: 'center'
                                 }}
                             >
                                 {r === 'week' ? '週' : r === 'month' ? '月' : '年'}
@@ -354,15 +379,26 @@ const HistoryPage = () => {
                 <div className="chart-with-axis">
                     {/* Y-Axis */}
                     <div className="y-axis">
-                        <div className="y-tick"><span>{maxDailyTotal}m</span></div>
-                        <div className="y-tick"><span>{Math.round(maxDailyTotal * 0.75)}m</span></div>
-                        <div className="y-tick"><span>{Math.round(maxDailyTotal * 0.5)}m</span></div>
-                        <div className="y-tick"><span>{Math.round(maxDailyTotal * 0.25)}m</span></div>
-                        <div className="y-tick"><span>0m</span></div>
+                        {(() => {
+                            const formatYAxis = (m) => {
+                                if (m === 0) return '0';
+                                const h = m / 60;
+                                return Number.isInteger(h) ? `${h}h` : `${h.toFixed(1)}h`;
+                            };
+                            return (
+                                <>
+                                    <div className="y-tick"><span>{formatYAxis(maxDailyTotal)}</span></div>
+                                    <div className="y-tick"><span>{formatYAxis(maxDailyTotal * 0.75)}</span></div>
+                                    <div className="y-tick"><span>{formatYAxis(maxDailyTotal * 0.5)}</span></div>
+                                    <div className="y-tick"><span>{formatYAxis(maxDailyTotal * 0.25)}</span></div>
+                                    <div className="y-tick"><span>0</span></div>
+                                </>
+                            );
+                        })()}
                     </div>
 
                     {/* Chart Area */}
-                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ overflowX: timeRange === 'month' ? 'auto' : 'hidden' }}>
+                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ overflowX: 'auto' }}>
                         {/* Horizontal Grid Lines */}
                         <div className="grid-lines">
                             <div className="grid-line"></div>
@@ -374,13 +410,22 @@ const HistoryPage = () => {
 
                         {chartData.map(day => {
                             const heightPct = day.total > 0 ? (day.total / maxDailyTotal) * 100 : 0;
+                            // Width tuning for mobile scroll comfort
+                            // Week: Fit 7 days (100% / 7)
+                            // Year: Fit 6 months (100% / 6)
+                            // Month: Fit 4-5 weeks. 20% fits 5 perfectly.
+                            let colWidth;
+                            if (timeRange === 'week') colWidth = '14.28%'; // 1/7
+                            else if (timeRange === 'year') colWidth = '16.66%'; // 1/6
+                            else colWidth = '20%'; // Month: 5 weeks
+
                             return (
-                                <div key={day.date} className="chart-column" style={{ minWidth: timeRange === 'month' ? '12px' : 'auto' }}>
+                                <div key={day.date} className="chart-column" style={{ minWidth: colWidth }}>
                                     <div className="bar-container">
                                         <div
                                             className="stacked-bar-group"
                                             style={{ height: `${heightPct}%` }}
-                                            title={`${day.label}: ${Math.round(day.total)} mins`}
+                                            title={`${day.label}${day.subLabel || ''}: ${Math.round(day.total)} mins`}
                                         >
                                             {CATEGORIES.map(cat => {
                                                 const mins = day.breakdown[cat] || 0;
@@ -396,7 +441,18 @@ const HistoryPage = () => {
                                             })}
                                         </div>
                                     </div>
-                                    <span className="x-label" style={{ fontSize: timeRange === 'month' ? '0.55rem' : '0.7rem' }}>{day.label}</span>
+                                    <span className="x-label" style={{
+                                        fontSize: '0.7rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        lineHeight: '1.2',
+                                        whiteSpace: 'normal',
+                                        bottom: timeRange === 'month' ? '-5px' : '0'
+                                    }}>
+                                        {day.label}
+                                        {day.subLabel && <span style={{ fontSize: '0.65rem', color: '#555', marginTop: '0px', fontWeight: 'bold' }}>{day.subLabel}</span>}
+                                    </span>
                                 </div>
                             );
                         })}
@@ -405,39 +461,95 @@ const HistoryPage = () => {
             </div>
 
             <div className="chart-card">
-                <h2>{t('history.categoryDist') || 'Category Distribution'}</h2>
-                {(() => {
-                    // NEW: Calculate Category Minutes from Session History
-                    // This aligns with "Time Memory" request
-                    const catMins = {};
-                    CATEGORIES.forEach(c => catMins[c] = 0);
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px', gap: '12px' }}>
+                    <h2 style={{ margin: 0 }}>{t('history.categoryDist') || 'Category Distribution'}</h2>
+                    <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        style={{
+                            padding: '8px 16px',
+                            borderRadius: '12px',
+                            border: '1px solid #e0e0e0',
+                            fontSize: '0.9rem',
+                            color: '#555',
+                            outline: 'none',
+                            background: '#f8f9fa',
+                            cursor: 'pointer',
+                            minWidth: '200px',
+                            textAlign: 'center',
+                            textAlignLast: 'center'
+                        }}
+                    >
+                        <option value="All">{t('tasks.filterAll') || 'Whole'}</option>
+                        {CATEGORIES.map(cat => (
+                            <option key={cat} value={cat}>{t(`tasks.categories.${cat.toLowerCase()}`)}</option>
+                        ))}
+                    </select>
+                </div>
 
-                    // 1. Accumulate History
+                {(() => {
+                    // Logic to toggle between Main Categories or Sub Categories
+                    const isAll = selectedCategory === 'All';
+
+                    const SUB_CATEGORY_MAP = {
+                        Work: ['meeting', 'development', 'planning', 'email'],
+                        Study: ['math', 'english', 'programming', 'reading'],
+                        Health: ['exercise', 'meditation', 'meal'],
+                        Hobby: ['game', 'art', 'music'],
+                        General: ['chores', 'shopping', 'misc']
+                    };
+
+                    const distChartData = {}; // key: minutes
                     const sessionHistory = gameState.sessionHistory || [];
+
                     sessionHistory.forEach(s => {
+                        // Filter by Main Category first
                         let cat = s.category || 'General';
-                        // Normalize
-                        cat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
-                        // Ignore Breaks for Category Distribution if we only want Focus Categories
-                        // Usually 'Break' is not in CATEGORIES list so it's filtered naturally unless mapped to General
-                        if (CATEGORIES.includes(cat)) {
-                            catMins[cat] += (s.duration || 0);
-                        } else if (s.type === 'FOCUS') {
-                            // Map potential outliers to General
-                            catMins['General'] += (s.duration || 0);
+                        cat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase(); // Normalize
+
+                        // If viewing specific category, ignore others.
+                        if (!isAll && cat !== selectedCategory) return;
+
+                        // Determine Key
+                        let key;
+                        if (isAll) {
+                            key = cat;
+                            if (!CATEGORIES.includes(key)) key = 'General';
+                        } else {
+                            key = s.subCategory || 'misc';
                         }
+
+                        distChartData[key] = (distChartData[key] || 0) + (s.duration || 0);
                     });
 
-                    // 2. Add Live Session
+                    // Add Live Session
                     if (mode === 'FOCUS' && (totalTime - timeLeft) >= 60) {
                         const elapsedMins = Math.floor((totalTime - timeLeft) / 60);
                         const activeCat = activeTask?.category || 'General';
-                        const normActiveIndex = CATEGORIES.findIndex(c => c.toLowerCase() === activeCat.toLowerCase());
-                        const normActiveVal = normActiveIndex !== -1 ? CATEGORIES[normActiveIndex] : 'General';
-                        catMins[normActiveVal] += elapsedMins;
+                        const activeNormCat = activeCat.charAt(0).toUpperCase() + activeCat.slice(1).toLowerCase();
+
+                        if (isAll || activeNormCat === selectedCategory) {
+                            let key;
+                            if (isAll) {
+                                const idx = CATEGORIES.findIndex(c => c.toLowerCase() === activeCat.toLowerCase());
+                                key = idx !== -1 ? CATEGORIES[idx] : 'General';
+                            } else {
+                                key = activeTask?.subCategory || 'misc';
+                            }
+                            distChartData[key] = (distChartData[key] || 0) + elapsedMins;
+                        }
                     }
 
-                    const maxCatVal = Math.max(...Object.values(catMins), 60); // Min scale 60m
+                    // Define Keys for X-Axis (Fixed Order)
+                    let keys;
+                    if (isAll) {
+                        keys = CATEGORIES;
+                    } else {
+                        // Show ALL recognized sub-categories for this parent, even if 0
+                        keys = SUB_CATEGORY_MAP[selectedCategory] || ['misc'];
+                    }
+
+                    const maxVal = Math.max(...Object.values(distChartData), 60);
 
                     // Helper for Axis Labels
                     const formatAxis = (m) => {
@@ -446,18 +558,24 @@ const HistoryPage = () => {
                         return `${m}m`;
                     };
 
+                    // Helper to Translate SubCat Key
+                    const getLabel = (k) => {
+                        if (isAll) return t(`tasks.categories.${k.toLowerCase()}`);
+                        return t(`tasks.subCategories.${k}`) || k;
+                    };
+
                     return (
                         <div className="chart-with-axis">
                             {/* Y-Axis */}
                             <div className="y-axis">
-                                <div className="y-tick"><span>{formatAxis(maxCatVal)}</span></div>
-                                <div className="y-tick"><span>{formatAxis(Math.round(maxCatVal * 0.75))}</span></div>
-                                <div className="y-tick"><span>{formatAxis(Math.round(maxCatVal * 0.5))}</span></div>
-                                <div className="y-tick"><span>{formatAxis(Math.round(maxCatVal * 0.25))}</span></div>
+                                <div className="y-tick"><span>{formatAxis(maxVal)}</span></div>
+                                <div className="y-tick"><span>{formatAxis(Math.round(maxVal * 0.75))}</span></div>
+                                <div className="y-tick"><span>{formatAxis(Math.round(maxVal * 0.5))}</span></div>
+                                <div className="y-tick"><span>{formatAxis(Math.round(maxVal * 0.25))}</span></div>
                                 <div className="y-tick"><span>0</span></div>
                             </div>
 
-                            <div className="bar-chart" style={{ overflowX: 'hidden' }}>
+                            <div className="bar-chart" style={{ overflowX: 'auto' }}>
                                 <div className="grid-lines">
                                     <div className="grid-line"></div>
                                     <div className="grid-line"></div>
@@ -466,19 +584,25 @@ const HistoryPage = () => {
                                     <div className="grid-line"></div>
                                 </div>
 
-                                {CATEGORIES.map(cat => {
-                                    const val = catMins[cat];
-                                    const percentage = (val / maxCatVal) * 100;
+                                {keys.map(k => {
+                                    const val = distChartData[k] || 0;
+                                    const percentage = maxVal > 0 ? (val / maxVal) * 100 : 0;
+                                    const barClass = isAll ? k.toLowerCase() : selectedCategory.toLowerCase();
+
+                                    // Fix: Define colWidth
+                                    const count = keys.length;
+                                    const colWidth = count <= 6 ? '0px' : '16%';
+
                                     return (
-                                        <div key={cat} className="chart-column">
+                                        <div key={k} className="chart-column" style={{ minWidth: colWidth }}>
                                             <div className="bar-container">
                                                 <div
-                                                    className={`bar-fill ${cat.toLowerCase()}`}
+                                                    className={`bar-fill ${barClass}`}
                                                     style={{ height: `${percentage}%` }}
                                                     title={`${val} minutes`}
                                                 ></div>
                                             </div>
-                                            <span className="x-label">{t(`tasks.categories.${cat.toLowerCase()}`)}</span>
+                                            <span className="x-label">{getLabel(k)}</span>
                                         </div>
                                     );
                                 })}

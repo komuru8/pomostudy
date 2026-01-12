@@ -22,7 +22,7 @@ const translations = {
             tasksSuffix: 'タスク',
             totalFocus: '合計集中時間 (🍅)',
             tasksCompleted: '完了タスク',
-            dailyFocus: '日別集中時間',
+            dailyFocus: '集中時間',
             categoryDist: 'カテゴリ別内訳',
             today: '今日',
             total: '累計',

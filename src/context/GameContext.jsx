@@ -31,7 +31,7 @@ const INITIAL_STATE = {
 };
 
 const LEVELS = [
-    { level: 1, label: '始まりの荒野', reqTime: 0, description: '何もないからこそ、何でもできる場所。', quote: '俺はレオ！君と一緒に伝説の村を目指す冒険者さ。これからよろしくな！', tsukkomi: '私はノア。この方向音痴のガイド役よ。……ま、悪いようにはしないから、よろしくね。' },
+    { level: 1, label: '始まりの荒野', reqTime: 0, description: '何もないからこそ、何でもできる場所。', quote: '俺はレオ！君と一緒に伝説の村を目指す冒険者さ。これからよろしくな！', tsukkomi: '私はノア。この方向音痴のガイド役よ。……ま、悪いようにはしないから、よろしくね。', luca: 'ボクは彼らと契約した精霊ルカ✨人間を素敵な未来に導くのが僕らの一族の使命なんだ' },
     { level: 2, label: '旅人の休息地', reqTime: 25, description: '焚き火を囲み、冒険の疲れを癒やす拠点。', quote: '休むのも戦略のうちさ。研いでない剣じゃ、ドラゴンどころか雑草も切れないからね。', tsukkomi: 'その剣、そもそも抜いたことあったっけ？まあ、お茶でも飲みましょ。' },
     { level: 3, label: '若草色のミニ農園', reqTime: 180, description: '荒野に初めて生まれた、小さな緑の奇跡。', quote: 'あの小さな芽を見てよ。自分が小さいなんて気にしてない、ただ空に届きたいだけさ。僕らみたいにね。', tsukkomi: 'ポエムはいいけど、水やり忘れてるわよ。夢を見る前に、まずは現実を見てよね、、' },
     { level: 4, label: 'こがねに揺れる庭', reqTime: 600, description: '収穫の喜びを知り、一面がキラキラと輝く畑。', quote: 'キラキラしてるだろ？あれはただの野菜じゃない、君が流した汗の結晶さ。だから格別に美味いんだ。', tsukkomi: '泥だらけの手で食べないでね。結晶というか、ただの立派なカボチャよ。' },
@@ -445,7 +445,7 @@ export const GameProvider = ({ children }) => {
         });
     };
 
-    const completeFocusSession = (minutes, category = 'General') => {
+    const completeFocusSession = (minutes, category = 'General', subCategory = null) => {
         setGameState((prev) => {
             const newState = {
                 ...prev,
@@ -457,6 +457,7 @@ export const GameProvider = ({ children }) => {
                         date: new Date().toISOString(),
                         duration: minutes,
                         category,
+                        subCategory,
                         type: 'FOCUS'
                     },
                     ...(prev.sessionHistory || [])

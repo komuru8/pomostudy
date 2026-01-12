@@ -491,7 +491,8 @@ const VillagePage = () => {
                                                                             <span className={reqTime <= 0 ? 'done' : ''} style={{ fontSize: '0.85rem' }}>
                                                                                 ・ {(t('village.studyTime'))}:<br />
                                                                                 <span style={{ marginLeft: '12px', fontWeight: 'bold' }}>
-                                                                                    {` ${Math.min(totalStudyTime, nextLevelTarget.reqTime)}/${nextLevelTarget.reqTime}m`}
+                                                                                    {` ${Math.min(totalStudyTime, nextLevelTarget.reqTime)}/${nextLevelTarget.reqTime}分`}
+                                                                                    {nextLevelTarget.reqTime >= 60 && <span style={{ fontWeight: 'normal', fontSize: '0.9em' }}>{`（${parseFloat((nextLevelTarget.reqTime / 60).toFixed(1))}時間）`}</span>}
                                                                                 </span>
                                                                                 {reqTime <= 0 && ' ✅'}
                                                                             </span>
@@ -998,7 +999,7 @@ const VillagePage = () => {
                     <div className="harvest-popup" onClick={() => setSelectedLevelInfo(null)}>
                         <div className="popup-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', padding: '0', overflow: 'hidden', background: '#fff', borderRadius: '32px' }}>
                             {/* Image Header */}
-                            <div style={{ width: '100%', height: '250px', position: 'relative', background: '#fff', padding: '16px', boxSizing: 'border-box' }}>
+                            <div style={{ width: '100%', height: '200px', position: 'relative', background: '#fff', padding: '12px', boxSizing: 'border-box' }}>
                                 {selectedLevelInfo.visual.type === 'image' ? (
                                     <img src={selectedLevelInfo.visual.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '16px' }} />
                                 ) : (
@@ -1009,9 +1010,9 @@ const VillagePage = () => {
                                 <button
                                     onClick={() => setSelectedLevelInfo(null)}
                                     style={{
-                                        position: 'absolute', top: '12px', right: '12px',
+                                        position: 'absolute', top: '8px', right: '8px',
                                         background: 'rgba(0,0,0,0.1)', color: '#555',
-                                        border: 'none', borderRadius: '50%', width: '32px', height: '32px',
+                                        border: 'none', borderRadius: '50%', width: '28px', height: '28px',
                                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         zIndex: 10
                                     }}
@@ -1019,8 +1020,7 @@ const VillagePage = () => {
                             </div>
 
                             {/* Content Body */}
-                            {/* Content Body */}
-                            <div style={{ padding: '12px 32px 32px' }}>
+                            <div style={{ padding: '4px 24px 24px' }}>
                                 {/* Meta Row: Level & Time */}
                                 <div style={{
                                     display: 'flex',
@@ -1032,17 +1032,17 @@ const VillagePage = () => {
                                 }}>
                                     <div style={{
                                         background: '#2ecc71', color: 'white',
-                                        padding: '4px 12px',
-                                        borderRadius: '20px', fontSize: '0.75rem', fontWeight: '800',
+                                        padding: '4px 10px',
+                                        borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800',
                                         letterSpacing: '0.5px'
                                     }}>
                                         LEVEL {selectedLevelInfo.level}
                                     </div>
                                     <div style={{
-                                        fontSize: '0.8rem', color: '#95a5a6', fontWeight: '600',
+                                        fontSize: '0.75rem', color: '#95a5a6', fontWeight: '600',
                                         display: 'flex', alignItems: 'center', gap: '4px'
                                     }}>
-                                        <Clock size={14} />
+                                        <Clock size={12} />
                                         {(() => {
                                             const currentReq = LEVELS[selectedLevelInfo.level - 1]?.reqTime || 0;
                                             const nextReq = LEVELS[selectedLevelInfo.level]?.reqTime;
@@ -1054,10 +1054,10 @@ const VillagePage = () => {
                                 {/* Title */}
                                 <h3 style={{
                                     margin: '0 0 8px 0',
-                                    fontSize: '1.5rem',
+                                    fontSize: '1.3rem',
                                     color: '#2c3e50',
                                     fontWeight: '800',
-                                    lineHeight: '1.3'
+                                    lineHeight: '1.2'
                                 }}>
                                     {LEVELS[selectedLevelInfo.level - 1]?.label}
                                 </h3>
@@ -1066,38 +1066,41 @@ const VillagePage = () => {
                                 <p style={{
                                     textAlign: 'center',
                                     color: '#7f8c8d',
-                                    lineHeight: '1.8',
-                                    fontSize: '0.95rem',
-                                    marginBottom: '40px'
+                                    lineHeight: '1.5',
+                                    fontSize: '0.9rem',
+                                    marginBottom: '20px'
                                 }}>
                                     {LEVELS[selectedLevelInfo.level - 1]?.description || "No description available."}
                                 </p>
 
                                 {/* Divider */}
-                                <div style={{ height: '1px', background: '#f0f0f0', width: '100%', marginBottom: '24px' }} />
+                                <div style={{ height: '1px', background: '#f0f0f0', width: '100%', marginBottom: '16px' }} />
 
                                 {/* Guide Characters Interaction Footer */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-                                    {/* Boy (Boke) - Left Aligned */}
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                        <img
-                                            src="/assets/guide_character.jpg"
-                                            alt="Guide Boy"
-                                            style={{
-                                                width: '48px', height: '48px',
-                                                borderRadius: '50%', objectFit: 'cover',
-                                                border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                                            }}
-                                        />
+                                    {/* Leo (Boke) - Left Aligned */}
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', minWidth: '40px' }}>
+                                            <img
+                                                src="/assets/guide_character.jpg"
+                                                alt="Guide Boy"
+                                                style={{
+                                                    width: '40px', height: '40px',
+                                                    borderRadius: '50%', objectFit: 'cover',
+                                                    border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                                }}
+                                            />
+                                            <span style={{ fontSize: '0.65rem', color: '#7f8c8d', fontWeight: 'bold' }}>レオ</span>
+                                        </div>
                                         <div style={{
                                             position: 'relative',
                                             background: '#f1f2f6',
                                             color: '#2f3542',
-                                            padding: '10px 14px',
+                                            padding: '8px 12px',
                                             borderRadius: '16px',
                                             borderTopLeftRadius: '4px',
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.8rem',
                                             lineHeight: '1.4',
                                             textAlign: 'left',
                                             maxWidth: '85%'
@@ -1106,25 +1109,28 @@ const VillagePage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Girl (Tsukkomi) - Right Aligned */}
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', flexDirection: 'row-reverse' }}>
-                                        <img
-                                            src="/assets/guide_female.jpg"
-                                            alt="Guide Girl"
-                                            style={{
-                                                width: '48px', height: '48px',
-                                                borderRadius: '50%', objectFit: 'cover',
-                                                border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                                            }}
-                                        />
+                                    {/* Noah (Tsukkomi) - Right Aligned */}
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', flexDirection: 'row-reverse' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', minWidth: '40px' }}>
+                                            <img
+                                                src="/assets/guide_female.jpg"
+                                                alt="Guide Girl"
+                                                style={{
+                                                    width: '40px', height: '40px',
+                                                    borderRadius: '50%', objectFit: 'cover',
+                                                    border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                                }}
+                                            />
+                                            <span style={{ fontSize: '0.65rem', color: '#7f8c8d', fontWeight: 'bold' }}>ノア</span>
+                                        </div>
                                         <div style={{
                                             position: 'relative',
                                             background: '#e8f5e9', // Light green
                                             color: '#2f3542', // Standard dark text
-                                            padding: '10px 14px',
+                                            padding: '8px 12px',
                                             borderRadius: '16px',
                                             borderTopRightRadius: '4px',
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.8rem',
                                             lineHeight: '1.4',
                                             textAlign: 'left',
                                             maxWidth: '85%'
@@ -1132,6 +1138,38 @@ const VillagePage = () => {
                                             {LEVELS[selectedLevelInfo.level - 1]?.tsukkomi || "はいはい、頑張りましょ。"}
                                         </div>
                                     </div>
+
+                                    {/* Luca (Guide) - Left Aligned */}
+                                    {LEVELS[selectedLevelInfo.level - 1]?.luca && (
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginTop: '4px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', minWidth: '40px' }}>
+                                                <img
+                                                    src="/assets/luca.jpg"
+                                                    alt="Luca"
+                                                    style={{
+                                                        width: '40px', height: '40px',
+                                                        borderRadius: '50%', objectFit: 'cover',
+                                                        border: '2px solid #fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                                <span style={{ fontSize: '0.65rem', color: '#e67e22', fontWeight: 'bold' }}>ルカ</span>
+                                            </div>
+                                            <div style={{
+                                                position: 'relative',
+                                                background: '#fff3e0', // Light Orange/Cream
+                                                color: '#5d4037',
+                                                padding: '8px 12px',
+                                                borderRadius: '16px',
+                                                borderTopLeftRadius: '4px',
+                                                fontSize: '0.8rem',
+                                                lineHeight: '1.4',
+                                                textAlign: 'left',
+                                                maxWidth: '85%'
+                                            }}>
+                                                {LEVELS[selectedLevelInfo.level - 1]?.luca}
+                                            </div>
+                                        </div>
+                                    )}
 
                                 </div>
                             </div>

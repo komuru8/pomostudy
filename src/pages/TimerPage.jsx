@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Palette } from 'lucide-react';
+import { Palette, Coffee, Play, X } from 'lucide-react';
 import TimerDisplay from '../components/TimerDisplay';
 import Controls from '../components/Controls';
 import TaskItem from '../components/TaskItem';
@@ -11,7 +11,7 @@ import './TimerPage.css';
 
 const TimerPage = () => {
     const { gameState, changeTheme } = useGame();
-    const { timeLeft, isActive, mode, MODES, switchMode, toggleTimer, resetTimer, totalTime, showConfetti } = useTimerContext();
+    const { timeLeft, isActive, mode, MODES, switchMode, toggleTimer, resetTimer, totalTime, showConfetti, isSessionComplete, setIsSessionComplete } = useTimerContext();
     const { activeTask, tasks, selectActiveTask, updateTask, deleteTask, toggleToday } = useTasks();
     const { t } = useLanguage();
     const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -114,9 +114,7 @@ const TimerPage = () => {
                                 zIndex: 20
                             }}>
                                 <h4 style={{ margin: '0 0 8px 8px', fontSize: '0.85rem', color: '#666' }}>{t('village.themes')}</h4>
-                                {['default', 'wood', 'cafe'].map((themeName, idx) => {
-                                    const unlockLevel = idx + 1;
-                                    const isLocked = (gameState.level || 1) < unlockLevel;
+                                {['default', 'wood', 'cafe'].map((themeName) => {
                                     const isActive = (gameState.theme || 'default') === themeName;
                                     const themeLabels = {
                                         default: t('village.themeNames.default'),
@@ -128,12 +126,9 @@ const TimerPage = () => {
                                         <button
                                             key={themeName}
                                             onClick={() => {
-                                                if (!isLocked) {
-                                                    changeTheme(themeName);
-                                                    setPendingMode(null);
-                                                }
+                                                changeTheme(themeName);
+                                                setPendingMode(null);
                                             }}
-                                            disabled={isLocked}
                                             style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
@@ -144,16 +139,15 @@ const TimerPage = () => {
                                                 border: 'none',
                                                 borderRadius: '8px',
                                                 background: isActive ? '#e8f8f5' : 'transparent',
-                                                color: isLocked ? '#ccc' : '#333',
-                                                cursor: isLocked ? 'not-allowed' : 'pointer',
+                                                color: '#333',
+                                                cursor: 'pointer',
                                                 fontSize: '0.9rem',
                                                 fontWeight: isActive ? 'bold' : 'normal',
                                                 textAlign: 'left'
                                             }}
                                         >
                                             <span>{themeLabels[themeName]}</span>
-                                            {isLocked && <span>🔒</span>}
-                                            {isActive && !isLocked && <span style={{ color: '#2ecc71' }}>✓</span>}
+                                            {isActive && <span style={{ color: '#2ecc71' }}>✓</span>}
                                         </button>
                                     );
                                 })}
@@ -285,6 +279,140 @@ const TimerPage = () => {
                                 {t('tasks.yes', 'はい')}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Session Completion Modal */}
+            {isSessionComplete && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
+                    display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 3100
+                }}>
+                    <div style={{
+                        background: 'rgba(255,255,255,0.95)', padding: '32px', borderRadius: '32px',
+                        maxWidth: '360px', width: '90%', textAlign: 'center',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                        border: '1px solid rgba(255,255,255,0.8)',
+                        animation: 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                    }}>
+                        {mode === 'FOCUS' ? (
+                            <>
+                                <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🎉</div>
+                                <h2 style={{ margin: '0 0 12px 0', color: '#2c3e50', fontSize: '1.5rem' }}>お疲れ様でした！</h2>
+                                <p style={{ color: '#7f8c8d', marginBottom: '32px', lineHeight: '1.5' }}>
+                                    25分の集中が完了しました。<br />次はどうしますか？
+                                </p>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {/* 5 min Break */}
+                                    <button
+                                        onClick={() => {
+                                            switchMode('SHORT_BREAK');
+                                            setIsSessionComplete(false);
+                                            setTimeout(() => toggleTimer(), 300);
+                                        }}
+                                        style={{
+                                            padding: '14px', borderRadius: '16px', border: 'none',
+                                            background: '#e0f2f1', color: '#00695c',
+                                            fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                        }}
+                                    >
+                                        <Coffee size={20} /> 5分休憩する
+                                    </button>
+
+                                    {/* 15 min Break */}
+                                    <button
+                                        onClick={() => {
+                                            switchMode('LONG_BREAK');
+                                            setIsSessionComplete(false);
+                                            setTimeout(() => toggleTimer(), 300);
+                                        }}
+                                        style={{
+                                            padding: '14px', borderRadius: '16px', border: 'none',
+                                            background: '#e3f2fd', color: '#1565c0',
+                                            fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                        }}
+                                    >
+                                        <Coffee size={20} /> 15分休憩する
+                                    </button>
+
+                                    {/* Continue Focus */}
+                                    <button
+                                        onClick={() => {
+                                            resetTimer(); // Resets to current mode (FOCUS)
+                                            setIsSessionComplete(false);
+                                            setTimeout(() => toggleTimer(), 300);
+                                        }}
+                                        style={{
+                                            padding: '14px', borderRadius: '16px', border: 'none',
+                                            background: 'var(--primary-gradient)', color: 'white',
+                                            fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            boxShadow: '0 4px 12px rgba(46, 204, 113, 0.3)'
+                                        }}
+                                    >
+                                        <Play size={20} /> 休憩せず続ける
+                                    </button>
+
+                                    {/* Finish */}
+                                    <button
+                                        onClick={() => setIsSessionComplete(false)}
+                                        style={{
+                                            padding: '12px', borderRadius: '16px', border: 'none',
+                                            background: 'transparent', color: '#95a5a6',
+                                            fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer',
+                                            marginTop: '8px'
+                                        }}
+                                    >
+                                        終了
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔋</div>
+                                <h2 style={{ margin: '0 0 12px 0', color: '#2c3e50', fontSize: '1.5rem' }}>休憩終了！</h2>
+                                <p style={{ color: '#7f8c8d', marginBottom: '32px', lineHeight: '1.5' }}>
+                                    リフレッシュできましたか？<br />次は集中モードに戻りますか？
+                                </p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {/* Start Focus Logic */}
+                                    <button
+                                        onClick={() => {
+                                            switchMode('FOCUS');
+                                            setIsSessionComplete(false);
+                                            setTimeout(() => toggleTimer(), 300);
+                                        }}
+                                        style={{
+                                            padding: '14px', borderRadius: '16px', border: 'none',
+                                            background: 'var(--primary-gradient)', color: 'white',
+                                            fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                            boxShadow: '0 4px 12px rgba(46, 204, 113, 0.3)'
+                                        }}
+                                    >
+                                        <Play size={20} /> はい、集中する
+                                    </button>
+
+                                    {/* Finish Logic */}
+                                    <button
+                                        onClick={() => setIsSessionComplete(false)}
+                                        style={{
+                                            padding: '12px', borderRadius: '16px', border: 'none',
+                                            background: 'transparent', color: '#95a5a6',
+                                            fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer',
+                                            marginTop: '8px'
+                                        }}
+                                    >
+                                        終了
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

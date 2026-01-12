@@ -25,6 +25,7 @@ export const TimerProvider = ({ children }) => {
     const [timeLeft, setTimeLeft] = useState(MODES.FOCUS.time);
     const [isActive, setIsActive] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [isSessionComplete, setIsSessionComplete] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const ignoreSnapshotUntilRef = useRef(0); // Race condition protection
@@ -62,17 +63,20 @@ export const TimerProvider = ({ children }) => {
             // Find active task category
             const activeTask = tasks.find(t => t.id === activeTaskId);
             const category = activeTask ? activeTask.category : 'General';
+            const subCategory = activeTask ? activeTask.subCategory : null;
 
-            completeFocusSession(minutesCompleted, category);
+            completeFocusSession(minutesCompleted, category, subCategory);
 
             if (activeTaskId) {
                 incrementPomodoroCount(activeTaskId);
             }
             setShowConfetti(true);
+            setIsSessionComplete(true); // Trigger modal
             setTimeout(() => setShowConfetti(false), 5000);
         } else {
             const minutesCompleted = Math.floor(MODES[mode].time / 60);
             completeBreakSession(minutesCompleted, mode);
+            setIsSessionComplete(true); // Trigger modal for breaks too
         }
 
         // Reset or Clear timer state in Firestore??
@@ -258,6 +262,7 @@ export const TimerProvider = ({ children }) => {
         ignoreSnapshotUntilRef.current = Date.now() + 2000;
 
         setMode(newMode);
+        setIsSessionComplete(false); // Reset modal status
         const newTime = MODES[newMode].time;
         setTimeLeft(newTime);
         initialTimeRef.current = newTime;
@@ -285,6 +290,7 @@ export const TimerProvider = ({ children }) => {
 
         // Reset Logic
         setIsActive(false);
+        setIsSessionComplete(false); // Reset modal status
         const resetTime = MODES[mode].time;
         setTimeLeft(resetTime);
         initialTimeRef.current = resetTime; // Sync initial time ref!
@@ -318,7 +324,9 @@ export const TimerProvider = ({ children }) => {
             switchMode,
             toggleTimer,
             resetTimer,
-            setCustomTime
+            setCustomTime,
+            isSessionComplete,
+            setIsSessionComplete
         }}>
             {children}
         </TimerContext.Provider>
