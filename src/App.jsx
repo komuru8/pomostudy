@@ -7,6 +7,7 @@ import VillagePage from './pages/VillagePage';
 import AIPage from './pages/AIPage';
 import AuthPage from './pages/AuthPage';
 import HistoryPage from './pages/HistoryPage';
+import AboutPage from './pages/AboutPage';
 
 import { useAuth } from './context/AuthContext';
 
@@ -32,6 +33,7 @@ function App() {
         <Route path="/auth" element={<AuthPage />} />
 
         <Route path="/" element={<MainLayout />}>
+          <Route path="about" element={<AboutPage />} />
           <Route index element={<TimerPage />} />
           <Route path="tasks" element={
             <ProtectedRoute>

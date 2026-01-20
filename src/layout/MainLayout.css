@@ -106,6 +106,23 @@
     background: #27ae60;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: #95a5a6;
+}
+
+/* GLOBAL SHARED CARD STYLE */
+.unified-card {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    padding: 24px;
+    border-radius: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: visible;
+}
+
 .control-btn.logout {
     color: #e74c3c;
 }

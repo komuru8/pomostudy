@@ -12,7 +12,8 @@ const translations = {
             village: '村',
             base: '拠点',
             history: '学習時間',
-            ai: 'AIコーチ'
+            ai: 'AIコーチ',
+            about: 'アプリ紹介'
         },
         history: {
             todayFocusTime: '今日の集中時間',
@@ -174,6 +175,40 @@ const translations = {
                 motivation: '🔥 やる気が出ない...',
                 focus5: '⏱️ 5分だけ集中したい'
             }
+        },
+        about: {
+            title: 'ManaVillageについて',
+            description: 'ManaVillageは、ポモドーロ・テクニックと育成ゲームを組み合わせた新しい学習・作業支援アプリです。',
+            features: {
+                timer: { title: '集中タイマー', desc: '25分の集中と5分の休憩を繰り返すポモドーロ・タイマーで、効率的に作業を進めましょう。' },
+                tasks: { title: 'タスク管理', desc: 'やるべきことを整理し、優先順位をつけて一つずつ着実に完了させましょう。' },
+                history: { title: '学習時間管理', desc: '日々の集中時間を自動で記録。グラフで努力の積み重ねを可視化し、モチベーションを高めます。' },
+                village: { title: '村の育成', desc: '集中した時間が、あなたの村を育てます。作物を収穫し、村を豊かにしましょう。' },
+                ai: { title: 'AIコーチ', desc: 'AIがあなたの学習計画やモチベーション維持をサポートします。' }
+            },
+            login: 'ログイン / 登録',
+            backToTimer: 'タイマーに戻る',
+            welcome: 'ようこそ、ManaVillageへ',
+            hero: {
+                catchphrase: '25分集中するたび、野菜が育つ',
+                intro: '「勉強の成果が見えない…」そんな悩みは、今日で終わり。 あなたの机の上の25分を、目に見える「実り」と「村の発展」に変えましょう。\n\n『ManaVillage（マナビレッジ）』は、ポモドーロ・テクニックで集中した時間を「村を育てる水」に変える、育成型学習アプリです。'
+            },
+            story: {
+                grow: {
+                    title: '25分集中するたび、野菜が育つ',
+                    content: '使い方は簡単。ポモドーロタイマーをセットして勉強するだけ。 集中した時間はそのまま栄養となり、ラディッシュ、トマト、かぼちゃ、そして幻の黄金野菜へと姿を変えます。「あと少しでトマトが収穫できるから頑張ろう」——そんなワクワクが、あなたの背中を押し続けます。'
+                },
+                village: {
+                    title: '荒野から、叡智のユートピアへ',
+                    content: '最初は小さなテントと荒れ地だけのスタートです。 しかし、日々のタスクをこなし、収穫を重ねることで、村は少しずつ発展していきます。家が建ち、農園ができ、公民館が作られ…… 1年後、あなたの継続した努力は、誰も見たことのない理想郷（ユートピア）として画面の中に広がっているはずです。'
+                },
+                ai: {
+                    title: 'AIパートナーがあなたをコーチング',
+                    content: '学習につまずいた時は、頼れる村の仲間たちが優しくサポート。 あなた専用の学習プランの提案や、サボり気味な時の励ましなど、村の仲間として伴走します。'
+                }
+            },
+            closing: '見えない努力を、確かな収穫へ。\nさあ、学びの開拓者となって、あなただけの村を作り始めましょう。',
+            featuresTitle: '主な機能'
         }
     },
     en: {
@@ -183,7 +218,8 @@ const translations = {
             village: 'Village',
             base: 'Base',
             history: 'Study Time',
-            ai: 'AI Coach'
+            ai: 'AI Coach',
+            about: 'About'
         },
         history: {
             todayFocusTime: 'Today Focus',
@@ -335,6 +371,40 @@ const translations = {
                 plan: "Here's a suggested plan for today:\n1. 🍅 Focus (25m) - Tackle the hardest task\n2. ☕ Break (5m)\n3. 🍅 Focus (25m) - Continue\n4. 🥗 Long Break (15m)\nYou got this!",
                 hello: "Hi there! Ready to grow your village today? 🌱"
             }
+        },
+        about: {
+            title: 'About ManaVillage',
+            description: 'ManaVillage is a new productivity app that combines the Pomodoro Technique with village building elements.',
+            features: {
+                timer: { title: 'Focus Timer', desc: 'Boost efficiency with the Pomodoro Timer: 25 minutes of focus followed by a 5-minute break.' },
+                tasks: { title: 'Task Management', desc: 'Organize your to-dos, set priorities, and complete them one by one.' },
+                history: { title: 'Time Tracking', desc: 'Automatically track your focus time. Visualize your progress with graphs and stay motivated.' },
+                village: { title: 'Village Building', desc: 'Your focus time grows your village. Harvest crops and make your village prosper.' },
+                ai: { title: 'AI Coach', desc: 'Your personal AI coach helps with study plans and keeping you motivated.' }
+            },
+            login: 'Login / Sign Up',
+            backToTimer: 'Back to Timer',
+            welcome: 'Welcome to ManaVillage',
+            hero: {
+                catchphrase: 'Grow vegetables every 25 minutes of focus.',
+                intro: '"I can\'t see the results of my studying..." End that worry today. Turn every 25 minutes at your desk into visible "fruit" and "village growth".\n\n"ManaVillage" is a breeding-type learning app that turns focus time using the Pomodoro technique into "water to grow the village".'
+            },
+            story: {
+                grow: {
+                    title: 'Grow vegetables every 25 minutes',
+                    content: 'Easy to use. Just set the Pomodoro timer and study. Concentrated time becomes nutrition, transforming into radishes, tomatoes, pumpkins, and even phantom golden vegetables. "Let\'s do my best because I can harvest tomatoes soon" - such excitement will keep pushing you forward.'
+                },
+                village: {
+                    title: 'From wilderness to utopia of wisdom',
+                    content: 'Start with just a small tent and wasteland. However, by completing daily tasks and repeating harvests, the village will develop little by little. Houses are built, farms are built, public halls are built... One year later, your continued efforts should spread on the screen as a utopia that no one has ever seen.'
+                },
+                ai: {
+                    title: 'AI partner coaches you',
+                    content: 'When you stumble in learning, reliable village friends will gently support you. We will accompany you as a friend of the village, such as proposing your own learning plan and encouraging you when you tend to skip.'
+                }
+            },
+            closing: 'Turn invisible efforts into certain harvests.\nNow, let\'s become a pioneer of learning and start building your own village.',
+            featuresTitle: 'Main Features'
         }
     }
 };

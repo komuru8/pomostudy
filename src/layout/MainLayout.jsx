@@ -4,7 +4,7 @@ import BottomNav from '../components/BottomNav';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameContext';
-import { Globe, LogIn, LogOut, Menu, X, Trees, Coffee } from 'lucide-react';
+import { Globe, LogIn, LogOut, Menu, X, Trees, Coffee, Info } from 'lucide-react';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -65,7 +65,7 @@ const MainLayout = () => {
                                 : '🌱'}
                     </span>
                     <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary-dark)', letterSpacing: '-0.5px' }}>
-                        Pomodoro Farm
+                        ManaVillage
                     </span>
                 </div>
 
@@ -81,6 +81,17 @@ const MainLayout = () => {
 
                     {/* Menu Items */}
                     <div className={`menu-items ${isMenuOpen ? 'open' : ''}`}>
+                        <button
+                            className="control-btn"
+                            onClick={() => {
+                                navigate('/about');
+                                setIsMenuOpen(false);
+                            }}
+                            title={t('nav.about')}
+                        >
+                            <Info size={20} />
+                            <span>{t('nav.about')}</span>
+                        </button>
                         <button
                             className="control-btn"
                             onClick={handleLanguageClick}
