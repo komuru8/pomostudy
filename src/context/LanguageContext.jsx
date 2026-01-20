@@ -190,7 +190,7 @@ const translations = {
             backToTimer: 'タイマーに戻る',
             welcome: 'ようこそ、ManaVillageへ',
             hero: {
-                catchphrase: '25分集中するたび、野菜が育つ',
+                catchphrase: '今日の集中時間は未来への種まき',
                 intro: '「勉強の成果が見えない…」そんな悩みは、今日で終わり。 あなたの机の上の25分を、目に見える「実り」と「村の発展」に変えましょう。\n\n『ManaVillage（マナビレッジ）』は、ポモドーロ・テクニックで集中した時間を「村を育てる水」に変える、育成型学習アプリです。'
             },
             story: {
@@ -200,7 +200,7 @@ const translations = {
                 },
                 village: {
                     title: '荒野から、叡智のユートピアへ',
-                    content: '最初は小さなテントと荒れ地だけのスタートです。 しかし、日々のタスクをこなし、収穫を重ねることで、村は少しずつ発展していきます。家が建ち、農園ができ、公民館が作られ…… 1年後、あなたの継続した努力は、誰も見たことのない理想郷（ユートピア）として画面の中に広がっているはずです。'
+                    content: '最初は小さなテントと荒れ地だけのスタートです。 しかし、日々のタスクをこなし、収穫を重ねることで、村は少しずつ発展していきます。家が建ち、農園ができ、公民館が作られ…… 1年後、あなたの継続した努力は、誰も見たことのない理想郷（ユートピア）として画面の中だけでなく現実世界にも広がっているはずです。'
                 },
                 ai: {
                     title: 'AIパートナーがあなたをコーチング',
@@ -208,6 +208,12 @@ const translations = {
                 }
             },
             closing: '見えない努力を、確かな収穫へ。\nさあ、学びの開拓者となって、あなただけの村を作り始めましょう。',
+            stats: {
+                totalUsers: '村の人口',
+                totalHours: '村人の総学習時間',
+                unitUsers: '人',
+                unitHours: '時間'
+            },
             featuresTitle: '主な機能'
         }
     },
@@ -386,7 +392,7 @@ const translations = {
             backToTimer: 'Back to Timer',
             welcome: 'Welcome to ManaVillage',
             hero: {
-                catchphrase: 'Grow vegetables every 25 minutes of focus.',
+                catchphrase: 'Today\'s focus is planting seeds for the future.',
                 intro: '"I can\'t see the results of my studying..." End that worry today. Turn every 25 minutes at your desk into visible "fruit" and "village growth".\n\n"ManaVillage" is a breeding-type learning app that turns focus time using the Pomodoro technique into "water to grow the village".'
             },
             story: {
@@ -396,7 +402,7 @@ const translations = {
                 },
                 village: {
                     title: 'From wilderness to utopia of wisdom',
-                    content: 'Start with just a small tent and wasteland. However, by completing daily tasks and repeating harvests, the village will develop little by little. Houses are built, farms are built, public halls are built... One year later, your continued efforts should spread on the screen as a utopia that no one has ever seen.'
+                    content: 'Start with just a small tent and wasteland. However, by completing daily tasks and repeating harvests, the village will develop little by little. Houses are built, farms are built, public halls are built... One year later, your continued efforts should spread not only on the screen but also in the real world as a utopia that no one has ever seen.'
                 },
                 ai: {
                     title: 'AI partner coaches you',
@@ -404,6 +410,12 @@ const translations = {
                 }
             },
             closing: 'Turn invisible efforts into certain harvests.\nNow, let\'s become a pioneer of learning and start building your own village.',
+            stats: {
+                totalUsers: 'Village Population',
+                totalHours: 'Villagers\' Total Focus Time',
+                unitUsers: 'Villagers',
+                unitHours: 'Hours'
+            },
             featuresTitle: 'Main Features'
         }
     }

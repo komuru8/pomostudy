@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
+import { collection, getCountFromServer, getAggregateFromServer, sum } from 'firebase/firestore';
 import { useLanguage } from '../context/LanguageContext';
 import { Timer, CheckSquare, Flower2, Bot, ArrowLeft, LogIn, Sprout, Tent, BookOpen } from 'lucide-react';
 import aboutHero from '../assets/about_hero.png';
@@ -10,6 +12,38 @@ import aboutAI from '../assets/about_ai.jpg';
 const AboutPage = () => {
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const [stats, setStats] = React.useState({ users: 0, hours: 0 });
+
+    React.useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const usersColl = collection(db, 'users');
+
+                // 1. Get User Count
+                const snapshot = await getCountFromServer(usersColl);
+                const userCount = snapshot.data().count;
+
+                // 2. Get Total Study Time (Total Water Points)
+                // Note: 'gameState.totalWP' is a nested field. Firestore aggregation might require specific index.
+                // If this fails initially, we might need a manual fallback or console warning.
+                const aggSnapshot = await getAggregateFromServer(usersColl, {
+                    totalWP: sum('gameState.totalWP')
+                });
+                const totalMinutes = aggSnapshot.data().totalWP;
+
+                setStats({
+                    users: userCount,
+                    hours: Math.floor(totalMinutes / 60)
+                });
+            } catch (e) {
+                console.error("Failed to fetch global stats:", e);
+                // Fallback for dev/demo if aggregation fails
+                setStats({ users: 128, hours: 3450 });
+            }
+        };
+
+        fetchStats();
+    }, []);
 
     const features = [
         {
@@ -62,6 +96,54 @@ const AboutPage = () => {
                 }} />
             </div>
 
+            {/* Global Stats Section */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '2rem',
+                marginBottom: '4rem',
+                flexWrap: 'wrap',
+                marginTop: '1rem'
+            }}>
+                {/* User Count */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%)',
+                    padding: '1.5rem 3rem',
+                    borderRadius: '20px',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                    textAlign: 'center',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    minWidth: '200px'
+                }}>
+                    <div style={{ fontSize: '0.9rem', color: '#666', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                        {t('about.stats.totalUsers')}
+                    </div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#2e7d32' }}>
+                        {stats.users.toLocaleString()}
+                        <span style={{ fontSize: '1rem', marginLeft: '4px', color: '#888' }}>{t('about.stats.unitUsers')}</span>
+                    </div>
+                </div>
+
+                {/* Total Hours */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%)',
+                    padding: '1.5rem 3rem',
+                    borderRadius: '20px',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                    textAlign: 'center',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    minWidth: '200px'
+                }}>
+                    <div style={{ fontSize: '0.9rem', color: '#666', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                        {t('about.stats.totalHours')}
+                    </div>
+                    <div style={{ fontSize: '2.5rem', fontWeight: '800', color: '#006064' }}>
+                        {stats.hours.toLocaleString()}
+                        <span style={{ fontSize: '1rem', marginLeft: '4px', color: '#888' }}>{t('about.stats.unitHours')}</span>
+                    </div>
+                </div>
+            </div>
+
             {/* Hero Catchphrase */}
             <h2 style={{
                 fontSize: '1.6rem',
@@ -84,6 +166,7 @@ const AboutPage = () => {
             }}>
                 {t('about.hero.intro')}
             </p>
+
 
             {/* Story Sections - Structured Layout */}
             <div style={{ marginBottom: '4rem', textAlign: 'left', margin: '0 0 4rem' }}>

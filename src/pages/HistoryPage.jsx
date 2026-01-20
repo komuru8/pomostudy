@@ -370,7 +370,7 @@ const HistoryPage = () => {
                                     textAlign: 'center'
                                 }}
                             >
-                                {r === 'week' ? '週' : r === 'month' ? '月' : '年'}
+                                {r === 'week' ? '日' : r === 'month' ? '週' : '月'}
                             </button>
                         ))}
                     </div>
