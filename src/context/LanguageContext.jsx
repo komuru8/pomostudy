@@ -136,7 +136,7 @@ const translations = {
         },
         auth: {
             welcomeBack: 'おかえりなさい',
-            joinVillage: 'Farmへようこそ',
+            joinVillage: 'ManaVillage\nへようこそ',
             continueJourney: '集中への旅を続けましょう',
             startJourney: '今日から習慣を育てましょう',
             email: 'メールアドレス',
