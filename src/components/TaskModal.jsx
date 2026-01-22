@@ -16,16 +16,20 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
     // Categories
     const CATEGORIES = ['Study', 'Health', 'Hobby', 'Work', 'General'];
     const SUB_CATEGORIES = {
-        Work: ['meeting', 'development', 'planning', 'email'],
-        Study: ['math', 'english', 'programming', 'reading'],
-        Health: ['exercise', 'meditation', 'meal'],
-        Hobby: ['game', 'art', 'music'],
-        General: ['chores', 'shopping', 'misc']
+        Study: ['languages', 'certification', 'tech', 'reading', 'assignment', 'misc'],
+        Health: ['exercise', 'cooking', 'sleep', 'mental', 'beauty', 'misc'],
+        Hobby: ['creative', 'sports', 'game', 'entertainment', 'travel', 'misc'],
+        Work: ['planning', 'development', 'meeting', 'admin', 'analysis', 'misc'],
+        General: ['chores', 'shopping', 'finance', 'family', 'organize', 'misc']
     };
+
+    // Validations State
+    const [errors, setErrors] = useState({});
 
     // Reset or Load Data when opening
     useEffect(() => {
         if (isOpen) {
+            setErrors({}); // Reset errors
             if (initialData) {
                 // Edit Mode (Future proofing)
                 setTitle(initialData.title || '');
@@ -46,8 +50,22 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!title.trim()) return;
 
+        // Validation
+        const newErrors = {};
+        if (!title.trim()) {
+            newErrors.title = t('tasks.validation.titleRequired');
+        }
+        if (!subCategory) {
+            newErrors.subCategory = t('tasks.validation.subCategoryRequired');
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        // Submit if valid
         onSubmit({
             title,
             priority,
@@ -70,18 +88,22 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                     </button>
                 </header>
 
-                <div className="modal-body">
-                    <form id="task-modal-form" onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                    <div className="modal-body" style={{ flex: 1, overflowY: 'auto' }}>
                         {/* Title Input */}
                         <div className="input-group">
                             <input
                                 type="text"
                                 placeholder={t('tasks.placeholder')}
                                 value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="task-input"
+                                onChange={(e) => {
+                                    setTitle(e.target.value);
+                                    if (errors.title) setErrors(prev => ({ ...prev, title: null }));
+                                }}
+                                className={`task-input ${errors.title ? 'input-error' : ''}`}
                                 style={{ fontSize: '1.2rem', padding: '12px 0' }}
                             />
+                            {errors.title && <p className="error-message">{errors.title}</p>}
                         </div>
 
                         {/* Selectors Grid */}
@@ -94,6 +116,7 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                     onChange={(e) => {
                                         setCategory(e.target.value);
                                         setSubCategory('');
+                                        if (errors.subCategory) setErrors(prev => ({ ...prev, subCategory: null }));
                                     }}
                                     className="priority-select"
                                 >
@@ -110,17 +133,21 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 <label className="select-label">{t('tasks.labels.subCategory') || 'Sub'}</label>
                                 <select
                                     value={subCategory}
-                                    onChange={(e) => setSubCategory(e.target.value)}
-                                    className="priority-select"
+                                    onChange={(e) => {
+                                        setSubCategory(e.target.value);
+                                        if (errors.subCategory) setErrors(prev => ({ ...prev, subCategory: null }));
+                                    }}
+                                    className={`priority-select ${errors.subCategory ? 'input-error' : ''}`}
                                     disabled={!SUB_CATEGORIES[category]}
                                 >
-                                    <option value="">{t('tasks.subCategories.misc') || 'Select...'}</option>
+                                    <option value="">{t('tasks.selectPlaceholder') || 'Select...'}</option>
                                     {SUB_CATEGORIES[category]?.map(sub => (
                                         <option key={sub} value={sub}>
                                             {t(`tasks.subCategories.${sub}`) || sub}
                                         </option>
                                     ))}
                                 </select>
+                                {errors.subCategory && <p className="error-message">{errors.subCategory}</p>}
                             </div>
 
                             {/* 3. Priority */}
@@ -154,18 +181,18 @@ const TaskModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                                 </select>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
 
-                <footer className="modal-footer">
-                    <button type="submit" form="task-modal-form" className="save-btn" disabled={!title.trim()}>
-                        <Save size={20} style={{ marginRight: '8px' }} />
-                        {t('tasks.save')}
-                    </button>
-                    <button type="button" className="cancel-btn" onClick={onClose}>
-                        {t('tasks.cancel')}
-                    </button>
-                </footer>
+                    <footer className="modal-footer">
+                        <button type="submit" className="save-btn">
+                            <Save size={20} style={{ marginRight: '8px' }} />
+                            {t('tasks.save')}
+                        </button>
+                        <button type="button" className="cancel-btn" onClick={onClose}>
+                            {t('tasks.cancel')}
+                        </button>
+                    </footer>
+                </form>
             </div>
         </div>
     );

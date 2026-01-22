@@ -239,15 +239,18 @@ export const TimerProvider = ({ children }) => {
                 if (minutesCompleted > 0) {
                     // Find active task category - handle tasks being undefined/loading
                     let category = 'General';
+                    let subCategory = null;
+
                     if (tasks && Array.isArray(tasks)) {
                         const activeTask = tasks.find(t => t.id === activeTaskId);
-                        if (activeTask && activeTask.category) {
-                            category = activeTask.category;
+                        if (activeTask) {
+                            category = activeTask.category || 'General';
+                            subCategory = activeTask.subCategory || null;
                         }
                     }
 
-                    completeFocusSession(minutesCompleted, category);
-                    console.log(`Saved partial progress: ${minutesCompleted} minutes`);
+                    completeFocusSession(minutesCompleted, category, subCategory);
+                    console.log(`Saved partial progress: ${minutesCompleted} minutes (${category}/${subCategory})`);
                 }
             }
         } catch (error) {

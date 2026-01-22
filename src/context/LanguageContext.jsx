@@ -15,6 +15,9 @@ const translations = {
             ai: 'AIコーチ',
             about: 'アプリ紹介'
         },
+        app: {
+            title: 'ポモトピア'
+        },
         history: {
             todayFocusTime: '今日の集中時間',
             todayCompletedTasks: '今日の完了タスク',
@@ -30,7 +33,8 @@ const translations = {
             focusSessions: '集中回数',
             shortBreaks: '休憩回数',
             longBreaks: '長い休憩回数',
-            companionMsg: '頑張って！村は順調に育っていますよ。'
+            companionMsg: '頑張って！村は順調に育っていますよ。',
+            allTime: '全期間'
         },
         timer: {
             focus: '集中',
@@ -65,16 +69,26 @@ const translations = {
             yes: 'はい',
             no: 'いいえ',
             searchPlaceholder: 'タスクを検索...',
+            selectPlaceholder: '選択してください',
             filterAll: '全カテゴリー',
             sortBy: '並び替え',
             sort: { priority: '優先度順', newest: '新しい順', oldest: '古い順' },
             newTask: '新規タスク',
             subCategories: {
-                meeting: '会議', development: '開発', planning: '計画', email: 'メール',
-                math: '数学', english: '英語', programming: 'プログラミング', reading: '読書',
-                exercise: '運動', meditation: '瞑想', meal: '食事',
-                game: 'ゲーム', art: '創作', music: '音楽',
-                chores: '家事', shopping: '買い物', misc: 'その他'
+                meeting: '会議', development: '開発・制作', planning: '企画・構想', email: 'メール',
+                math: '数学', english: '英語', programming: 'プログラミング', reading: '読書・教養',
+                exercise: '筋トレ・運動', mental: 'メンタルケア', meal: '食事・料理',
+                game: 'ゲーム', art: '創作・アート', music: '音楽',
+                chores: '家事・掃除', shopping: '買い物', misc: 'その他',
+                languages: '語学', certification: '資格・試験', tech: 'IT・技術', assignment: '課題・演習',
+                cooking: '食事・料理', sleep: '睡眠・休息', beauty: '美容・ケア',
+                creative: '創作・アート', sports: 'スポーツ', entertainment: 'エンタメ鑑賞', travel: '旅行・お出かけ',
+                admin: '事務・メール', analysis: '調査・分析',
+                finance: 'お金・資産運用', family: '家族・交際', organize: '手続き・整理'
+            },
+            validation: {
+                titleRequired: 'タスク名を入力してください',
+                subCategoryRequired: '小カテゴリーを選択してください'
             }
         },
         village: {
@@ -136,7 +150,7 @@ const translations = {
         },
         auth: {
             welcomeBack: 'おかえりなさい',
-            joinVillage: 'ManaVillage\nへようこそ',
+            joinVillage: 'ポモトピア\nへようこそ',
             continueJourney: '集中への旅を続けましょう',
             startJourney: '今日から習慣を育てましょう',
             email: 'メールアドレス',
@@ -177,8 +191,8 @@ const translations = {
             }
         },
         about: {
-            title: 'ManaVillageについて',
-            description: 'ManaVillageは、ポモドーロ・テクニックと育成ゲームを組み合わせた新しい学習・作業支援アプリです。',
+            title: 'ポモトピアについて',
+            description: 'ポモトピアは、ポモドーロ・テクニックと育成ゲームを組み合わせた新しい学習・作業支援アプリです。',
             features: {
                 timer: { title: '集中タイマー', desc: '25分の集中と5分の休憩を繰り返すポモドーロ・タイマーで、効率的に作業を進めましょう。' },
                 tasks: { title: 'タスク管理', desc: 'やるべきことを整理し、優先順位をつけて一つずつ着実に完了させましょう。' },
@@ -188,10 +202,10 @@ const translations = {
             },
             login: 'ログイン / 登録',
             backToTimer: 'タイマーに戻る',
-            welcome: 'ようこそ、ManaVillageへ',
+            welcome: 'ようこそ！\nポモトピアへ',
             hero: {
                 catchphrase: '今日の集中時間は未来への種まき',
-                intro: '「勉強の成果が見えない…」そんな悩みは、今日で終わり。 あなたの机の上の25分を、目に見える「実り」と「村の発展」に変えましょう。\n\n『ManaVillage（マナビレッジ）』は、ポモドーロ・テクニックで集中した時間を「村を育てる水」に変える、育成型学習アプリです。'
+                intro: '勉強は、植物を育てるのと似ています。 芽が出るまでの時間は長く、孤独なもの。 でも、その土の下では、才能の根が確実に育っています。\n\n『ポモトピア』は、そんなあなたの「見えない努力」を可視化する育成型学習アプリです。 「勉強の成果が見えない…」そんな悩みは、今日で終わり、学びの開拓者となって、あなただけの村を作り始めましょう。'
             },
             story: {
                 grow: {
@@ -207,7 +221,7 @@ const translations = {
                     content: '学習につまずいた時は、頼れる村の仲間たちが優しくサポート。 あなた専用の学習プランの提案や、サボり気味な時の励ましなど、村の仲間として伴走します。'
                 }
             },
-            closing: '見えない努力を、確かな収穫へ。\nさあ、学びの開拓者となって、あなただけの村を作り始めましょう。',
+            closing: 'さあ、時間を植える旅に出かけましょう。 村の成長は、あなたの成長そのもの。 いつか辿り着く「理想郷」で、最高の景色と実りがあなたを待っています。',
             stats: {
                 totalUsers: '村の人口',
                 totalHours: '村人の総学習時間',
@@ -227,6 +241,9 @@ const translations = {
             ai: 'AI Coach',
             about: 'About'
         },
+        app: {
+            title: 'Pomotopia'
+        },
         history: {
             todayFocusTime: 'Today Focus',
             todayCompletedTasks: 'Today Tasks',
@@ -242,7 +259,8 @@ const translations = {
             focusSessions: 'Focus Sessions',
             shortBreaks: 'Short Breaks',
             longBreaks: 'Long Breaks',
-            companionMsg: 'Keep going! Your village is growing nicely.'
+            companionMsg: 'Keep going! Your village is growing nicely.',
+            allTime: 'All Time'
         },
         timer: {
             focus: 'Focus',
@@ -275,6 +293,7 @@ const translations = {
             yes: 'Yes',
             no: 'No',
             searchPlaceholder: 'Search tasks...',
+            selectPlaceholder: 'Select...',
             filterAll: 'All Categories',
             sortBy: 'Sort By',
             sort: { priority: 'Priority', newest: 'Newest', oldest: 'Oldest' },
@@ -282,9 +301,18 @@ const translations = {
             subCategories: {
                 meeting: 'Meeting', development: 'Development', planning: 'Planning', email: 'Email',
                 math: 'Math', english: 'English', programming: 'Programming', reading: 'Reading',
-                exercise: 'Exercise', meditation: 'Meditation', meal: 'Meal',
+                exercise: 'Exercise', mental: 'Mental Care', meal: 'Meal',
                 game: 'Game', art: 'Art', music: 'Music',
-                chores: 'Chores', shopping: 'Shopping', misc: 'Misc'
+                chores: 'Chores', shopping: 'Shopping', misc: 'Misc',
+                languages: 'Languages', certification: 'Certification', tech: 'IT/Tech', assignment: 'Assignment',
+                cooking: 'Cooking/Meal', sleep: 'Sleep/Rest', beauty: 'Beauty/Care', mental: 'Mental Care',
+                creative: 'Creative/Art', sports: 'Sports', entertainment: 'Entertainment', travel: 'Travel',
+                admin: 'Admin/Email', analysis: 'Analysis',
+                finance: 'Finance', family: 'Family', organize: 'Organize'
+            },
+            validation: {
+                titleRequired: 'Please enter a task title',
+                subCategoryRequired: 'Please select a subcategory'
             }
         },
         village: {
@@ -379,8 +407,8 @@ const translations = {
             }
         },
         about: {
-            title: 'About ManaVillage',
-            description: 'ManaVillage is a new productivity app that combines the Pomodoro Technique with village building elements.',
+            title: 'About Pomotopia',
+            description: 'Pomotopia is a new productivity app that combines the Pomodoro Technique with village building elements.',
             features: {
                 timer: { title: 'Focus Timer', desc: 'Boost efficiency with the Pomodoro Timer: 25 minutes of focus followed by a 5-minute break.' },
                 tasks: { title: 'Task Management', desc: 'Organize your to-dos, set priorities, and complete them one by one.' },
@@ -390,10 +418,10 @@ const translations = {
             },
             login: 'Login / Sign Up',
             backToTimer: 'Back to Timer',
-            welcome: 'Welcome to ManaVillage',
+            welcome: 'Welcome to Pomotopia',
             hero: {
                 catchphrase: 'Today\'s focus is planting seeds for the future.',
-                intro: '"I can\'t see the results of my studying..." End that worry today. Turn every 25 minutes at your desk into visible "fruit" and "village growth".\n\n"ManaVillage" is a breeding-type learning app that turns focus time using the Pomodoro technique into "water to grow the village".'
+                intro: '"I can\'t see the results of my studying..." End that worry today. Turn every 25 minutes at your desk into visible "fruit" and "village growth".\n\n"Pomotopia" is a breeding-type learning app that turns focus time using the Pomodoro technique into "water to grow the village".'
             },
             story: {
                 grow: {

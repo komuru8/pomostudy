@@ -65,7 +65,7 @@ const MainLayout = () => {
                                 : '🌱'}
                     </span>
                     <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary-dark)', letterSpacing: '-0.5px' }}>
-                        ManaVillage
+                        {t('app.title')}
                     </span>
                 </div>
 

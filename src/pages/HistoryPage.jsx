@@ -112,6 +112,13 @@ const HistoryPage = () => {
                 labels.push({ key, label: `${d.getMonth() + 1}月` });
                 dataMap[key] = { total: 0, breakdown: {} };
             }
+        } else if (timeRange === 'years') {
+            for (let i = 4; i >= 0; i--) {
+                const y = today.getFullYear() - i;
+                const key = String(y);
+                labels.push({ key, label: `${y}年` });
+                dataMap[key] = { total: 0, breakdown: {} };
+            }
         }
 
         // Process History
@@ -119,7 +126,9 @@ const HistoryPage = () => {
         sessionHistory.forEach(s => {
             const d = new Date(s.date);
             let key;
-            if (timeRange === 'year') {
+            if (timeRange === 'years') {
+                key = String(d.getFullYear());
+            } else if (timeRange === 'year') {
                 key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
             } else if (timeRange === 'month') {
                 const now = new Date();
@@ -352,7 +361,7 @@ const HistoryPage = () => {
                     <h2 style={{ margin: 0 }}>{t('history.dailyFocus') || 'Focus Trend'}</h2>
                     {/* Time Range Switcher */}
                     <div className="time-range-switcher" style={{ display: 'inline-flex', background: '#f1f2f6', borderRadius: '8px', padding: '4px' }}>
-                        {['week', 'month', 'year'].map(r => (
+                        {['week', 'month', 'year', 'years'].map(r => (
                             <button
                                 key={r}
                                 onClick={() => setTimeRange(r)}
@@ -370,7 +379,7 @@ const HistoryPage = () => {
                                     textAlign: 'center'
                                 }}
                             >
-                                {r === 'week' ? '日' : r === 'month' ? '週' : '月'}
+                                {r === 'week' ? '日' : r === 'month' ? '週' : r === 'year' ? '月' : '年'}
                             </button>
                         ))}
                     </div>
@@ -398,7 +407,7 @@ const HistoryPage = () => {
                     </div>
 
                     {/* Chart Area */}
-                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ overflowX: 'auto' }}>
+                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ width: '100%', overflow: 'hidden' }}>
                         {/* Horizontal Grid Lines */}
                         <div className="grid-lines">
                             <div className="grid-line"></div>
@@ -416,11 +425,11 @@ const HistoryPage = () => {
                             // Month: Fit 4-5 weeks. 20% fits 5 perfectly.
                             let colWidth;
                             if (timeRange === 'week') colWidth = '14.28%'; // 1/7
-                            else if (timeRange === 'year') colWidth = '16.66%'; // 1/6
-                            else colWidth = '20%'; // Month: 5 weeks
+                            else if (timeRange === 'year') colWidth = '8.33%'; // 1/12
+                            else colWidth = '20%'; // Month: 5 weeks or Years: 5 years
 
                             return (
-                                <div key={day.date} className="chart-column" style={{ minWidth: colWidth }}>
+                                <div key={day.date} className="chart-column" style={{ width: colWidth }}>
                                     <div className="bar-container">
                                         <div
                                             className="stacked-bar-group"
@@ -461,8 +470,11 @@ const HistoryPage = () => {
             </div>
 
             <div className="chart-card">
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px', gap: '8px' }}>
                     <h2 style={{ margin: 0 }}>{t('history.categoryDist') || 'Category Distribution'}</h2>
+                    <span style={{ fontSize: '0.8rem', color: '#888', fontWeight: '500' }}>
+                        ({t('history.allTime') || 'All Time'})
+                    </span>
                     <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
@@ -492,11 +504,11 @@ const HistoryPage = () => {
                     const isAll = selectedCategory === 'All';
 
                     const SUB_CATEGORY_MAP = {
-                        Work: ['meeting', 'development', 'planning', 'email'],
-                        Study: ['math', 'english', 'programming', 'reading'],
-                        Health: ['exercise', 'meditation', 'meal'],
-                        Hobby: ['game', 'art', 'music'],
-                        General: ['chores', 'shopping', 'misc']
+                        Study: ['languages', 'certification', 'tech', 'reading', 'assignment', 'misc'],
+                        Health: ['exercise', 'cooking', 'sleep', 'mental', 'beauty', 'misc'],
+                        Hobby: ['creative', 'sports', 'game', 'entertainment', 'travel', 'misc'],
+                        Work: ['planning', 'development', 'meeting', 'admin', 'analysis', 'misc'],
+                        General: ['chores', 'shopping', 'finance', 'family', 'organize', 'misc']
                     };
 
                     const distChartData = {}; // key: minutes
@@ -516,7 +528,7 @@ const HistoryPage = () => {
                             key = cat;
                             if (!CATEGORIES.includes(key)) key = 'General';
                         } else {
-                            key = s.subCategory || 'misc';
+                            key = (s.subCategory || 'misc').toLowerCase();
                         }
 
                         distChartData[key] = (distChartData[key] || 0) + (s.duration || 0);
@@ -534,7 +546,7 @@ const HistoryPage = () => {
                                 const idx = CATEGORIES.findIndex(c => c.toLowerCase() === activeCat.toLowerCase());
                                 key = idx !== -1 ? CATEGORIES[idx] : 'General';
                             } else {
-                                key = activeTask?.subCategory || 'misc';
+                                key = (activeTask?.subCategory || 'misc').toLowerCase();
                             }
                             distChartData[key] = (distChartData[key] || 0) + elapsedMins;
                         }
@@ -575,7 +587,7 @@ const HistoryPage = () => {
                                 <div className="y-tick"><span>0</span></div>
                             </div>
 
-                            <div className="bar-chart" style={{ overflowX: 'auto' }}>
+                            <div className="bar-chart" style={{ width: '100%', overflow: 'hidden' }}>
                                 <div className="grid-lines">
                                     <div className="grid-line"></div>
                                     <div className="grid-line"></div>
@@ -591,10 +603,10 @@ const HistoryPage = () => {
 
                                     // Fix: Define colWidth
                                     const count = keys.length;
-                                    const colWidth = count <= 6 ? '0px' : '16%';
+                                    const colWidth = `${100 / count}%`;
 
                                     return (
-                                        <div key={k} className="chart-column" style={{ minWidth: colWidth }}>
+                                        <div key={k} className="chart-column" style={{ width: colWidth }}>
                                             <div className="bar-container">
                                                 <div
                                                     className={`bar-fill ${barClass}`}

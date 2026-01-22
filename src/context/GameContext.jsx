@@ -237,7 +237,8 @@ export const GameProvider = ({ children }) => {
                 const currentPlots = gameState.fieldPlots || [];
 
                 if (currentPlots.length < maxSlots) {
-                    const slotsToFill = maxSlots - currentPlots.length;
+                    // Change: Deliver max 2 seeds, but don't exceed maxSlots
+                    const slotsToFill = Math.min(2, maxSlots - currentPlots.length);
                     const newPlots = [];
                     const candidateLevels = Object.keys(LEVEL_CROPS)
                         .map(Number)

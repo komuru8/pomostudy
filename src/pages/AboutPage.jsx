@@ -8,6 +8,8 @@ import aboutHero from '../assets/about_hero.png';
 import aboutGrow from '../assets/about_grow.jpg';
 import aboutVillage from '../assets/about_village.jpg';
 import aboutAI from '../assets/about_ai.jpg';
+import aboutConcept from '../assets/about_concept.png';
+import aboutClosing from '../assets/about_closing_boy.jpg';
 
 const AboutPage = () => {
     const { t } = useLanguage();
@@ -79,7 +81,9 @@ const AboutPage = () => {
                 marginBottom: '1rem',
                 fontSize: '2.2rem',
                 color: 'var(--primary-dark)',
-                fontWeight: '800'
+                fontWeight: '800',
+                whiteSpace: 'pre-line',
+                lineHeight: 1.4
             }}>
                 {t('about.welcome')}
             </h1>
@@ -89,7 +93,7 @@ const AboutPage = () => {
                 justifyContent: 'center',
                 marginBottom: '2.5rem'
             }}>
-                <img src={aboutHero} alt="ManaVillage Hero" style={{
+                <img src={aboutHero} alt="Pomotopia Hero" style={{
                     maxWidth: '100%',
                     height: 'auto',
                     borderRadius: '24px',
@@ -153,6 +157,20 @@ const AboutPage = () => {
             }}>
                 {t('about.hero.catchphrase')}
             </h2>
+
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginBottom: '2rem'
+            }}>
+                <img src={aboutConcept} alt="Pomotopia Concept" style={{
+                    maxWidth: '100%',
+                    height: 'auto',
+                    borderRadius: '16px',
+                    maxHeight: '180px',
+                    objectFit: 'contain'
+                }} />
+            </div>
 
             <p style={{
                 fontSize: '1.05rem',
@@ -250,6 +268,15 @@ const AboutPage = () => {
                 }}>
                     {t('about.closing')}
                 </p>
+                <img src={aboutClosing} alt="Boy Pointing to Future" style={{
+                    marginTop: '2rem',
+                    maxWidth: '200px',
+                    height: 'auto',
+                    borderRadius: '16px',
+                    display: 'block',
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
+                }} />
             </div>
 
             {/* Feature Summary Grid - Minimalist */}
