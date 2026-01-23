@@ -106,7 +106,7 @@ const VillagerRanking = () => {
                         <div className="ranking-header">
                             <span className="col-rank">{t('ranking.rank')}</span>
                             <span className="col-name">{t('ranking.villager')}</span>
-                            <span className="col-level">Lv.</span>
+                            <span className="col-level">{t('nav.village')}</span>
                             <span className="col-time">{t('ranking.time')}</span>
                         </div>
                         {rankingData.map((player, index) => {
@@ -126,7 +126,7 @@ const VillagerRanking = () => {
                                         {player.username}
                                         {isMe && <span className="me-badge"> ({t('ranking.you')})</span>}
                                     </div>
-                                    <div className="col-level">{player.level}</div>
+                                    <div className="col-level">Lv.{player.level}</div>
                                     <div className="col-time">{formatTime(player.duration || 0)}</div>
                                 </div>
                             );

@@ -237,8 +237,8 @@ const translations = {
             month: '今月',
             year: '今年',
             rank: '順位',
-            villager: '村人',
-            time: '集中時間',
+            villager: '名前',
+            time: '集中',
             noData: 'ランキングデータが集計中です...',
             you: 'あなた'
         }

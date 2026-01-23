@@ -58,19 +58,24 @@
 
 .ranking-header {
     display: grid;
-    grid-template-columns: 50px 1fr 50px 80px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
     padding: 8px 12px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
+    font-weight: bold;
     color: #999;
     border-bottom: 1px solid #eee;
 }
 
 .ranking-item {
     display: grid;
-    grid-template-columns: 50px 1fr 50px 80px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
     padding: 12px;
     align-items: center;
     border-bottom: 1px solid #f9f9f9;
+    font-size: 0.9rem;
+    font-weight: bold;
     transition: background 0.2s;
 }
 
@@ -90,8 +95,9 @@
 
 .col-rank {
     text-align: center;
-    font-weight: bold;
+    text-align: center;
     color: #78909c;
+    /* font-weight handled by container */
 }
 
 .rank-icon {
@@ -109,12 +115,12 @@
 }
 
 .col-name {
-    font-weight: 500;
+    /* font-weight: 500; Remove to match rank bold */
     color: #455a64;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 8px;
+    text-align: center;
 }
 
 .me-badge {
@@ -125,23 +131,22 @@
 
 .col-level {
     color: #8d6e63;
-    font-size: 0.9rem;
+    /* font-size removed to match container */
     text-align: center;
 }
 
 .col-time {
-    text-align: right;
+    text-align: center;
     color: #ef5350;
-    font-weight: bold;
-    font-family: monospace;
+    /* font-weight and monospace removed */
 }
 
 @media (max-width: 480px) {
 
     .ranking-header,
     .ranking-item {
-        grid-template-columns: 40px 1fr 40px 70px;
-        font-size: 0.9rem;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        font-size: 0.8rem;
     }
 
     .col-level {

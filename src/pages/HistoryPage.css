@@ -127,7 +127,7 @@
     }
 
     .chart-column {
-        padding-bottom: 60px;
+        padding-bottom: 54px;
         /* Significantly more space for rotated labels */
     }
 
@@ -187,7 +187,7 @@
     justify-content: flex-end;
     gap: 8px;
     position: relative;
-    padding-bottom: 24px;
+    padding-bottom: 18px;
     /* Space for x-label */
 }
 
@@ -300,7 +300,7 @@
     }
 
     .chart-column {
-        padding-bottom: 60px;
+        padding-bottom: 54px;
         /* Significantly more space for rotated labels */
     }
 
