@@ -113,7 +113,7 @@ const VillagerRanking = () => {
                             const isMe = user && player.id === user.uid;
                             const rank = index + 1;
                             let rankIcon = null;
-                            if (rank === 1) rankIcon = '👑';
+                            if (rank === 1) rankIcon = '🥇';
                             else if (rank === 2) rankIcon = '🥈';
                             else if (rank === 3) rankIcon = '🥉';
 

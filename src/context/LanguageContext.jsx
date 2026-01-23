@@ -11,7 +11,7 @@ const translations = {
             tasks: 'タスク',
             village: '村',
             base: '拠点',
-            history: '学習時間',
+            history: '集中時間',
             ai: 'AIコーチ',
             about: 'アプリ紹介'
         },
@@ -34,7 +34,17 @@ const translations = {
             shortBreaks: '休憩回数',
             longBreaks: '長い休憩回数',
             companionMsg: '頑張って！村は順調に育っていますよ。',
-            allTime: '全期間'
+            allTime: '全期間',
+            consecutiveDays: '連続集中',
+            daysUnit: '日',
+            cheerMessages: [
+                '素晴らしい継続力です！',
+                'その調子で頑張りましょう！',
+                '毎日の積み重ねが力になります。',
+                '今日も一歩前進！',
+                '努力は裏切りません。',
+                'この調子でいきましょう！'
+            ]
         },
         timer: {
             focus: '集中',
@@ -109,7 +119,7 @@ const translations = {
             toNextLevel: '次のレベルまで',
             tips: 'ヒント',
             approxSessions: '集中セッションあと約{{count}}回 (25分)',
-            studyTime: '学習時間',
+            studyTime: '集中時間',
             tasks: 'タスク完了',
             lockedArea: 'ロックされたエリア',
             unlockHint: '前のレベルの条件を達成して解放',
@@ -272,7 +282,17 @@ const translations = {
             shortBreaks: 'Short Breaks',
             longBreaks: 'Long Breaks',
             companionMsg: 'Keep going! Your village is growing nicely.',
-            allTime: 'All Time'
+            allTime: 'All Time',
+            consecutiveDays: 'Streak',
+            daysUnit: ' days',
+            cheerMessages: [
+                'Great consistency!',
+                'Keep up the good work!',
+                'Every day counts.',
+                'One step closer to your goal!',
+                'Effort pays off.',
+                'Keep this momentum going!'
+            ]
         },
         ranking: {
             title: 'Villager Ranking',

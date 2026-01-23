@@ -195,11 +195,90 @@ const HistoryPage = () => {
     const todayDate = new Date();
     const todayStr = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
 
+    // --- Streak Calculation ---
+    const calculateStreak = () => {
+        if (!gameState.sessionHistory || gameState.sessionHistory.length === 0) return 0;
+
+        // Get unique dates with activity
+        const uniqueDates = new Set();
+        gameState.sessionHistory.forEach(s => {
+            const d = new Date(s.date);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            uniqueDates.add(key);
+        });
+
+        // Add today if active session exists
+        if (mode === 'FOCUS' && (totalTime - timeLeft) >= 60) {
+            uniqueDates.add(todayStr); // todayStr is defined later but we can use local var or hoist
+        }
+
+        // Helper to formatting check string 
+        const getStr = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        let currentStreak = 0;
+        let checkDate = new Date(); // Start checking from Today
+
+        let checkStr = getStr(checkDate);
+
+        if (uniqueDates.has(checkStr)) {
+            currentStreak++;
+        } else {
+            // If today not active yet, check yesterday
+            checkDate.setDate(checkDate.getDate() - 1);
+            checkStr = getStr(checkDate);
+            if (uniqueDates.has(checkStr)) {
+                currentStreak++;
+            } else {
+                return 0; // No streak
+            }
+        }
+
+        // Count backwards
+        while (true) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            checkStr = getStr(checkDate);
+            if (uniqueDates.has(checkStr)) {
+                currentStreak++;
+            } else {
+                break;
+            }
+        }
+        return currentStreak;
+    };
+
+    const currentStreak = calculateStreak();
+
+    // Random Cheer Message (Stable on render)
+    const cheerMessage = React.useMemo(() => {
+        const messages = t('history.cheerMessages');
+        if (Array.isArray(messages) && messages.length > 0) {
+            const idx = Math.floor(Math.random() * messages.length);
+            return messages[idx];
+        }
+        return '';
+    }, [t]);
+
     return (
         <div className="history-page">
             <header className="page-header">
                 <h1>{t('nav.history') || 'History'}</h1>
             </header>
+
+            {/* Consecutive Days Card (Streak) */}
+            <div className="streak-card mb-24">
+                <div className="streak-icon-circle">
+                    <span className="streak-icon-emoji">🔥</span>
+                </div>
+                <div className="streak-content">
+                    <div className="streak-main-row">
+                        <span className="streak-label">{t('history.consecutiveDays')}</span>
+                        <span className="streak-value">
+                            {currentStreak}<span className="streak-unit">{t('history.daysUnit')}</span>
+                        </span>
+                    </div>
+                    {cheerMessage && <div className="streak-message-compact">{cheerMessage}</div>}
+                </div>
+            </div>
 
             {/* Top Summary Stats Grid */}
             <div className="detailed-stats-grid mb-24" style={{ gridTemplateColumns: '1fr 1fr' }}>
