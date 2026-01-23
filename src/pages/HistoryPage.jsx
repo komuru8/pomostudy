@@ -80,7 +80,8 @@ const HistoryPage = () => {
         const dataMap = {};
 
         if (timeRange === 'week') {
-            for (let i = 6; i >= 0; i--) {
+            // Day view: 30 days
+            for (let i = 29; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(today.getDate() - i);
                 const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -88,24 +89,25 @@ const HistoryPage = () => {
                 dataMap[key] = { total: 0, breakdown: {} };
             }
         } else if (timeRange === 'month') {
-            const y = today.getFullYear();
-            const m = today.getMonth(); // 0-indexed
-            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            // Week view: Current Month + Previous Month
+            // Using 2 months covers ~8-9 weeks, satisfying "Scrollable 8 weeks"
+            for (let mOffset = 1; mOffset >= 0; mOffset--) {
+                const d = new Date(today.getFullYear(), today.getMonth() - mOffset, 1);
+                const y = d.getFullYear();
+                const m = d.getMonth();
+                const daysInMonth = new Date(y, m + 1, 0).getDate();
 
-            // Generate weeks (1st to 5th)
-            // 1-7, 8-14, 15-21, 22-28, 29+
-            for (let w = 1; w <= 5; w++) {
-                // Skip 5th week if month has 28 days
-                if (w === 5 && daysInMonth <= 28) continue;
-
-                const key = `${y}-${String(m + 1).padStart(2, '0')}-W${w}`;
-                // User request: "1月" on top, "1週目" on bottom for every column
-                const label = `${m + 1}月`;
-                const subLabel = `${w}週目`;
-                labels.push({ key, label, subLabel });
-                dataMap[key] = { total: 0, breakdown: {} };
+                for (let w = 1; w <= 5; w++) {
+                    if (w === 5 && daysInMonth <= 28) continue;
+                    const key = `${y}-${String(m + 1).padStart(2, '0')}-W${w}`;
+                    const label = `${m + 1}月`;
+                    const subLabel = `${w}週目`;
+                    labels.push({ key, label, subLabel });
+                    dataMap[key] = { total: 0, breakdown: {} };
+                }
             }
         } else if (timeRange === 'year') {
+            // Month view: 12 months (Default 6 visible)
             for (let i = 11; i >= 0; i--) {
                 const d = new Date(today);
                 d.setMonth(today.getMonth() - i);
@@ -114,7 +116,8 @@ const HistoryPage = () => {
                 dataMap[key] = { total: 0, breakdown: {} };
             }
         } else if (timeRange === 'years') {
-            for (let i = 4; i >= 0; i--) {
+            // Year view: 10 years (Default 5 visible)
+            for (let i = 9; i >= 0; i--) {
                 const y = today.getFullYear() - i;
                 const key = String(y);
                 labels.push({ key, label: `${y}年` });
@@ -132,13 +135,10 @@ const HistoryPage = () => {
             } else if (timeRange === 'year') {
                 key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
             } else if (timeRange === 'month') {
-                const now = new Date();
-                if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
-                    const day = d.getDate();
-                    const w = Math.floor((day - 1) / 7) + 1;
-                    // Cap at 5 for sanity, though logic shouldn't exceed
-                    key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-W${w}`;
-                }
+                // Key generation logic from date: YYYY-MM-Week
+                const day = d.getDate();
+                const w = Math.floor((day - 1) / 7) + 1;
+                key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-W${w}`;
             } else {
                 // week (daily)
                 key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -408,7 +408,7 @@ const HistoryPage = () => {
                     </div>
 
                     {/* Chart Area */}
-                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ width: '100%', overflow: 'hidden' }}>
+                    <div ref={chartScrollRef} className="bar-chart stacked" style={{ width: '100%', overflowX: 'auto', overflowY: 'hidden', justifyContent: 'flex-start' }}>
                         {/* Horizontal Grid Lines */}
                         <div className="grid-lines">
                             <div className="grid-line"></div>
@@ -425,12 +425,14 @@ const HistoryPage = () => {
                             // Year: Fit 6 months (100% / 6)
                             // Month: Fit 4-5 weeks. 20% fits 5 perfectly.
                             let colWidth;
-                            if (timeRange === 'week') colWidth = '14.28%'; // 1/7
-                            else if (timeRange === 'year') colWidth = '8.33%'; // 1/12
-                            else colWidth = '20%'; // Month: 5 weeks or Years: 5 years
+                            // Width tuning for scrollable area
+                            if (timeRange === 'week') colWidth = '14.28%'; // 7 days visible
+                            else if (timeRange === 'year') colWidth = '16.66%'; // 6 months visible
+                            else if (timeRange === 'month') colWidth = '25%'; // 4 weeks visible
+                            else colWidth = '20%'; // 5 years visible
 
                             return (
-                                <div key={day.date} className="chart-column" style={{ width: colWidth }}>
+                                <div key={day.date} className="chart-column" style={{ width: colWidth, minWidth: colWidth, flex: 'none' }}>
                                     <div className="bar-container">
                                         <div
                                             className="stacked-bar-group"
