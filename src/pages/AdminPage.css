@@ -1,0 +1,263 @@
+.admin-page {
+    padding: 20px 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 10px;
+}
+
+.admin-header h1 {
+    font-size: 1.25rem;
+    color: #333;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.refresh-btn,
+.logout-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: white;
+}
+
+.refresh-btn {
+    background-color: #2196F3;
+}
+
+.logout-btn {
+    background-color: #757575;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: hidden;
+    /* Handle via cards on mobile */
+}
+
+/* Base Table for Desktop */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.user-table th,
+.user-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.user-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.user-id {
+    font-family: monospace;
+    color: #333;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.last-login {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.user-name {
+    font-weight: 500;
+}
+
+.edit-input {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.edit-input.sm {
+    width: 60px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.edit-btn,
+.delete-btn,
+.save-btn,
+.cancel-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.edit-btn {
+    background-color: #FFC107;
+    color: #333;
+}
+
+.delete-btn {
+    background-color: #F44336;
+}
+
+.save-btn {
+    background-color: #4CAF50;
+}
+
+.cancel-btn {
+    background-color: #9E9E9E;
+}
+
+/* Login Screen */
+.admin-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+    padding: 20px;
+}
+
+.admin-login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+}
+
+.admin-login-box h2 {
+    margin: 0 0 24px 0;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+
+    .user-table,
+    .user-table thead,
+    .user-table tbody,
+    .user-table th,
+    .user-table td,
+    .user-table tr {
+        display: block;
+    }
+
+    .user-table thead {
+        display: none;
+        /* Hide headers */
+    }
+
+    .user-table tr {
+        margin-bottom: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+    }
+
+    .user-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        text-align: right;
+        border-bottom: 1px solid #f5f5f5;
+        min-height: 24px;
+    }
+
+    .user-table td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    /* Add labels via pseudo-elements or data attributes */
+    .user-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        color: #999;
+        text-align: left;
+        margin-right: 15px;
+    }
+
+    .col-meta {
+        background: #fafafa;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .edit-input {
+        text-align: right;
+    }
+}

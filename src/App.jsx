@@ -8,6 +8,7 @@ import AIPage from './pages/AIPage';
 import AuthPage from './pages/AuthPage';
 import HistoryPage from './pages/HistoryPage';
 import AboutPage from './pages/AboutPage';
+import AdminPage from './pages/AdminPage';
 
 import { useAuth } from './context/AuthContext';
 
@@ -55,6 +56,7 @@ function App() {
               <AIPage />
             </ProtectedRoute>
           } />
+          <Route path="admin" element={<AdminPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, writeBatch, increment } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import turnipIcon from '../assets/crops/turnip.png';
 
@@ -102,8 +102,8 @@ export const GameProvider = ({ children }) => {
             unsubscribe = onSnapshot(userRef, (docSnap) => {
                 if (docSnap.exists() && docSnap.data().gameState) {
                     const loadedState = { ...INITIAL_STATE, ...docSnap.data().gameState };
-                    if (!loadedState.username && user.displayName) {
-                        loadedState.username = user.displayName;
+                    if (!loadedState.username && user.name) {
+                        loadedState.username = user.name;
                     }
                     if (!loadedState.unlockedCrops) {
                         loadedState.unlockedCrops = [];
@@ -123,11 +123,16 @@ export const GameProvider = ({ children }) => {
                             const parsed = JSON.parse(guestSaved);
                             console.log("Migrating Guest data to Firestore...");
                             newState = { ...INITIAL_STATE, ...parsed };
+
+                            // If Guest Name is empty, use Google Name
+                            if (!newState.username && user.name) {
+                                newState.username = user.name;
+                            }
                         } catch (e) {
                             console.error("Migration failed", e);
                         }
-                    } else if (user.displayName) {
-                        newState.username = user.displayName;
+                    } else if (user.name) {
+                        newState.username = user.name;
                     }
                     setGameState(newState);
                     // We don't auto-save immediately here to avoid write loops, 
@@ -438,12 +443,99 @@ export const GameProvider = ({ children }) => {
         });
     };
 
-    const updateUsername = (name) => {
+    const updateUsername = async (name) => {
         setGameState(prev => {
             const newState = { ...prev, username: name };
             saveGame(newState);
             return newState;
         });
+
+        // Also update leaderboards for current periods
+        if (user) {
+            try {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+
+                // ISO Week Calculation
+                const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+                const dayNum = d.getUTCDay() || 7;
+                d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+                const week = String(weekNo).padStart(2, '0');
+                const isoYear = d.getUTCFullYear();
+
+                const periods = [
+                    `day_${year}-${month}-${day}`,
+                    `week_${isoYear}-W${week}`,
+                    `month_${year}-${month}`,
+                    `year_${year}`
+                ];
+
+                const batch = writeBatch(db);
+                periods.forEach(periodId => {
+                    const ref = doc(db, 'leaderboards', periodId, 'users', user.id);
+                    batch.set(ref, { username: name }, { merge: true });
+                });
+                await batch.commit();
+                console.log("Leaderboard username synced");
+            } catch (e) {
+                console.error("Failed to sync username to leaderboard", e);
+            }
+        }
+    };
+
+
+    const updateLeaderboardStats = async (minutes, currentGameState) => {
+        console.log("Updating Leaderboard Stats:", { minutes, user: user?.uid, currentGameState });
+
+        if (!user) {
+            console.warn("Leaderboard update skipped: No user logged in.");
+            return;
+        }
+        try {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+
+            // Calculate ISO Week
+            const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            const week = String(weekNo).padStart(2, '0');
+            const isoYear = d.getUTCFullYear();
+
+            const periods = [
+                { id: `day_${year}-${month}-${day}` },
+                { id: `week_${isoYear}-W${week}` },
+                { id: `month_${year}-${month}` },
+                { id: `year_${year}` }
+            ];
+
+            const batch = writeBatch(db);
+
+            periods.forEach(p => {
+                // Fix: AuthContext provides user.id, not user.uid
+                const ref = doc(db, 'leaderboards', p.id, 'users', user.id);
+                console.log(`Writing to leaderboard: ${p.id}`, ref.path);
+                batch.set(ref, {
+                    username: currentGameState.username || 'Villager',
+                    level: currentGameState.level || 1,
+                    duration: increment(minutes),
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            });
+
+            await batch.commit();
+            console.log("Leaderboard update committed successfully.");
+        } catch (e) {
+            console.error("Leaderboard update failed", e);
+        }
     };
 
     const completeFocusSession = (minutes, category = 'General', subCategory = null) => {
@@ -467,7 +559,11 @@ export const GameProvider = ({ children }) => {
             saveGame(newState);
             return newState;
         });
+
+        // Trigger Leaderboard Update
+        updateLeaderboardStats(minutes, gameState);
     };
+
 
     const completeBreakSession = (minutes, type = 'SHORT_BREAK') => {
         setGameState((prev) => {

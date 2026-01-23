@@ -1,5 +1,4 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import './Controls.css';
 
@@ -43,7 +42,7 @@ const Controls = ({ isActive, toggleTimer, resetTimer, mode, switchMode, MODES }
                     className="reset-btn"
                     aria-label={t('timer.reset')}
                 >
-                    <RefreshCw size={20} style={{ pointerEvents: 'none' }} />
+                    <span>{t('timer.reset')}</span>
                 </button>
             </div>
         </div>

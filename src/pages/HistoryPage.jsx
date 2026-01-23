@@ -5,6 +5,7 @@ import { useTasks } from '../context/TaskContext';
 import { useLanguage } from '../context/LanguageContext';
 import './HistoryPage.css';
 import './HistoryPage_Scrollbar.css';
+import VillagerRanking from '../components/VillagerRanking';
 
 const HistoryPage = () => {
     const { tasks, activeTask } = useTasks();
@@ -623,6 +624,8 @@ const HistoryPage = () => {
                     );
                 })()}
             </div>
+
+            <VillagerRanking />
         </div>
     );
 };

@@ -43,7 +43,7 @@ const translations = {
             currentFocus: '現在のタスク',
             start: '開始',
             pause: '一時停止',
-            reset: 'リセット',
+            reset: '完了',
             pomodoros: 'ポモドーロ',
             switchConfirmTitle: 'タイマーを切り替えますか？',
             switchConfirmMsg: '進行中のタイマーはリセットされます。'
@@ -229,6 +229,18 @@ const translations = {
                 unitHours: '時間'
             },
             featuresTitle: '主な機能'
+        },
+        ranking: {
+            title: '村人ランキング',
+            day: '今日',
+            week: '今週',
+            month: '今月',
+            year: '今年',
+            rank: '順位',
+            villager: '村人',
+            time: '集中時間',
+            noData: 'ランキングデータが集計中です...',
+            you: 'あなた'
         }
     },
     en: {
@@ -261,6 +273,18 @@ const translations = {
             longBreaks: 'Long Breaks',
             companionMsg: 'Keep going! Your village is growing nicely.',
             allTime: 'All Time'
+        },
+        ranking: {
+            title: 'Villager Ranking',
+            day: 'Day',
+            week: 'Week',
+            month: 'Month',
+            year: 'Year',
+            rank: 'Rank',
+            villager: 'Villager',
+            time: 'Focus Time',
+            noData: 'Ranking data is being calculated...',
+            you: 'You'
         },
         timer: {
             focus: 'Focus',

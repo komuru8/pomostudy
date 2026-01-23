@@ -1,0 +1,150 @@
+.villager-ranking {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 20px 0;
+    max-width: 100%;
+}
+
+.ranking-title {
+    margin: 0 0 16px 0;
+    font-size: 1.2rem;
+    color: #5d4037;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ranking-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.ranking-tab {
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    color: #888;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.ranking-tab:hover {
+    background: #f5f5f5;
+}
+
+.ranking-tab.active {
+    background: #ffecb3;
+    color: #6d4c41;
+    font-weight: bold;
+}
+
+.ranking-list-container {
+    min-height: 200px;
+}
+
+.ranking-loading,
+.ranking-empty {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.ranking-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 50px 80px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: #999;
+    border-bottom: 1px solid #eee;
+}
+
+.ranking-item {
+    display: grid;
+    grid-template-columns: 50px 1fr 50px 80px;
+    padding: 12px;
+    align-items: center;
+    border-bottom: 1px solid #f9f9f9;
+    transition: background 0.2s;
+}
+
+.ranking-item:last-child {
+    border-bottom: none;
+}
+
+.ranking-item:hover {
+    background: #fff8e1;
+}
+
+.ranking-item.is-me {
+    background: #e3f2fd;
+    border-radius: 8px;
+    /* Highlight user nicely */
+}
+
+.col-rank {
+    text-align: center;
+    font-weight: bold;
+    color: #78909c;
+}
+
+.rank-icon {
+    font-size: 1.2rem;
+}
+
+.rank-num {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    background: #eceff1;
+    border-radius: 50%;
+    font-size: 0.8rem;
+}
+
+.col-name {
+    font-weight: 500;
+    color: #455a64;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 8px;
+}
+
+.me-badge {
+    font-size: 0.75rem;
+    color: #1e88e5;
+    margin-left: 4px;
+}
+
+.col-level {
+    color: #8d6e63;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.col-time {
+    text-align: right;
+    color: #ef5350;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+@media (max-width: 480px) {
+
+    .ranking-header,
+    .ranking-item {
+        grid-template-columns: 40px 1fr 40px 70px;
+        font-size: 0.9rem;
+    }
+
+    .col-level {
+        font-size: 0.8rem;
+    }
+}

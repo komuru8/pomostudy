@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Palette, Coffee, Play, X } from 'lucide-react';
+import { Palette, Coffee, Play, X, Check } from 'lucide-react';
 import TimerDisplay from '../components/TimerDisplay';
 import Controls from '../components/Controls';
 import TaskItem from '../components/TaskItem';
@@ -217,10 +217,10 @@ const TimerPage = () => {
                         border: '1px solid rgba(255,255,255,0.8)'
                     }} onClick={e => e.stopPropagation()}>
                         <h3 style={{ marginTop: 0, marginBottom: '12px', color: 'var(--text-color)' }}>
-                            リセットしますか？
+                            記録して終了しますか？
                         </h3>
                         <p style={{ color: '#666', marginBottom: '24px', fontSize: '0.95rem' }}>
-                            時間は元に戻りますが、そこまでの学習記録は保存されます。
+                            現在の学習時間を記録して、タイマーを終了します。
                         </p>
                         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                             <button onClick={() => setShowResetConfirm(false)}
@@ -228,15 +228,17 @@ const TimerPage = () => {
                                     padding: '12px 24px', borderRadius: '16px', border: '1px solid #e0e0e0',
                                     background: 'var(--bg-color)', color: '#666', fontWeight: 'bold', cursor: 'pointer', flex: 1
                                 }}>
-                                いいえ
+                                キャンセル
                             </button>
                             <button onClick={confirmReset}
                                 style={{
                                     padding: '12px 24px', borderRadius: '16px', border: 'none',
                                     background: 'var(--primary-color)', color: 'white', fontWeight: 'bold',
-                                    boxShadow: '0 4px 12px rgba(46, 204, 113, 0.3)', cursor: 'pointer', flex: 1
+                                    boxShadow: '0 4px 12px rgba(46, 204, 113, 0.3)', cursor: 'pointer', flex: 1,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
                                 }}>
-                                はい
+                                <Check size={18} />
+                                完了
                             </button>
                         </div>
                     </div>
